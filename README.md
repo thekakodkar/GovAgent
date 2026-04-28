@@ -93,3 +93,8 @@ We are building GovAgent to be the industry standard for accountable AI. We welc
 * **Framework:** GovAgent v0.1.0 (Public Release)
 * **Status:** Active / Open-Source Standard
 * **Compliance:** Designed for Enterprise-Grade Accountability
+
+### Author Stamp
+* **Framework:** GovAgent v0.1.0 (Public Release)
+* **Status:** Active / Open-Source Standard
+* **Compliance:** Designed for Enterprise-Grade Accountability
