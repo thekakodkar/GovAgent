@@ -38,12 +38,30 @@ Every execution generates a **Business Value Summary**:
 * **Governance Manifest (`policy.py`):** Structured YAML-based policy enforcement.
 * **Forensic Telemetry (`telemetry.py`):** Real-time ROI and audit trail generation.
 * **Circuit Breakers (`guards.py`):** Financial and operational risk mitigation logic.
+**Human-in-the-Loop (`hitl.py`)** - Managed intervention state.
 * **The Executive Loop (`agent.py`):** A "Think-Guard-Act" orchestration engine.
 
 ### 🛠️ In Active Development
 * **Standardized Tool Registry:** A type-safe way to map business functions to agent capabilities.
 * **Mock Model Client:** A testing utility to simulate LLM responses without incurring API costs.
 * **HITL Connectors:** Initial hooks for manual approval via CLI.
+
+## 📖 Usage Example: Controlled Execution
+
+GovAgent allows you to wrap any AI task in a protective governance layer. Here is how you enforce a $0.50 budget on a research task:
+
+```python
+from govagent import ExecutiveAgent, Policy
+
+# Load your enterprise SOP
+policy = Policy.from_yaml("market_research_policy.yaml")
+
+# Run the agent with real-time circuit breakers
+agent = ExecutiveAgent(persona="Analyst", policy=policy, model_client=my_llm)
+report = await agent.execute("Research competitor pricing")
+
+print(f"Audit Trace: {report.audit_id}")
+print(f"Budget Consumed: ${report.estimated_cost_usd}")
 
 ### 💡 Call for Contributions & Ideas
 We are looking for collaborators to help build:

@@ -1,0 +1,19 @@
+version: "1.0"
+agent_name: "MarketAnalyst"
+
+# Financial Guardrails
+max_spend_usd: 0.50  # Low limit to demonstrate the circuit breaker
+
+# Action Scopes
+allowed_tools:
+  - "web_search"
+  - "internal_db_query"
+  - "generate_summary"
+
+restricted_domains:
+  - "competitor-alpha.com"
+  - "unverified-leak-site.org"
+
+# Escalation
+require_human_approval: true
+confidence_threshold: 0.90

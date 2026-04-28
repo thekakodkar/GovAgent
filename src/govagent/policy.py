@@ -1,3 +1,4 @@
+import yaml
 from pydantic import BaseModel, Field
 from typing import List, Optional
 
@@ -15,4 +16,11 @@ class Policy(BaseModel):
     
     # Escalation
     require_human_approval: bool = True
-    confidence_threshold: float = 0.85  # Pause if the model is unsure
+    confidence_threshold: float = 0.85
+
+    @classmethod
+    def from_yaml(cls, file_path: str):
+        """Standardizes the loading of governance policies from YAML files."""
+        with open(file_path, "r") as f:
+            data = yaml.safe_load(f)
+        return cls(**data)
