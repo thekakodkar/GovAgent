@@ -4,13 +4,13 @@ build-backend = "hatchling.build"
 
 [project]
 name = "govagent"
-version = "0.1.1"
+version = "0.1.2"
 description = "The Governance-First Framework for Agentic AI"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
-    {name = "Your Name", email = "niraj.kakodkar@gmail.com"}
+    {name = "Niraj Kakodkar", email = "niraj.kakodkar@gmail.com"}
 ]
 keywords = ["ai", "agents", "governance", "roi", "enterprise"]
 dependencies = [
