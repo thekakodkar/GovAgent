@@ -9,7 +9,7 @@ In high-stakes environments, the barrier to AI adoption is **reliability and con
 
 * **Active Circuit Breakers:** Real-time enforcement of financial and operational limits.
 * **Governance-as-Code:** Human-readable permission manifests (`policy.yaml`) that align technical execution with organizational policy.
-* **Forensic Telemetry:** Standardized audit logs and ROI projections (USD saved vs. USD spent).
+* **Forensic Telemetry:** Standardized audit logs and ROI projections.
 * **Zero-Trust Tooling:** Strict whitelisting for agent actions and domain access.
 
 ---
@@ -29,8 +29,6 @@ Every execution generates a **Business Value Summary**:
 
 ---
 
-# GovAgent: Enterprise-Grade Agentic Governance
-
 ## 🚧 Development Status (WIP)
 **GovAgent is rapidly evolving.** We are currently moving from architectural design to core module implementation.
 
@@ -38,7 +36,7 @@ Every execution generates a **Business Value Summary**:
 * **Governance Manifest (`policy.py`):** Structured YAML-based policy enforcement.
 * **Forensic Telemetry (`telemetry.py`):** Real-time ROI and audit trail generation.
 * **Circuit Breakers (`guards.py`):** Financial and operational risk mitigation logic.
-**Human-in-the-Loop (`hitl.py`)** - Managed intervention state.
+* **Human-in-the-Loop (`hitl.py`):** Managed intervention state.
 * **The Executive Loop (`agent.py`):** A "Think-Guard-Act" orchestration engine.
 
 ### 🛠️ In Active Development
@@ -46,9 +44,11 @@ Every execution generates a **Business Value Summary**:
 * **Mock Model Client:** A testing utility to simulate LLM responses without incurring API costs.
 * **HITL Connectors:** Initial hooks for manual approval via CLI.
 
+---
+
 ## 📖 Usage Example: Controlled Execution
 
-GovAgent allows you to wrap any AI task in a protective governance layer. Here is how you enforce a $0.50 budget on a research task:
+GovAgent allows you to wrap any AI task in a protective governance layer. 
 
 ```python
 from govagent import ExecutiveAgent, Policy
@@ -62,13 +62,34 @@ report = await agent.execute("Research competitor pricing")
 
 print(f"Audit Trace: {report.audit_id}")
 print(f"Budget Consumed: ${report.estimated_cost_usd}")
+```
 
-### 💡 Call for Contributions & Ideas
-We are looking for collaborators to help build:
-1. **Cloud Adapters:** Exporting `telemetry.py` logs to AWS CloudWatch or Azure Monitor.
-2. **Standard Policies:** Pre-built `policy.yaml` templates for common roles (e.g., "Safe Research", "Data Entry", "Code Review").
-3. **Reasoning Visualizers:** A tool to turn the Audit Trail JSON into a readable PDF report for non-technical stakeholders.
+---
+
+## 🤝 Call for Contributions
+We are building GovAgent to be the industry standard for accountable AI. We welcome collaborators from both technical and strategic backgrounds.
+
+### 👩‍💻 Technical Contributions
+* **Cloud Adapters:** Help us build exporters for `telemetry.py` logs to AWS CloudWatch, Azure Monitor, or ELK stacks.
+* **HITL Integration:** We need native connectors for Slack and Microsoft Teams "Approve/Reject" workflows.
+* **Performance:** Optimizing the async reasoning loop for high-concurrency environments.
+
+### 👔 Strategic Contributions
+* **Standard Policy Library:** Help us draft pre-built `policy.yaml` templates for common enterprise roles (e.g., "Legal Researcher," "Data Entry Clerk," "Code Auditor").
+* **Reporting Tools:** Help design "Reasoning Visualizers" that turn Audit Trail JSON into executive-ready PDF reports.
+
+---
+
+## 💡 Future Ideas
+* **Cross-Provider Arbitrage:** Dynamic routing to the most cost-effective model based on task complexity.
+* **Digital Twin Governance:** Agents that simulate red-team attacks on your own governance policies.
 
 ---
 **"Governance is not a constraint; it is the catalyst for enterprise AI adoption."**
+
 ---
+
+### Author Stamp
+* **Framework:** GovAgent v0.1.0 (Public Release)
+* **Status:** Active / Open-Source Standard
+* **Compliance:** Designed for Enterprise-Grade Accountability
