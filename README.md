@@ -1,4 +1,4 @@
-# GovAgent: The Enterprise Protocol for Agentic AI
+# govAgent: The Enterprise Protocol for Agentic AI
 
 **The Governance-First Framework for Production-Grade Autonomous Systems.**
 
