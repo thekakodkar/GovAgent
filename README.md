@@ -2,10 +2,11 @@
 
 **The Governance-First Framework for Production-Grade Autonomous Systems.**
 
-`GovAgent` is a high-abstraction, lightweight Python framework designed to bridge the gap between experimental AI and business-critical operations. 
+GovAgent provides a high-abstraction 'Control Plane' for agentic AI. By implementing a **Chain of Accountability**, this lightweight framework enables organizations to move autonomous systems out of the sandbox and into production-grade, governed environments.
 
 ## 🎯 Value Proposition
 In high-stakes environments, the barrier to AI adoption is **reliability and control**. `GovAgent` ensures every action is transparent, budget-aware, and risk-managed.
+Unlike standard frameworks that prioritize open-ended autonomy, GovAgent enforces a Chain of Accountability.
 
 * **Active Circuit Breakers:** Real-time enforcement of financial and operational limits.
 * **Governance-as-Code:** Human-readable permission manifests (`policy.yaml`) that align technical execution with organizational policy.
