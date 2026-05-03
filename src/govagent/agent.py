@@ -2,6 +2,7 @@ from typing import List, Optional, Any
 from govagent.policy import Policy
 from govagent.guards import CircuitBreaker, GovernanceViolation
 from govagent.telemetry import TelemetryManager
+from govagent.hitl import HITLManager
 
 class ExecutiveAgent:
     """
@@ -13,42 +14,60 @@ class ExecutiveAgent:
         persona: str, 
         policy: Policy, 
         model_client: Any,
-        telemetry: Optional[TelemetryManager] = None
+        telemetry: Optional[TelemetryManager] = None,
+        hitl_manager: Optional[HITLManager] = None
     ):
         self.persona = persona
         self.policy = policy
         self.model = model_client
         self.guard = CircuitBreaker(policy)
         self.telemetry = telemetry or TelemetryManager()
+        self.hitl = hitl_manager or HITLManager()
 
     async def execute(self, task: str):
         """
         The 'Governed Reasoning' Loop: Think -> Guard -> Act -> Record.
+        Strictly enforces a Hard-Stop on human rejection.
         """
         self.telemetry.start_trace(self.persona, task)
         current_step = 0
-        max_steps = 10 # Safety ceiling
+        max_steps = 10 
         
         try:
             while current_step < max_steps:
                 # 1. Financial Guard Check
                 self.guard.check_financial_risk(self.telemetry.current_session.estimated_cost_usd)
                 
-                # 2. Reasoning Phase (LLM Call)
-                # Note: This is a conceptual representation of the LLM interaction
+                # 2. Reasoning Phase
                 thought, action, params = await self.model.generate_plan(task, self.persona)
                 
-                # 3. Action Validation Guard
-                # Intercept the intent before execution
+                # 3. Action Validation Guard (Policy Enforcement)
                 self.guard.validate_action(action, params)
                 
-                # 4. Human-in-the-Loop Check
-                if self.guard.assess_confidence(0.9) == "ESCALATE_TO_HUMAN":
-                    # Placeholder for HITL protocol (Slack/Teams)
-                    return "Pending Human Approval"
+                # 4. Synchronous HITL Check (The Judiciary)
+                confidence = 0.9 
+                
+                if self.policy.is_high_risk(action) or confidence < self.policy.confidence_threshold:
+                    print(f"⚠️ Intervention required for action: {action}")
+                    
+                    approved = await self.hitl.secure_approval(
+                        agent_id=self.policy.agent_name,
+                        reason=f"High-risk action: {action}" if self.policy.is_high_risk(action) else "Low confidence",
+                        context={"action": action, "params": params, "thought": thought}
+                    )
 
-                # 5. Execution & Logging
+                    # DEFENSIVE GATE: Only proceed if approved is explicitly True
+                    if approved is not True:
+                        print(f"🛑 HALTING: Rejection or timeout for {action}")
+                        return self.telemetry.finalize(
+                            status=f"rejected: Human denied {action}", 
+                            tokens=current_step * 100
+                        )
+
+                # 5. Execution (ONLY reachable if step 4 passed)
                 result = await self.perform_action(action, params)
+                
+                # 6. Logging & Completion check
                 self.telemetry.log_step(thought, action, result)
                 
                 if self.is_task_complete(result):
@@ -56,18 +75,17 @@ class ExecutiveAgent:
                 
                 current_step += 1
 
-            return self.telemetry.finalize(status="success", tokens=1200) # Mock token count
+            return self.telemetry.finalize(status="success", tokens=current_step * 150)
 
         except GovernanceViolation as gv:
-            # Operationalize the error: Log the violation and stop
-            return self.telemetry.finalize(status=f"blocked: {str(gv)}", tokens=500)
+            return self.telemetry.finalize(status=f"blocked: {str(gv)}", tokens=current_step * 50)
         except Exception as e:
             return self.telemetry.finalize(status=f"error: {str(e)}", tokens=0)
 
     async def perform_action(self, action: str, params: dict):
-        """Placeholder for actual tool execution logic."""
-        return f"Executed {action} with success."
+        """Standard tool execution simulation."""
+        return f"Executed {action} with success. Task complete."
 
     def is_task_complete(self, result: str) -> bool:
-        """Logic to determine if the agent has reached its goal."""
+        """Determines if the session objectives are met."""
         return "complete" in result.lower()

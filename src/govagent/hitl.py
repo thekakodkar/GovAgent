@@ -1,6 +1,7 @@
 from enum import Enum
-from typing import Optional, Any
+from typing import Optional, Any, Protocol
 from pydantic import BaseModel, Field
+import uuid
 
 class ApprovalStatus(Enum):
     PENDING = "pending"
@@ -9,37 +10,56 @@ class ApprovalStatus(Enum):
 
 class ApprovalRequest(BaseModel):
     """A formal request for human intervention."""
-    request_id: str
+    request_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     agent_id: str
-    reason: str  # e.g., "Confidence below threshold" or "High-risk tool call"
-    context: Any # Data the agent was working on
+    reason: str 
+    action_type: str  # e.g., "tool_call", "budget_override"
+    context: Any 
     status: ApprovalStatus = ApprovalStatus.PENDING
     reviewer_notes: Optional[str] = None
 
+class HITLAdapter(Protocol):
+    """Protocol for different notification channels (CLI, Slack, Teams)."""
+    async def notify(self, request: ApprovalRequest) -> bool:
+        ...
+
+class CLIAdapter:
+    """Standard Console Adapter for local development."""
+    async def notify(self, request: ApprovalRequest) -> bool:
+        print(f"\n--- 🛑 GOVAGENT INTERVENTION REQUIRED ---")
+        print(f"ID: {request.request_id}")
+        print(f"Agent: {request.agent_id}")
+        print(f"Reason: {request.reason}")
+        print(f"Context: {request.context}")
+        
+        user_input = input("\nDecision (y/n) or add notes: ").strip().lower()
+        if user_input.startswith('y'):
+            return True
+        return False
+
 class HITLManager:
     """
-    Orchestrates human intervention. Designed to be extended 
-    with Slack, Teams, or Email adapters.
+    Orchestrates the Chain of Accountability's 'Judiciary' layer.
     """
-    def __init__(self):
-        self.active_requests: dict[str, ApprovalRequest] = {}
+    def __init__(self, adapter: HITLAdapter = None):
+        self.adapter = adapter or CLIAdapter()
+        self.history: list[ApprovalRequest] = []
 
-    def request_approval(self, request: ApprovalRequest) -> bool:
+    async def secure_approval(self, agent_id: str, reason: str, context: Any) -> bool:
         """
-        In the 'Lite' version, this logs to console/file.
-        In 'Pro', this would trigger a webhook to a messaging platform.
+        The entry point for the Executive Loop to request permission.
         """
-        self.active_requests[request.request_id] = request
-        print(f"\n[HITL REQUIRED] Agent: {request.agent_id}")
-        print(f"Reason: {request.reason}")
-        print(f"Action: {request.context}")
+        request = ApprovalRequest(
+            agent_id=agent_id,
+            reason=reason,
+            action_type="intervention",
+            context=context
+        )
         
-        # Simulated CLI Approval for the initial PyPI package
-        user_input = input("Approve this action? (y/n/notes): ").lower()
+        # Block execution until the adapter returns a decision
+        is_approved = await self.adapter.notify(request)
         
-        if user_input.startswith('y'):
-            request.status = ApprovalStatus.APPROVED
-            return True
-        else:
-            request.status = ApprovalStatus.REJECTED
-            return False
+        request.status = ApprovalStatus.APPROVED if is_approved else ApprovalStatus.REJECTED
+        self.history.append(request)
+        
+        return is_approved
