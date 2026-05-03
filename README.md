@@ -19,7 +19,7 @@ In a professional services or regulated environment, autonomy without accountabi
 
 1.  **Policy (The Law):** Declarative boundaries and "Rules of Engagement" defined by stakeholders in `policy.yaml`.
 2.  **Guards (The Enforcement):** Real-time circuit breakers that intercept agent intent *before* API execution to prevent budget or security breaches.
-3.  **HITL (The Judiciary):** Managed Human-in-the-Loop escalation for high-risk tool calls or low-confidence reasoning.
+3.  **HITL (The Judiciary):** **Synchronous** Human-in-the-Loop escalation. High-risk actions are blocked until a human provides an explicit "Approve" or "Reject" signal.
 4.  **Telemetry (The Evidence):** Forensic-grade audit trails that provide an immutable ledger of compliance and real-world ROI.
 
 ---
@@ -27,9 +27,9 @@ In a professional services or regulated environment, autonomy without accountabi
 ## 🗺️ Strategic Roadmap
 
 ### v0.2.0: Operational Safety (Current Focus)
-*   **Synchronous HITL:** Implementation of CLI/Slack approval connectors for high-risk actions.
+*   **Synchronous HITL:** Implementation of decoupled CLI/Slack adapters for real-time intervention.
+*   **The Governance Testing Suite:** Comprehensive unit testing utility to verify guardrail enforcement.
 *   **The `@tool` Registry:** A type-safe decorator to auto-map Python functions to policy permissions.
-*   **Confidence Circuit Breakers:** Logic to pause tasks if reasoning confidence drops below the `confidence_threshold`.
 
 ### v0.3.0: Enterprise Connectivity
 *   **Cloud Telemetry Adapters:** Native exporters for **AWS CloudWatch** and **Azure Monitor**.
@@ -38,36 +38,47 @@ In a professional services or regulated environment, autonomy without accountabi
 
 ---
 
-## 💡 Future Ideas
-*   **Cross-Provider Arbitrage:** Dynamic routing to the most cost-effective model based on task complexity.
-*   **Digital Twin Governance:** Agents that simulate red-team attacks on your own governance policies to identify loopholes.
-*   **ROI Heatmaps:** Visualizing organizational savings through automated "Chain of Accountability" reporting and manual human-hour offsets.
+## 🧪 Testing & Validation
+GovAgent prioritizes reliability. We maintain a dual-layer testing utility:
+*   **Operational Flow (`test_flow.py`):** Ensures the "Happy Path" remains functional across library updates.
+*   **Governance Verification (`test_governance.py`):** Specifically attempts to breach policy to ensure guards and HITL triggers correctly block unauthorized intent.
+
+Run the full suite with: `pytest tests/`
 
 ---
 
 ## 🚧 Development Status (WIP)
-**GovAgent is rapidly evolving.** We are currently moving from architectural design to core module implementation.
+**GovAgent is rapidly evolving.** We have successfully moved the HITL module from a passive placeholder to an active, synchronous blocking mechanism.
 
 ### ✅ Completed Modules
-*   **Governance Manifest (`policy.py`):** Structured YAML-based policy enforcement.
+*   **Governance Manifest (`policy.py`):** Structured YAML-based policy enforcement with high-risk tool detection.
 *   **Forensic Telemetry (`telemetry.py`):** Real-time ROI and audit trail generation.
 *   **Circuit Breakers (`guards.py`):** Financial and operational risk mitigation logic.
-*   **Human-in-the-Loop (`hitl.py`):** Managed intervention state.
-*   **The Executive Loop (`agent.py`):** A "Think-Guard-Act" orchestration engine.
+*   **Synchronous HITL (`hitl.py`):** Multi-adapter manager (CLI/Slack-ready) for human intervention.
+*   **The Executive Loop (`agent.py`):** An async orchestration engine that treats governance as a blocking priority.
 
 ---
 
 ## 📖 Usage Example: Controlled Execution
 
 ```python
-from govagent import ExecutiveAgent, Policy
+from govagent import ExecutiveAgent, Policy, HITLManager
 
-# Load your enterprise SOP
+# 1. Load your enterprise SOP
 policy = Policy.from_yaml("market_research_policy.yaml")
 
-# Run the agent with real-time circuit breakers
-agent = ExecutiveAgent(persona="Analyst", policy=policy, model_client=my_llm)
-report = await agent.execute("Research competitor pricing")
+# 2. Initialize the Judiciary (HITL)
+hitl = HITLManager() 
+
+# 3. Run the agent with real-time circuit breakers
+agent = ExecutiveAgent(
+    persona="Analyst", 
+    policy=policy, 
+    model_client=my_llm,
+    hitl_manager=hitl
+)
+
+report = await agent.execute("Research competitor pricing and delete old logs")
 
 print(f"Audit Trace: {report.audit_id}")
 print(f"Budget Consumed: ${report.estimated_cost_usd}")
@@ -79,12 +90,11 @@ print(f"Budget Consumed: ${report.estimated_cost_usd}")
 We are building GovAgent to be the industry standard for accountable AI. I welcome collaborators from both technical and strategic backgrounds.
 
 ### 👩‍💻 Technical Contributions
-*   **Cloud Adapters:** Help us build exporters for `telemetry.py` logs to AWS CloudWatch or Azure Monitor.
-*   **HITL Integration:** We need native connectors for Slack and Microsoft Teams "Approve/Reject" workflows.
+*   **Slack/Teams Adapters:** Help us finalize the `SlackAdapter` for mobile-first human approvals.
+*   **Cloud Exporters:** Native integrations for enterprise logging stacks (ELK, CloudWatch).
 
 ### 👔 Strategic Contributions
-*   **Standard Policy Library:** Help us draft pre-built `policy.yaml` templates for common enterprise roles.
-*   **Reporting Tools:** Help design "Reasoning Visualizers" that turn Audit Trail JSON into executive-ready PDF reports.
+*   **Standard Policy Library:** Help us draft pre-built `policy.yaml` templates for regulated industries (Finance, Healthcare, Legal).
 
 ---
 **"Governance is not a constraint; it is the catalyst for enterprise AI adoption."**
@@ -92,6 +102,6 @@ We are building GovAgent to be the industry standard for accountable AI. I welco
 ---
 
 ### Author Stamp
-*   **Framework:** GovAgent v0.1.4
+*   **Framework:** GovAgent v0.2.0 (Pre-release)
 *   **Status:** Active / Open-Source Standard
 *   **Compliance:** Designed for Enterprise-Grade Accountability
