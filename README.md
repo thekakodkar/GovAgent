@@ -4,6 +4,20 @@
 
 GovAgent provides a high-abstraction 'Control Plane' for agentic AI. With a **Chain of Accountability**, this lightweight framework helps organizations move autonomous systems from sandbox to production, governed environments.
 
+# 🛡️ GovAgent (v0.1.6 - Stabilized Core)
+GovAgent v0.1.6 establishes the hardened core for AI governance. This release introduces explicit intent validation, ensuring that AI agents can be audited without telemetry data interfering with security guardrails. This is an alpha release preparing the foundation for the v0.2.0 full Governance Suite (Slack HITL and Type-safe Tool Registry).
+
+## 🚧 Roadmap to v0.2.0
+- [x] **Hardened Core**: Explicit Intent Validation & Telemetry Contract.
+- [x] **Financial Circuit Breaker**: Real-time spend tracking and budget enforcement.
+- [x] **Path Independence**: Absolute resolution for Policies.
+- [ ] **@tool Registry**: Type-safe decorator for auto-mapping permissions.
+- [ ] **Decoupled HITL**: Slack & CLI adapters for Judiciary oversight.
+- [ ] **Governance Test Suite**: Comprehensive "break-the-guard" testing utility.
+
+## 🛠️ Current Status
+The **Executive Engine** is now 4/4 PASSED and production-ready. The system correctly separates reasoning, execution, and telemetry.
+
 ## 🎯 Value Proposition
 In high-stakes environments, the barrier to AI adoption is **reliability and control**. `govAgent` ensures every action is transparent, budget-aware, and risk-managed. Unlike standard frameworks that prioritize open-ended autonomy, GovAgent enforces a **Chain of Accountability**.
 
@@ -62,26 +76,22 @@ Run the full suite with: `pytest tests/`
 ## 📖 Usage Example: Controlled Execution
 
 ```python
-from govagent import ExecutiveAgent, Policy, HITLManager
+from govagent.agent import ExecutiveAgent
+from govagent.policy import Policy
 
-# 1. Load your enterprise SOP
-policy = Policy.from_yaml("market_research_policy.yaml")
+# Load Hardened Policy
+policy = Policy.from_yaml("policies/healthcare_ops_policy.yaml")
 
-# 2. Initialize the Judiciary (HITL)
-hitl = HITLManager() 
-
-# 3. Run the agent with real-time circuit breakers
+# Initialize Executive Agent
 agent = ExecutiveAgent(
-    persona="Analyst", 
-    policy=policy, 
-    model_client=my_llm,
-    hitl_manager=hitl
+    persona="Technology Director",
+    policy=policy,
+    model_client=YourModelClient()
 )
 
-report = await agent.execute("Research competitor pricing and delete old logs")
-
-print(f"Audit Trace: {report.audit_id}")
-print(f"Budget Consumed: ${report.estimated_cost_usd}")
+# Execute Governed Task
+report = await agent.execute("Analyze Q4 market shifts.")
+print(f"Status: {report.status} | ROI: ${report.estimated_cost_usd}")
 ```
 
 ---
