@@ -1,0 +1,52 @@
+version: "1.0.0"
+metadata:
+  agent_name: "ClaimsAuditAgent"
+  department: "Healthcare Revenue Cycle"
+  compliance_scope: ["HIPAA", "HITRUST"]
+  last_updated: "2026-05-03"
+
+# 1. Legislative Boundaries (Global Constraints)
+governance:
+  max_session_cost_usd: 15.00
+  confidence_threshold: 0.95
+  enforce_pii_redaction: true
+  data_residency_region: "us-east-1"
+
+# 2. Tools & Permissions (The Whitelist)
+tools:
+  - name: "fetch_patient_history"
+    risk_level: "medium"
+    category: "data_retrieval"
+    requires_phi_access: true
+    description: "Read-only access to historical medical records."
+
+  - name: "calculate_insurance_eligibility"
+    risk_level: "low"
+    category: "logic"
+    description: "Determines coverage based on policy data."
+
+  - name: "authorize_claim_payment"
+    risk_level: "high"
+    category: "financial"
+    requires_hitl: true
+    max_disbursement_limit: 5000.00
+    description: "Approves financial payouts to providers."
+
+  - name: "update_patient_billing_address"
+    risk_level: "high"
+    category: "data_modification"
+    requires_hitl: true
+    description: "Writes new PII to the database."
+
+# 3. Escalation Protocols (The Judiciary)
+escalation:
+  high_risk_adapter: "slack"
+  notification_channel: "#compliance-approvals-claims"
+  auto_reject_on_timeout: true
+  timeout_seconds: 1800 # 30 minutes for Director approval
+
+# 4. Telemetry & Audit Requirements
+audit_log:
+  retention_days: 2555 # 7-year HIPAA requirement
+  granularity: "verbose"
+  log_pii_metadata_only: true

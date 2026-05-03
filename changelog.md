@@ -10,3 +10,9 @@
 
 ### Fixed
 - Fixed a critical bypass where the agent would continue execution after an intervention request was denied.
+
+## [0.1.6] - 2026-05-03
+### Added
+- [x] **Hardened Core**: Explicit Intent Validation & Telemetry Contract.
+- [x] **Financial Circuit Breaker**: Real-time spend tracking and budget enforcement.
+- [x] **Path Independence**: Absolute resolution for Policies.

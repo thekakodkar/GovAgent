@@ -1,0 +1,34 @@
+version: "1.0"
+
+metadata:
+  agent_name: "MarketAnalyst"
+  department: "Strategic Research"
+
+governance:
+  # Financial Guardrail (Satisfies self.max_spend_usd)
+  max_session_cost_usd: 0.50
+  
+  # Logic Threshold (Satisfies self.confidence_threshold)
+  confidence_threshold: 0.90
+  
+  # Domain Safety (Satisfies self.restricted_domains)
+  restricted_domains:
+    - "competitor-alpha.com"
+    - "unverified-leak-site.org"
+  
+  # Judiciary Trigger
+  require_human_approval: true
+
+# Action Manifest (Satisfies self.tool_rules & self.allowed_tools)
+tools:
+  - name: "web_search"
+    risk_level: "low"
+    category: "research"
+  
+  - name: "internal_db_query"
+    risk_level: "medium"
+    category: "data_access"
+  
+  - name: "generate_summary"
+    risk_level: "low"
+    category: "utility"

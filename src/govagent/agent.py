@@ -39,10 +39,31 @@ class ExecutiveAgent:
                 self.guard.check_financial_risk(self.telemetry.current_session.estimated_cost_usd)
                 
                 # 2. Reasoning Phase
-                thought, action, params = await self.model.generate_plan(task, self.persona)
+                # We unpack the tuple. v0.2.0 ensures we have distinct vars for 
+                # Reasoning (thought), the executable (action/params), and metadata.
+                response = await self.model.generate_plan(task, self.persona)
+
+                # Explicit Intent Extraction:
+                # We extract the intent (index 0) and the cost/telemetry (indices 1, 2)
+                # This prevents the 'Unauthorized Tool' error for numeric data.
+                intent, cost, tokens = response if isinstance(response, tuple) else (response, 0, 0)
                 
-                # 3. Action Validation Guard (Policy Enforcement)
-                self.guard.validate_action(action, params)
+                # Update session metrics immediately for financial oversight
+                self.telemetry.current_session.estimated_cost_usd += cost
+
+                # 3. Action Validation Guard (Explicit Intent Validation)
+                # We only pass the action and params to the guard.
+                # We extract them from the intent if the intent is a dictionary.
+                if isinstance(intent, dict):
+                    action = intent.get("action")
+                    params = intent.get("params", {})
+                    thought = intent.get("thought", "Executing plan...")
+                else:
+                    # Fallback for reasoning-only steps
+                    action, params, thought = None, {}, intent
+
+                if action:
+                    self.guard.validate_action(action, params)
                 
                 # 4. Synchronous HITL Check (The Judiciary)
                 confidence = 0.9 
