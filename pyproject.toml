@@ -10,7 +10,8 @@ readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
-    {name = "Niraj Kakodkar", email = "niraj.kakodkar@gmail.com"}
+    {name = "Niraj Kakodkar"},
+    {email = "niraj.kakodkar@gmail.com"}
 ]
 keywords = ["ai", "agents", "governance", "roi", "enterprise"]
 dependencies = [
