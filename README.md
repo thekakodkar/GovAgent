@@ -1,8 +1,11 @@
-## govAgent: The Enterprise Protocol for Agentic AI
+## govAgent: Enterprise-Grade AI Governance Framework
 
 **The Governance-First Framework for Production-Grade Autonomous Systems.**
 
-GovAgent provides a high-abstraction **Control Plane** for agentic AI. Built with a **Chain of Accountability**, this lightweight framework is engineered for Technology Directors and AI Strategists to move autonomous systems from experimental sandboxes into governed, production environments.
+GovAgent provides a high-abstraction **Control Plane** for agentic AI. With a clear chain of accountability, this lightweight framework helps move autonomous systems from experimental sandboxes into governed, production environments.
+
+<img width="1097" height="479" alt="ImagegoV" src="https://github.com/user-attachments/assets/4e05d505-63d6-4f14-9475-cc00b4f20d73" />
+
 
 The **v0.2.0 Stable Release** introduces a persistent, bi-directional Judiciary layer, ensuring that high-risk AI actions are always subject to human verification before execution.
 
