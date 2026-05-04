@@ -1,29 +1,63 @@
-## [0.1.5] - 2026-05-03
-### Added
-- **Synchronous HITL Enforcement**: The agent now treats a human 'Reject' signal as a terminal event, physically breaking the execution loop.
-- **Governance Test Suite**: Added `test_governance.py` to verify policy enforcement and guardrail reliability.
-- **ExecutionSnapshots**: Enhanced telemetry reporting for forensic-grade audit trails.
+## CHANGELOG.md
 
-### Changed
-- **Loop Hardening**: Refactored `ExecutiveAgent` to prioritize governance checks over tool execution.
-- **Telemetry Mapping**: Standardized attribute names (e.g., `reasoning_steps`) across the framework.
+All notable changes to the **GovAgent** framework are documented in this file. This project adheres to a "Governance-First" versioning strategy, prioritizing human oversight and fiscal accountability.
 
-### Fixed
-- Fixed a critical bypass where the agent would continue execution after an intervention request was denied.
+---
 
-## [0.1.6] - 2026-05-03
-### Added
-- [x] **Hardened Core**: Explicit Intent Validation & Telemetry Contract.
-- [x] **Financial Circuit Breaker**: Real-time spend tracking and budget enforcement.
-- [x] **Path Independence**: Absolute resolution for Policies.
+## [0.2.0] - 2026-05-04 (Stable)
+
+### 🏛️ Added: The Judiciary Pillar
+*   **Synchronous HITL Manager**: Introduced a core orchestration layer to manage Human-in-the-Loop (HITL) requests across multiple communication adapters.
+*   **Slack Socket Mode Adapter**: Implemented a real-time, mobile-first intervention bridge using secure WebSockets, enabling remote executive oversight without public endpoint exposure.
+*   **Stateful Execution Blocking**: Developed a mechanism using `asyncio.Future` patterns that physically pauses the agent's logic thread until a human "Approve" or "Reject" signal is received.
+*   **Interactive Block Kit UI**: Added rich, structured Slack message templates providing forensic context (Agent ID, Reason, Parameters) for executive decision-making.
+
+### 🛠️ Improvements & Refactoring
+*   **EU AI Act Compliance**: Mapped code-level functionality to **Article 14 (Human Oversight)** and **Article 12 (Traceability)** requirements.
+*   **Legislative Registry Hardening**: Stabilized the `@tool` decorator to ensure strict type-safety and parity between Python signatures and YAML policy permissions.
+*   **Self-Healing Handshake**: Added intelligent detection for common Slack errors (e.g., `not_in_channel`) with automated join attempts where permitted by scopes.
+*   **Executive Audit Logging**: Interaction handlers now capture and log the specific Slack User ID of the human overseer to maintain the "Chain of Accountability".
+
+### 🛡️ Security & Integrity
+*   **Zero-Trust Identity**: Standardized the dual-token system using `SLACK_APP_TOKEN` (`xapp-`) for connection and `SLACK_BOT_TOKEN` (`xoxb-`) for privileged communication.
+*   **Thread-Safe Callbacks**: Integrated `loop.call_soon_threadsafe` to bridge background WebSocket threads with the main asynchronous execution loop.
+*   **Constitutional Startup Check**: Enhanced the boot-up sequence to refuse execution if tool code and policy permissions do not align.
+
+---
 
 ## [0.1.7] - 2026-05-04
-### Added
-- **Legislative Tool Registry**: Introduced the `@tool` decorator to auto-map Python functions to governance permissions.
-- **Strict Risk Parity Audit**: Implemented `Policy.validate_registry()` to prevent "Risk Downgrading" between code and YAML.
-- **Shadow Tool Prevention**: The system now halts at startup if a code-level tool is not explicitly authorized in the Policy YAML.
-- **Interface Reflection**: Capture of function signatures and docstrings for future automated prompt engineering.
 
-### Fixed
-- **Policy Attribute Sync**: Standardized naming for `max_spend_usd` and `require_human_approval` to ensure internal Guard compatibility.
-- **Cross-Walk Validation**: Resolved the gap where code and policy could drift out of alignment without triggering a failure.
+### 📜 Added: Legislative Tool Registry
+*   **Legislative Tool Registry**: Introduced the `@tool` decorator to auto-map Python functions to governance permissions.
+*   **Strict Risk Parity Audit**: Implemented `Policy.validate_registry()` to prevent "Risk Downgrading" between code and YAML.
+*   **Shadow Tool Prevention**: The system now halts at startup if a code-level tool is not explicitly authorized in the Policy YAML.
+*   **Interface Reflection**: Captures function signatures and docstrings for automated prompt engineering.
+
+### 🛠️ Fixed
+*   **Policy Attribute Sync**: Standardized naming for `max_spend_usd` and `require_human_approval` to ensure internal Guard compatibility.
+*   **Cross-Walk Validation**: Resolved the gap where code and policy could drift out of alignment without triggering a failure.
+
+---
+
+## [0.1.6] - 2026-05-03
+
+### ✅ Added
+*   **Hardened Core**: Implemented explicit Intent Validation and a Telemetry Contract.
+*   **Financial Circuit Breaker**: Real-time spend tracking and budget enforcement.
+*   **Path Independence**: Absolute resolution for Policies.
+
+---
+
+## [0.1.5] - 2026-05-03
+
+### 🏛️ Added
+*   **Synchronous HITL Enforcement**: The agent now treats a human 'Reject' signal as a terminal event, physically breaking the execution loop.
+*   **Governance Test Suite**: Added `test_governance.py` to verify policy enforcement and guardrail reliability.
+*   **ExecutionSnapshots**: Enhanced telemetry reporting for forensic-grade audit trails.
+
+### 🛠️ Changed
+*   **Loop Hardening**: Refactored `ExecutiveAgent` to prioritize governance checks over tool execution.
+*   **Telemetry Mapping**: Standardized attribute names (e.g., `reasoning_steps`) across the framework.
+
+### 🛠️ Fixed
+*   **Bypass Resolution**: Fixed a critical bypass where the agent would continue execution after an intervention request was denied.
