@@ -4,14 +4,27 @@
 
 GovAgent provides a high-abstraction 'Control Plane' for agentic AI. With a **Chain of Accountability**, this lightweight framework helps organizations move autonomous systems from sandbox to production, governed environments.
 
-# 🛡️ GovAgent (v0.1.6 - Stabilized Core)
-GovAgent v0.1.6 establishes the hardened core for AI governance. This release introduces explicit intent validation, ensuring that AI agents can be audited without telemetry data interfering with security guardrails. This is an alpha release preparing the foundation for the v0.2.0 full Governance Suite (Slack HITL and Type-safe Tool Registry).
+The latest update introduces a type-safe tool registry that eliminates "Shadow AI" by enforcing strict parity between code and policy.
+
+### Key Capabilities:
+- **@tool Registry**: A type-safe decorator that auto-maps Python functions to policy permissions with metadata (risk level, category, signature).
+- **Synchronous Governance Audit**: The system performs a "Constitutional Check" at startup, refusing to boot if a tool exists in the code but is unauthorized in the YAML.
+- **Risk Hierarchy Enforcement**: Prevents "Risk Downgrading"—if a policy defines an action as HIGH RISK, the code cannot override it to bypass human oversight.
+- **Financial Circuit Breaker**: Real-time monitoring of session spend with automated halting when budget caps are reached.
+- **Zero-Trust Domain Guardrails**: Hardened protection against unauthorized or unverified web domains.
+
+## 🏗️ Architecture
+1. **Executive**: The engine orchestrating the "Think -> Guard -> Act" cycle.
+2. **Policy**: Structured YAML-based Digital SOPs.
+3. **Registry**: The single source of truth for all governed agent capabilities.
+4. **Telemetry**: Real-time auditing of spend and operational ROI.
+
 
 ## 🚧 Roadmap to v0.2.0
 - [x] **Hardened Core**: Explicit Intent Validation & Telemetry Contract.
 - [x] **Financial Circuit Breaker**: Real-time spend tracking and budget enforcement.
 - [x] **Path Independence**: Absolute resolution for Policies.
-- [ ] **@tool Registry**: Type-safe decorator for auto-mapping permissions.
+- [x] **@tool Registry**: Type-safe decorator for auto-mapping permissions.
 - [ ] **Decoupled HITL**: Slack & CLI adapters for Judiciary oversight.
 - [ ] **Governance Test Suite**: Comprehensive "break-the-guard" testing utility.
 
@@ -39,6 +52,11 @@ In a professional services or regulated environment, autonomy without accountabi
 ---
 
 ## 🗺️ Strategic Roadmap
+
+### v0.1.7: Legislative Stability (Current)
+*   **Legislative Registry:** Implementation of the @tool decorator for type-safe permission mapping.
+
+*   **Hardened Executive Core:** Stabilized loop with explicit intent validation and telemetry separation.
 
 ### v0.2.0: Operational Safety (Current Focus)
 *   **Synchronous HITL:** Implementation of decoupled CLI/Slack adapters for real-time intervention.
