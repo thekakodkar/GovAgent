@@ -21,13 +21,22 @@ GovAgent replaces "Black Box" reasoning with a transparent, governed loop:
 
 ---
 
-## 🇪🇺 EU AI Act Alignment
-GovAgent is architected to meet the rigorous transparency and oversight standards for **High-Risk AI Systems**:
+## ⚖️ Regulatory Compliance: EU AI Act (Regulation 2024/1689)
 
-*   **Human Oversight (Article 14):** Native HITL adapters ensure high-risk systems are overseen by natural persons in real-time.
-*   **Risk Management (Article 9):** Automated policy enforcement identifies and mitigates operational risks before they manifest.
-*   **Traceability (Article 12):** Forensic telemetry captures who approved an action and when, satisfying the "Chain of Accountability" required for regulatory audits.
+GovAgent is engineered to facilitate compliance for **High-Risk AI Systems** as defined under the EU AI Act. The framework provides the technical primitives required to satisfy key transparency and oversight mandates:
 
+*   **Article 14: Human Oversight**  
+    Native **Synchronous HITL** (Human-in-the-Loop) adapters ensure that high-risk tool execution is physically gated by natural persons in real-time.
+    
+*   **Article 9: Risk Management System**  
+    Automated, policy-driven enforcement (via `policy.yaml`) identifies and mitigates operational and financial risks *prior* to tool deployment.
+    
+*   **Article 12: Record-Keeping & Traceability**  
+    Immutable **Forensic Telemetry** captures the full "Chain of Accountability," including agent reasoning, tool parameters, and the identity of the human overseer who authorized the action.
+
+*   **Article 13: Transparency & Provision of Information**  
+    Automated generation of Execution Snapshots allows for the clear explanation of AI-driven outputs to end-users and regulators.
+    
 ---
 
 ## 🛠️ Key Capabilities (v0.2.0 Stable)
