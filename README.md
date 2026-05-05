@@ -6,8 +6,7 @@ GovAgent provides a high-abstraction **Control Plane** for agentic AI. With a cl
 
 <img width="1097" height="479" alt="ImagegoV" src="https://github.com/user-attachments/assets/4e05d505-63d6-4f14-9475-cc00b4f20d73" />
 
-
-The **v0.2.0 Stable Release** introduces a persistent, bi-directional Judiciary layer, ensuring that high-risk AI actions are always subject to human verification before execution.
+The v0.2.2 Update introduces a standardized LangChain Integration Layer and hardened Slack Socket Mode connectivity, ensuring that high-risk AI actions are always subject to verified human oversight.
 
 ---
 
@@ -39,50 +38,117 @@ GovAgent is engineered to facilitate compliance for **High-Risk AI Systems** as 
     
 ---
 
-## 🛠️ Key Capabilities (v0.2.0 Stable)
-*   **@tool Registry:** A type-safe decorator that auto-maps Python functions to policy permissions (risk level, category, signature).
-*   **Socket Mode Handshake:** Secure, persistent WebSocket connections for judiciary oversight without exposing public endpoints.
-*   **Financial Circuit Breakers:** Real-time monitoring of session spend with automated halting when budget caps are reached.
-*   **Constitutional Startup Check:** Refuses to boot if tool code and policy permissions do not match, eliminating "Shadow AI".
-*   **Zero-Trust Guardrails:** Hardened whitelisting for all agent actions and web domain access.
+## 🛠️ Key Capabilities (v0.2.2)
+* **🔗 LangChain Bridge:** Standardized `@langchain_tool` wrappers for seamless interception of LangChain agent intents.
+* **🔌 Socket Mode Judiciary:** Secure, persistent WebSocket connections for Slack oversight without exposing public endpoints (No Ngrok required).
+* **📦 Pydantic Telemetry:** Hardened serialization of agent tasks to ensure audit logs meet strict enterprise data schemas.
+* **⚠️ Constitutional Startup Check:** Refuses to boot if tool registry and policy permissions do not match, eliminating "Shadow AI."
+* **🛡️ Zero-Trust Guardrails:** Hardened whitelisting for all agent actions and financial disbursements.
 
 ---
-
 ## 🗺️ Strategic Roadmap
 
-### ✅ v0.2.0: Operational Safety (Current Stable)
-*   **Synchronous HITL:** Full implementation of Slack and CLI adapters for real-time intervention.
-*   **Legislative Registry:** Stabilized @tool decorator for type-safe permission mapping.
-*   **Forensic Telemetry:** Real-time ROI and audit trail generation.
+### ✅ v0.2.2: Operational Stability (Current)
+* **LangChain Integration:** Standardized tool-guarding for LangChain ecosystems.
+* **Synchronous HITL:** Stabilized Slack Socket Mode and CLI adapters for real-time intervention.
+* **Intent Serialization:** Resolved telemetry validation errors via JSON-based intent snapshots.
 
 ### 🚀 v0.3.0: Enterprise Connectivity (Next)
-*   **Fiscal Ceilings:** Recursive approval for multi-agent sub-tasks and "Total Cost of Operation" (TCO) guardrails.
-*   **Cloud Exporters:** Native integrations for enterprise logging stacks like AWS CloudWatch and Azure Monitor.
-*   **Dynamic Budgeting:** Real-time API pricing integration for penny-accurate cost tracking.
-
+* **Fiscal Ceilings:** Recursive approval for multi-agent sub-tasks and "Total Cost of Operation" (TCO) guardrails.
+* **Cloud Exporters:** Native integrations for enterprise logging stacks (AWS CloudWatch / Azure Monitor).
+* **Dynamic Budgeting:** Real-time API pricing integration for penny-accurate cost tracking.
 ---
 
-## 📖 Usage Example: Controlled Execution
+## 📖 Usage Example: Governed LangChain Tool (Simplified API)
+
+GovAgent v0.2.2 introduces a streamlined import structure and native support for LangChain tool interception. The following example demonstrates how to gate a high-risk financial transaction with a synchronous Slack Judiciary.
 
 ```python
-from govagent.agent import ExecutiveAgent
-from govagent.policy import Policy
+import os
+import asyncio
+from langchain_core.tools import tool as langchain_tool
+from govagent import ExecutiveAgent, Policy, HITLManager, SlackJudiciaryAdapter
 
-# Load Hardened Policy (The Law)
-policy = Policy.from_yaml("policies/enterprise_audit_policy.yaml")
+@langchain_tool
+async def healthcare_payment_tool(amount: float) -> str:
+    """Authorizes payments for healthcare claims. Input: amount."""
+    
+    # 1. Initialize the Judiciary Adapter (Slack Socket Mode)
+    # This establishes a secure, persistent connection for real-time oversight.
+    adapter = SlackJudiciaryAdapter(
+        bot_token=os.getenv("SLACK_BOT_TOKEN"),
+        app_token=os.getenv("SLACK_APP_TOKEN"),
+        channel_id=os.getenv("SLACK_CHANNEL_ID")
+    )
+    adapter.start() 
+    
+    # 2. Initialize Governance Layer via Flat API
+    manager = HITLManager(adapter=adapter)
+    policy = Policy.from_yaml("policies/healthcare_policy.yaml")
+    
+    # 3. ARTICLE 14: Synchronous Human Oversight
+    # Execution physically pauses here until a signal is received from Slack.
+    print(f"⚖️ [GovAgent] Intercepting request for ${amount}...")
+    
+    approved = await manager.secure_approval(
+        agent_id="Healthcare-Director-v0.2.2",
+        reason=f"High-risk authorization required for GuardedPayment (${amount}).",
+        context={
+            "amount": f"${amount}",
+            "compliance_check": "EU-AI-ACT-HIGH-RISK"
+        }
+    )
 
-# Initialize Executive Agent
-agent = ExecutiveAgent(
-    persona="Technology Director",
-    policy=policy,
-    model_client=YourModelClient()
-)
+    if approved:
+        # Business logic proceeds only after explicit human authorization
+        return f"SUCCESS: Payment of ${amount} authorized via Slack."
+    
+    return "REJECTED: Transaction denied by Human Judiciary."
 
-# Execute Governed Task
-# High-risk tools (e.g., payments) will pause and alert Slack.
-report = await agent.execute("Analyze Q4 market shifts and authorize $5k payment.")
-print(f"Status: {report.status} | ROI: ${report.estimated_cost_usd}")
+# Example Invocation
+async def main():
+    result = await healthcare_payment_tool.ainvoke({"amount": 1200.0})
+    print(result)
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```
+---
+## ⚙️ Installation
+
+GovAgent is designed to be lightweight and modular. You can install the core framework or include specific integrations as needed.
+
+### 1. Core Installation (Lightweight)
+Recommended for users building custom agents or those who only require the Judiciary and Policy layers.
+```bash
+pip install govagent
+```
+### 2. Full Integration (With LangChain)
+Includes all dependencies required to run governed LangChain sessions, including the langchain_tool wrappers and OpenAI clients.
+
+```bash
+pip install "govagent[langchain]"
+```
+### 3. Development Installation
+If you are contributing to the framework or running the examples in this repository, install in editable mode:
+
+```bash
+git clone [https://github.com/thekakodkar/govagent.git](https://github.com/thekakodkar/govagent.git)
+cd govagent
+pip install -e ".[langchain]"
+
+```
+### 🚀 Quick Setup
+Ensure your .env file is configured with the necessary tokens for the Judiciary Layer to function:
+
+Code snippet
+# Slack Credentials (Socket Mode)
+SLACK_BOT_TOKEN=xoxb-your-token
+SLACK_APP_TOKEN=xapp-your-token
+SLACK_CHANNEL_ID=C12345678
+
+# Model Provider
+OPENAI_API_KEY=sk-your-key
 
 ---
 
@@ -91,6 +157,6 @@ print(f"Status: {report.status} | ROI: ${report.estimated_cost_usd}")
 ---
 
 ### Author Stamp
-*   **Framework:** GovAgent v0.2.0 (Stable)
+*   **Framework:** GovAgent v0.2.2 (Stable)
 *   **Status:** Active / Open-Source Standard
 *   **Compliance:** Designed for Enterprise-Grade Accountability
