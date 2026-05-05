@@ -114,6 +114,43 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 ---
+## ⚙️ Installation
+
+GovAgent is designed to be lightweight and modular. You can install the core framework or include specific integrations as needed.
+
+### 1. Core Installation (Lightweight)
+Recommended for users building custom agents or those who only require the Judiciary and Policy layers.
+```bash
+pip install govagent
+```
+### 2. Full Integration (With LangChain)
+Includes all dependencies required to run governed LangChain sessions, including the langchain_tool wrappers and OpenAI clients.
+
+```bash
+pip install "govagent[langchain]"
+```
+### 3. Development Installation
+If you are contributing to the framework or running the examples in this repository, install in editable mode:
+
+```bash
+git clone [https://github.com/thekakodkar/govagent.git](https://github.com/thekakodkar/govagent.git)
+cd govagent
+pip install -e ".[langchain]"
+
+```
+### 🚀 Quick Setup
+Ensure your .env file is configured with the necessary tokens for the Judiciary Layer to function:
+
+Code snippet
+# Slack Credentials (Socket Mode)
+SLACK_BOT_TOKEN=xoxb-your-token
+SLACK_APP_TOKEN=xapp-your-token
+SLACK_CHANNEL_ID=C12345678
+
+# Model Provider
+OPENAI_API_KEY=sk-your-key
+
+---
 
 **"Governance is not a constraint; it is the catalyst for enterprise AI adoption."**
 
