@@ -4,22 +4,32 @@ build-backend = "hatchling.build"
 
 [project]
 name = "govagent"
-version = "0.2.1"
+version = "0.2.2"
 description = "The Governance-First Framework for Agentic AI"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {text = "MIT"}
 authors = [
-    {name = "Niraj Kakodkar"},
+    {name = "Niraj Kakodkar"}, 
     {email = "niraj.kakodkar@gmail.com"}
 ]
-keywords = ["ai", "agents", "governance", "roi", "enterprise"]
+keywords = ["ai", "agents", "governance", "roi", "enterprise", "EU-AI-Act"]
+
+# CORE DEPENDENCIES: Kept minimal to reduce the footprint
 dependencies = [
     "pydantic>=2.0.0",
     "pyyaml>=6.0.0",
-    "httpx>=0.25.0",  # Async-ready for modern LLM APIs
-    "slack-sdk",
-    "openai" # or your specific model client
+    "httpx>=0.25.0",
+    "slack-sdk>=3.0.0",
+    "python-dotenv>=1.0.0",
+]
+
+# OPTIONAL DEPENDENCIES: Users install via pip install "govagent[langchain]"
+[project.optional-dependencies]
+langchain = [
+    "langchain-core>=0.1.0",
+    "langchain-openai>=0.1.0",
+    "openai"
 ]
 
 [project.urls]

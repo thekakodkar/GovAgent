@@ -1,0 +1,30 @@
+# govAgent Policy Configuration v0.3.0
+version: "0.3.0"
+
+metadata:
+  org_name: "DecodeAIWithNiraj"
+  compliance_level: "EU-AI-ACT-HIGH-RISK"
+
+# 1. DEFINE TOOLS & RISK LEVELS
+tools:
+  - name: "GuardedPayment"
+    risk_level: "HIGH"
+    require_human_approval: true  # This triggers the Slack Judiciary
+    description: "Financial transaction tool for procurement"
+    max_per_transaction: 2000.0
+
+  - name: "SearchTool"
+    risk_level: "LOW"
+    require_human_approval: false # This will execute automatically
+    description: "General web search for information gathering"
+
+# 2. GLOBAL FISCAL GUARDRAILS (v0.3.0 Feature)
+global_limits:
+  daily_budget_usd: 100.0
+  max_tokens_per_run: 4000
+
+# 3. JUDICIARY SETTINGS
+judiciary:
+  primary_channel: "slack"
+  fallback: "cli"              # If Slack is down, ask in the terminal
+  timeout_seconds: 300         # Wait 5 mins for Director approval before auto-reject

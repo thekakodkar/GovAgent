@@ -2,6 +2,16 @@
 
 All notable changes to the **GovAgent** framework are documented in this file. This project adheres to a "Governance-First" versioning strategy, prioritizing human oversight and fiscal accountability.
 
+## [0.2.2] - 2026-05-05
+### Added
+- **LangChain Integration**: Standardized @langchain_tool bridging logic for GovAgent interception.
+- **Socket Mode Support**: Transitioned Slack Judiciary to persistent Socket Mode for increased security.
+- **Intent Serialization**: JSON-based serialization for tool inputs to ensure telemetry data integrity.
+
+### Fixed
+- **Validation Schema**: Resolved Pydantic string-type constraints in ExecutionSnapshot.
+- **Registry Mapping**: Fixed namespace mismatches between Python tool decorators and YAML policy names.
+
 ---
 
 ## [0.2.0] - 2026-05-04 (Stable)
