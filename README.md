@@ -6,7 +6,7 @@ GovAgent provides a high-abstraction **Control Plane** for agentic AI. With a cl
 
 <img width="1097" height="479" alt="ImagegoV" src="https://github.com/user-attachments/assets/4e05d505-63d6-4f14-9475-cc00b4f20d73" />
 
-The v0.2.2 Update introduces a standardized LangChain Integration Layer and hardened Slack Socket Mode connectivity, ensuring that high-risk AI actions are always subject to verified human oversight.
+The v0.2.3 Update transforms the framework into a proactive Triage Engine, introducing Modular Guards that intercept risky or expensive actions at the earliest possible stage, significantly increasing the Business ROI of autonomous sessions.
 
 ---
 
@@ -38,20 +38,86 @@ GovAgent is engineered to facilitate compliance for **High-Risk AI Systems** as 
     
 ---
 
-## 🛠️ Key Capabilities (v0.2.2)
-* **🔗 LangChain Bridge:** Standardized `@langchain_tool` wrappers for seamless interception of LangChain agent intents.
-* **🔌 Socket Mode Judiciary:** Secure, persistent WebSocket connections for Slack oversight without exposing public endpoints (No Ngrok required).
-* **📦 Pydantic Telemetry:** Hardened serialization of agent tasks to ensure audit logs meet strict enterprise data schemas.
-* **⚠️ Constitutional Startup Check:** Refuses to boot if tool registry and policy permissions do not match, eliminating "Shadow AI."
-* **🛡️ Zero-Trust Guardrails:** Hardened whitelisting for all agent actions and financial disbursements.
+## 🛠️ Key Capabilities (v0.2.3)
+* **🛡️ Modular Guard Engine:** Cascading triage (fiscal -> policy -> judiciary) to stop invalid or over-budget requests at zero token cost.
+* **🔗 Automated Model Adapter:** Standardizes ChatOpenAI patterns to the GovAgent contract, ensuring ROI and token telemetry are captured automatically.
+* **🔍 Dynamic Intent Extraction:** Replaces hardcoded parameters with regex-based parsing to identify Tool IDs and financial amounts directly from LLM reasoning.
+* **📂 Self-Healing Telemetry:** Automated management of the /logs directory and audit_trail.jsonl persistence for forensic-grade audit readiness.
+* **⚖️ High-Signal Judiciary:** Slack notifications are automatically summarized to provide executives with clear "Decision Support".
+---
+## 📖 Advanced Usage: High-Abstraction Governance
+In an enterprise environment, GovAgent acts as your digital "Control Plane" for high-stakes workflows like healthcare claim processing.
+
+### 1. Autonomous "Billing Director" Workflow
+Bridge the gap between LLM reasoning and financial policy:
+```python
+
+import asyncio
+from langchain_openai import ChatOpenAI
+from govagent import ExecutiveAgent, Policy, HITLManager, SlackJudiciaryAdapter
+
+async def run_governed_session():
+    # Load Enterprise Policy (Article 9 Compliance)
+    policy = Policy.from_yaml("policies/healthcare_ops_policy.yaml")
+    
+    # Initialize the Slack Judiciary (Article 14 Compliance)
+    judiciary = SlackJudiciaryAdapter(
+        bot_token="xoxb-...", 
+        app_token="xapp-...", 
+        channel_id="C12345"
+    )
+    judiciary.start()
+
+    # The Executive Agent: Your digital 'Control Plane'
+    agent = ExecutiveAgent(
+        persona="Healthcare Finance Director",
+        policy=policy,
+        model_client=ChatOpenAI(model="gpt-4o"), # Auto-wrapped by v0.2.3 Adapter
+        hitl_manager=HITLManager(adapter=judiciary)
+    )
+
+    # Task triggers cascading triage: Fiscal -> Policy -> Judiciary
+    task = "Process claim #7742 for $1,250.00 for the outpatient procedure."
+    report = await agent.execute(task)
+    
+    print(f"🏁 Session Status: {report.status}")
+```
+ 
+´### 2. The Cascading Triage Engine
+The v0.2.3 core intercepts intent through three distinct layers of defense:
+
+* **Stage 1:** Fiscal Guard: Blocks the action if the amount exceeds the max_per_transaction limit.
+* **Stage 2:** Policy Guard: Validates the tool (e.g., authorize_claim_payment) against the approved manifest for the persona.
+* **Stage 3:** Judiciary Guard: Escalates "High Risk" actions to Slack for synchronous human approval.
 
 ---
+
+### 📊 Forensic Telemetry: Article 12 Readiness
+Every session generates an immutable JSONL snapshot in /logs/audit_trail.jsonl.
+
+```python
+
+{
+  "timestamp": "2026-05-06T12:24:25",
+  "persona": "Healthcare Finance Director",
+  "task": "Process claim #7742 for $1,250.00",
+  "guards_evaluated": ["fiscal", "policy", "judiciary"],
+  "decision": "Approved by Judiciary (Slack)",
+  "metadata": {
+    "tokens": 450,
+    "cost_usd": 0.009,
+    "intent": {"action": "authorize_claim_payment", "params": {"amount": 1250.0}}
+  }
+}
+
+```
+
 ## 🗺️ Strategic Roadmap
 
-### ✅ v0.2.2: Operational Stability (Current)
-* **LangChain Integration:** Standardized tool-guarding for LangChain ecosystems.
-* **Synchronous HITL:** Stabilized Slack Socket Mode and CLI adapters for real-time intervention.
-* **Intent Serialization:** Resolved telemetry validation errors via JSON-based intent snapshots.
+### ✅ v0.2.3: Modular Enforcement (Current)
+* **Cascading Triage:** Tiered guards to protect LLM budget and human attention.
+* **Dynamic Extraction:** Automated parsing of claim metadata from conversation strings.
+* **Forensic JSONL:** Ready-to-audit logs for Enterprise SOCs.
 
 ### 🚀 v0.3.0: Enterprise Connectivity (Next)
 * **Fiscal Ceilings:** Recursive approval for multi-agent sub-tasks and "Total Cost of Operation" (TCO) guardrails.
