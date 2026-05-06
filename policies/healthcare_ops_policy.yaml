@@ -1,52 +1,39 @@
 version: "1.0.0"
 metadata:
   agent_name: "ClaimsAuditAgent"
-  department: "Healthcare Revenue Cycle"
-  compliance_scope: ["HIPAA", "HITRUST"]
-  last_updated: "2026-05-03"
+  # ... rest of metadata ...
 
-# 1. Legislative Boundaries (Global Constraints)
+# 1. Global Limits (Mapped for CircuitBreaker Stages 1 & 2)
+# We nest these so Policy.py can find them in one O(1) lookup
+global_limits:
+  daily_budget_usd: 100.0          # Added: To prevent month-end budget surprises
+  max_per_transaction: 5000.0      # Maps to authorize_claim_payment limit
+  max_tokens_per_run: 8000         # For large medical record processing
+
 governance:
   max_session_cost_usd: 15.00
   confidence_threshold: 0.95
+  restricted_domains: ["*"]        # Added: For HIPAA, default to 'all domains restricted'
   enforce_pii_redaction: true
-  data_residency_region: "us-east-1"
 
-# 2. Tools & Permissions (The Whitelist)
+# 2. Tools (Standardized keys for Policy.is_high_risk)
 tools:
-  - name: "fetch_patient_history"
-    risk_level: "medium"
-    category: "data_retrieval"
-    requires_phi_access: true
-    description: "Read-only access to historical medical records."
-
-  - name: "calculate_insurance_eligibility"
-    risk_level: "low"
-    category: "logic"
-    description: "Determines coverage based on policy data."
-
   - name: "authorize_claim_payment"
     risk_level: "high"
     category: "financial"
-    requires_hitl: true
+    require_human_approval: true   # Standardized: Matches Policy.is_high_risk()
+    guards: ["fiscal", "judiciary"] # Explicitly invokes the v0.2.3 engine
     max_disbursement_limit: 5000.00
-    description: "Approves financial payouts to providers."
 
   - name: "update_patient_billing_address"
     risk_level: "high"
     category: "data_modification"
-    requires_hitl: true
-    description: "Writes new PII to the database."
+    require_human_approval: true
+    guards: ["judiciary"]
 
-# 3. Escalation Protocols (The Judiciary)
-escalation:
-  high_risk_adapter: "slack"
-  notification_channel: "#compliance-approvals-claims"
-  auto_reject_on_timeout: true
-  timeout_seconds: 1800 # 30 minutes for Director approval
-
-# 4. Telemetry & Audit Requirements
-audit_log:
-  retention_days: 2555 # 7-year HIPAA requirement
-  granularity: "verbose"
-  log_pii_metadata_only: true
+# 3. Judiciary (Mapped for HITLManager)
+judiciary:                         # Standardized: Matches Policy.py keys
+  primary_channel: "slack"
+  slack_channel_id: "#compliance-approvals-claims"
+  timeout_seconds: 1800
+  auto_reject: true

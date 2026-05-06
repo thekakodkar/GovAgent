@@ -2,6 +2,20 @@
 
 All notable changes to the **GovAgent** framework are documented in this file. This project adheres to a "Governance-First" versioning strategy, prioritizing human oversight and fiscal accountability.
 
+## [0.2.3] - 2026-05-06
+### Added
+- **LangChain Integration Adapter**: Automated wrapper in `ExecutiveAgent` to standardize LangChain `ChatOpenAI` clients to the GovAgent contract.
+- **Dynamic Intent Extraction**: Replaced hardcoded parameters with Regex-based extraction for `claim_id` and `amount` within the model adapter.
+- **Self-Healing Telemetry**: Automatic creation of `/logs` directory and `audit_trail.jsonl` persistence.
+
+### Changed
+- **Modular Evaluation Engine**: Refactored `evaluate()` to follow a cascading triage: Fiscal (Cheap) -> Policy (Automated) -> Judiciary (High-Risk/HITL).
+- **HITL Interface**: Streamlined Slack context messages to provide "Executive Summaries" rather than raw LLM thought-logs.
+
+### Fixed
+- Resolved `NoneType` and `AttributeError` issues during agent initialization.
+- Fixed namespace exports in `govagent.hitl` for `SlackJudiciaryAdapter`.
+
 ## [0.2.2] - 2026-05-05
 ### Added
 - **LangChain Integration**: Standardized @langchain_tool bridging logic for GovAgent interception.

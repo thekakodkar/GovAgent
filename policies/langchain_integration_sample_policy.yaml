@@ -3,28 +3,42 @@ version: "0.3.0"
 
 metadata:
   org_name: "DecodeAIWithNiraj"
+  agent_name: "HealthcareFinanceDirector" # Added: Required by Policy.__init__
   compliance_level: "EU-AI-ACT-HIGH-RISK"
 
-# 1. DEFINE TOOLS & RISK LEVELS
+# 1. GLOBAL FISCAL & OPERATIONAL GUARDRAILS
+# Direct input for CircuitBreaker Stages 1 & 2
+global_limits:
+  daily_budget_usd: 100.0
+  max_per_transaction: 2000.0      # Added: Global ceiling for all tools
+  max_tokens_per_run: 4000
+  cost_per_1k_tokens: 0.02         # Added: Enables dynamic ROI calculation
+
+# 2. GOVERNANCE & CONTENT SECURITY
+governance:
+  restricted_domains:              # Added: Required by CircuitBreaker Stage 3
+    - "unverified-source.net"
+    - "competitor-internal-api.com"
+  confidence_threshold: 0.9        # Added: Trigger Judiciary if LLM is "unsure"
+
+# 3. DEFINE TOOLS & RISK LEVELS
 tools:
-  - name: "GuardedPayment"
-    risk_level: "HIGH"
-    require_human_approval: true  # This triggers the Slack Judiciary
+  - name: "authorize_claim_payment"
+    risk_level: "high"             # Standardized: Use lowercase to match risk_hierarchy
+    require_human_approval: true 
+    guards: ["fiscal", "judiciary"] # Added: Explicit guard manifest for v0.2.3
     description: "Financial transaction tool for procurement"
     max_per_transaction: 2000.0
 
   - name: "SearchTool"
-    risk_level: "LOW"
-    require_human_approval: false # This will execute automatically
+    risk_level: "low"
+    require_human_approval: false
+    guards: ["policy"]             # Only runs domain/whitelist checks
     description: "General web search for information gathering"
 
-# 2. GLOBAL FISCAL GUARDRAILS (v0.3.0 Feature)
-global_limits:
-  daily_budget_usd: 100.0
-  max_tokens_per_run: 4000
-
-# 3. JUDICIARY SETTINGS
+# 4. JUDICIARY SETTINGS (The Supreme Court)
 judiciary:
   primary_channel: "slack"
-  fallback: "cli"              # If Slack is down, ask in the terminal
-  timeout_seconds: 300         # Wait 5 mins for Director approval before auto-reject
+  fallback: "cli"
+  timeout_seconds: 300
+  slack_channel_id: "C0123456789"  # Suggested: Store IDs here rather than just .env

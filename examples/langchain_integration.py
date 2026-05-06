@@ -1,13 +1,14 @@
 import asyncio
-import json
 import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-# LangChain & GovAgent Imports
+# LangChain & OpenAI Imports
+from langchain_openai import ChatOpenAI
+from langchain_core.messages import HumanMessage
 from langchain_core.tools import tool as langchain_tool
 
-# GovAgent v0.2.2 Flat API
+# GovAgent v0.2.3 Modular API
 from govagent import ExecutiveAgent, Policy, HITLManager, SlackJudiciaryAdapter
 
 load_dotenv()
@@ -15,53 +16,67 @@ BASE_DIR = Path(__file__).parent
 
 @langchain_tool
 async def healthcare_payment_tool(amount: float) -> str:
-    """Authorizes payments for healthcare claims. Input: amount."""
+    """
+    Authorizes payments for healthcare claims. 
+    Use this tool only when a specific disbursement amount is identified.
+    """
+    # Note: In a production environment, the agent and policy should be 
+    # initialized once at the application level, not inside the tool.
     
-    # 1. Setup Slack Adapter (Mirroring your working test)
+    # Access the globally configured agent/policy (simplified for this demo)
+    # We use the centralized 'evaluate' to protect the OpenAI session ROI.
+    await agent.evaluate(
+        guards=["fiscal", "judiciary"],
+        value=amount,
+        intent={"action": "healthcare_payment_tool", "params": {"amount": amount}},
+        reason=f"LLM requested a healthcare disbursement of ${amount}"
+    )
+
+    return f"SUCCESS: Disbursement of ${amount} processed via Governed Pipe."
+
+async def main():
+    print("🚀 Initializing Governed LLM Session (OpenAI + Slack)...")
+
+    # 1. Initialize the LLM (The Engine)
+    # We use gpt-4o for complex reasoning while GovAgent handles the safety.
+    llm = ChatOpenAI(
+        model="gpt-4o", 
+        api_key=os.getenv("OPENAI_API_KEY"),
+        temperature=0
+    )
+
+    # 2. Setup GovAgent Control Plane
     adapter = SlackJudiciaryAdapter(
         bot_token=os.getenv("SLACK_BOT_TOKEN"),
         app_token=os.getenv("SLACK_APP_TOKEN"),
         channel_id=os.getenv("SLACK_CHANNEL_ID")
     )
-    adapter.start() # Start Socket Mode listener
+    adapter.start()
     
-    # 2. Setup Manager & Policy
     manager = HITLManager(adapter=adapter)
     policy = Policy.from_yaml(BASE_DIR / "../policies/langchain_integration_sample_policy.yaml")
-    
-    # 3. Initialize Agent
+
+    # 3. Initialize the ExecutiveAgent
+    # Global 'agent' variable so the tool can access it (for demo purposes)
+    global agent
     agent = ExecutiveAgent(
         persona="Healthcare Billing Director",
         policy=policy,
-        model_client=None,
+        model_client=llm,
         hitl_manager=manager
     )
 
-    print(f"\n⚖️ [GovAgent] Intercepting request for ${amount}...")
-
-    # 4. ARTICLE 14: Use the 'secure_approval' method from your working test
-    # We call the manager directly to ensure the Slack handshake happens
-    approved = await manager.secure_approval(
-        agent_id="Healthcare-Director-v0.3.0",
-        reason=f"Authorization required for GuardedPayment (${amount}).",
-        context={
-            "amount": f"${amount}",
-            "tool": "GuardedPayment",
-            "compliance_check": "EU-AI-ACT-HIGH-RISK"
-        }
-    )
-
-    if approved:
-        # In a real app, this would call your business logic
-        return f"SUCCESS: Payment of ${amount} was approved via Slack."
-    else:
-        return "REJECTED: The transaction was denied by the Human Judiciary in Slack."
-
-async def main():
-    print("🚀 Starting Governed LangChain Session (Slack Mode)...")
-    # Simulate a high-risk tool call
-    result = await healthcare_payment_tool.ainvoke({"amount": 1200.0})
-    print(f"\n🏁 Final System Output: {result}")
+    # 4. EXECUTING THE GOVERNED LOOP
+    # The LLM will parse this task, decide to use the tool, 
+    # and then be intercepted by your v0.2.3 Guards.
+    task = "I need to process a reimbursement for claim #882 in the amount of $1200."
+    
+    try:
+        print(f"🤖 Task: {task}")
+        result = await agent.execute(task)
+        print(f"\n🏁 Final System Output: {result.status}")
+    except Exception as e:
+        print(f"\n🛑 Governance Circuit Breaker: {e}")
 
 if __name__ == "__main__":
     asyncio.run(main())

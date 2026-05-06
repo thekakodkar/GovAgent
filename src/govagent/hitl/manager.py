@@ -24,7 +24,9 @@ class HITLManager:
         self.adapter = adapter or CLIAdapter()
         self.history = []
 
-    async def secure_approval(self, agent_id: str, reason: str, context: Any) -> bool:
+    async def secure_approval(self, agent_id: str, reason: str, context: dict = None, triggered_by: str = "policy"):
+        """Accepts 'triggered_by' to provide context to the human reviewer."""
+        # ... logic to pass triggered_by to the adapter
         request = ApprovalRequest(
             agent_id=agent_id,
             reason=reason,
