@@ -10,6 +10,29 @@ The v0.2.3 Update transforms the framework into a proactive Triage Engine, intro
 
 ---
 
+🚀 v0.2.3 New Feature: Zero-Config LangChain Integration
+The v0.2.3 update introduces Dynamic Model Adaptation. You no longer need to manually wrap every tool; the ExecutiveAgent now automatically intercepts and governs standard LangChain clients.
+
+```python
+
+from langchain_openai import ChatOpenAI
+from govagent.agent import ExecutiveAgent
+from govagent.policy import Policy
+
+# 1. Setup your standard LangChain client
+llm = ChatOpenAI(model="gpt-4o")
+
+# 2. GovAgent automatically wraps the model with a Governance Layer
+agent = ExecutiveAgent(
+    persona="Healthcare Billing Director",
+    policy=Policy.from_yaml("healthcare_policy.yaml"),
+    model_client=llm  # Auto-detected and Governed
+)
+
+# 3. Execute with built-in Triage (Fiscal -> Policy -> Judiciary)
+report = await agent.execute("Process reimbursement for claim #882 for $1200.00")
+```
+
 ## 🏗️ Core Pillars: The Chain of Accountability
 GovAgent replaces "Black Box" reasoning with a transparent, governed loop:
 
