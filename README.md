@@ -6,7 +6,7 @@ GovAgent provides a high-abstraction **Control Plane** for agentic AI. With a cl
 
 <img width="1097" height="479" alt="ImagegoV" src="https://github.com/user-attachments/assets/4e05d505-63d6-4f14-9475-cc00b4f20d73" />
 
-The v0.2.2 Update introduces a standardized LangChain Integration Layer and hardened Slack Socket Mode connectivity, ensuring that high-risk AI actions are always subject to verified human oversight.
+The v0.2.3 Update transforms the framework into a proactive Triage Engine, introducing Modular Guards that intercept risky or expensive actions at the earliest possible stage, significantly increasing the Business ROI of autonomous sessions.
 
 ---
 
@@ -39,33 +39,33 @@ GovAgent is engineered to facilitate compliance for **High-Risk AI Systems** as 
 ---
 
 ## 🛠️ Key Capabilities (v0.2.2)
-* **🔗 LangChain Bridge:** Standardized `@langchain_tool` wrappers for seamless interception of LangChain agent intents.
-* **🔌 Socket Mode Judiciary:** Secure, persistent WebSocket connections for Slack oversight without exposing public endpoints (No Ngrok required).
-* **📦 Pydantic Telemetry:** Hardened serialization of agent tasks to ensure audit logs meet strict enterprise data schemas.
-* **⚠️ Constitutional Startup Check:** Refuses to boot if tool registry and policy permissions do not match, eliminating "Shadow AI."
-* **🛡️ Zero-Trust Guardrails:** Hardened whitelisting for all agent actions and financial disbursements.
-
+*   **🛡️ Modular Guard Engine:** Cascading triage (fiscal -> policy -> judiciary) to stop invalid requests at zero token cost.
+*   **🔗 Unified Interceptor:** A single agent.evaluate() call replaces complex manual branching logic in your tool definitions.
+*   **🔌 Context-Aware Judiciary:** Slack notifications now include the specific guard that triggered the intervention (e.g., "Fiscal Ceiling Exceeded").
+*   **⚠️ Declarative Tool Guarding:** Map safety protocols directly in Python code using the @tool(guards=["fiscal", "judiciary"]) decorator.
+*   **📊 JSONL Telemetry:** Forensic-grade logs designed for Big 4 audit standards and enterprise log aggregators.
 ---
 ## 🗺️ Strategic Roadmap
 
-### ✅ v0.2.2: Operational Stability (Current)
-* **LangChain Integration:** Standardized tool-guarding for LangChain ecosystems.
-* **Synchronous HITL:** Stabilized Slack Socket Mode and CLI adapters for real-time intervention.
-* **Intent Serialization:** Resolved telemetry validation errors via JSON-based intent snapshots.
+### ✅ v0.2.3: Modular Enforcement (Current)
+*   **Cascading Triage:** Tiered guards to protect LLM budget and human attention.
+*   **Unified API:** The evaluate() method for minimalist tool integration.
+*   **JSONL Export:** Forensic data readiness for enterprise SOCs.
 
-### 🚀 v0.3.0: Enterprise Connectivity (Next)
-* **Fiscal Ceilings:** Recursive approval for multi-agent sub-tasks and "Total Cost of Operation" (TCO) guardrails.
-* **Cloud Exporters:** Native integrations for enterprise logging stacks (AWS CloudWatch / Azure Monitor).
-* **Dynamic Budgeting:** Real-time API pricing integration for penny-accurate cost tracking.
+### 🚀 v0.3.0: Institutional Scaling (Next)
+*   **TCO Guardrails:** Total Cost of Operation limits for autonomous agent swarms.
+*   **Multi-Agent Governance:** Shared policy enforcement across collaborative agent workflows.
+*   **Cloud Native Exporters:** Direct telemetry streaming to AWS CloudWatch and Azure Monitor.
 ---
 
 ## 📖 Usage Example: Governed LangChain Tool (Simplified API)
 
-GovAgent v0.2.2 introduces a streamlined import structure and native support for LangChain tool interception. The following example demonstrates how to gate a high-risk financial transaction with a synchronous Slack Judiciary.
+The v0.2.3 API is designed for Minimalist Integration. You no longer need manual if/else checks for approval; the evaluate method handles the circuit-breaking logic automatically.
 
 ```python
 import os
 import asyncio
+from langchain_openai import ChatOpenAI
 from langchain_core.tools import tool as langchain_tool
 from govagent import ExecutiveAgent, Policy, HITLManager, SlackJudiciaryAdapter
 
@@ -73,45 +73,27 @@ from govagent import ExecutiveAgent, Policy, HITLManager, SlackJudiciaryAdapter
 async def healthcare_payment_tool(amount: float) -> str:
     """Authorizes payments for healthcare claims. Input: amount."""
     
-    # 1. Initialize the Judiciary Adapter (Slack Socket Mode)
-    # This establishes a secure, persistent connection for real-time oversight.
-    adapter = SlackJudiciaryAdapter(
-        bot_token=os.getenv("SLACK_BOT_TOKEN"),
-        app_token=os.getenv("SLACK_APP_TOKEN"),
-        channel_id=os.getenv("SLACK_CHANNEL_ID")
-    )
-    adapter.start() 
-    
-    # 2. Initialize Governance Layer via Flat API
-    manager = HITLManager(adapter=adapter)
-    policy = Policy.from_yaml("policies/healthcare_policy.yaml")
-    
-    # 3. ARTICLE 14: Synchronous Human Oversight
-    # Execution physically pauses here until a signal is received from Slack.
-    print(f"⚖️ [GovAgent] Intercepting request for ${amount}...")
-    
-    approved = await manager.secure_approval(
-        agent_id="Healthcare-Director-v0.2.2",
-        reason=f"High-risk authorization required for GuardedPayment (${amount}).",
-        context={
-            "amount": f"${amount}",
-            "compliance_check": "EU-AI-ACT-HIGH-RISK"
-        }
+    # 1. UNIVERSAL INTERCEPTOR (v0.2.3 Modular Guard)
+    # This single call evaluates Fiscal limits, Policy rules, and triggers Slack Judiciary.
+    # Execution physically raises a GovernanceViolation if any guard fails.
+    await agent.evaluate(
+        guards=["fiscal", "judiciary"],
+        value=amount,
+        intent={"action": "healthcare_payment_tool", "params": {"amount": amount}},
+        reason=f"Processing healthcare disbursement of ${amount}"
     )
 
-    if approved:
-        # Business logic proceeds only after explicit human authorization
-        return f"SUCCESS: Payment of ${amount} authorized via Slack."
-    
-    return "REJECTED: Transaction denied by Human Judiciary."
+    # 2. Business logic proceeds ONLY if all guards pass
+    return f"SUCCESS: Payment of ${amount} authorized and processed."
 
 # Example Invocation
 async def main():
-    result = await healthcare_payment_tool.ainvoke({"amount": 1200.0})
-    print(result)
-
-if __name__ == "__main__":
-    asyncio.run(main())
+    llm = ChatOpenAI(model="gpt-4o")
+    # Setup Agent, Policy, and HITLManager...
+    agent = ExecutiveAgent(persona="Billing Director", model_client=llm, ...)
+    
+    result = await agent.execute("Pay claim #123 for $1200.00")
+    print(result.status)
 ```
 ---
 ## ⚙️ Installation
@@ -151,12 +133,9 @@ SLACK_CHANNEL_ID=C12345678
 OPENAI_API_KEY=sk-your-key
 
 ---
-
 **"Governance is not a constraint; it is the catalyst for enterprise AI adoption."**
-
 ---
-
 ### Author Stamp
-*   **Framework:** GovAgent v0.2.2 (Stable)
+*   **Framework:** GovAgent v0.2.3 (Stable)
 *   **Status:** Active / Open-Source Standard
 *   **Compliance:** Designed for Enterprise-Grade Accountability
