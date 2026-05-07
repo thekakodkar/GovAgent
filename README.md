@@ -163,6 +163,6 @@ OPENAI_API_KEY=sk-your-key
 **"Governance is not a constraint; it is the catalyst for enterprise AI adoption."**
 ---
 ### Author Stamp
-*   **Framework:** GovAgent v0.4.0 (Stable)
+*   **Framework:** GovAgent v0.4.2 (Stable)
 *   **Status:** Active / Open-Source Standard
 *   **Compliance:** Designed for Enterprise-Grade Accountability
