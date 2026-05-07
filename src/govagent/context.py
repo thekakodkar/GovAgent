@@ -1,29 +1,33 @@
 import contextvars
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, Dict
 
 if TYPE_CHECKING:
     from govagent.agent import ExecutiveAgent
 
-# The Context Variable: A thread-local storage for the active Governance Agent
+# Enhanced Context Variable for v0.4.0 Swarm Support
 _active_agent: contextvars.ContextVar[Optional["ExecutiveAgent"]] = contextvars.ContextVar(
     "active_agent", default=None
 )
 
+# Shared Fiscal state across the current async thread
+_shared_fiscal_state: contextvars.ContextVar[Dict[str, float]] = contextvars.ContextVar(
+    "shared_fiscal_state", default={"cumulative_spend": 0.0, "tco_ceiling": 0.0}
+)
+
 def set_current_agent(agent: "ExecutiveAgent") -> contextvars.Token:
-    """
-    Institutional Enrollment: Binds an agent to the current async context.
-    Returns a token required to reset the context later.
-    """
     return _active_agent.set(agent)
 
 def reset_current_agent(token: contextvars.Token) -> None:
-    """
-    Session Finalization: Clears the agent from the context to prevent leakage.
-    """
     _active_agent.reset(token)
 
 def get_current_agent() -> Optional["ExecutiveAgent"]:
-    """
-    The 'Governor' Finder: Used by decorators to locate the active evaluator.
-    """
     return _active_agent.get()
+
+def update_shared_spend(amount: float):
+    """Penny-accurate update across the recursive swarm."""
+    state = _shared_fiscal_state.get().copy()
+    state["cumulative_spend"] += amount
+    _shared_fiscal_state.set(state)
+
+def get_shared_fiscal_metrics() -> Dict[str, float]:
+    return _shared_fiscal_state.get()

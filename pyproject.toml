@@ -22,6 +22,13 @@ dependencies = [
     "httpx>=0.25.0",
     "slack-sdk>=3.0.0",
     "python-dotenv>=1.0.0",
+    "presidio-analyzer>=2.2.0",      # PII Analysis Engine (Pillar 2/Article 9)
+    "presidio-anonymizer>=2.2.0",    # PII Redaction/Anonymization (Pillar 2)
+    "spacy>=3.0.0",                  # Required NLP backend for Presidio
+    "boto3>=1.26.0",                 # AWS Pillar
+    "azure-monitor-ingestion>=1.0.0", # Azure Pillar
+    "azure-identity>=1.12.0",        # Azure Identity Pillar
+    "opentelemetry-api>=1.15.0"      # OTEL Pillar
 ]
 
 # OPTIONAL DEPENDENCIES: Users install via pip install "govagent[langchain]"
