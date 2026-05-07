@@ -4,7 +4,7 @@
 
 GovAgent provides a high-abstraction **Control Plane** for agentic AI. With a clear chain of accountability, this lightweight framework helps move autonomous systems from experimental sandboxes into governed, production environments.
 
-<img width="1097" height="479" alt="ImagegoV" src="https://github.com/user-attachments/assets/4e05d505-63d6-4f14-9475-cc00b4f20d73" />
+<img width="3078" height="1344" alt="ImagegoV" src="https://github.com/user-attachments/assets/14b0e084-4c17-430a-bfc7-ae143b13c5d1" />
 
 The v0.3.0 "Institutional Scaling" update transforms the framework into an automated gatekeeper, introducing thread-safe context management and declarative tool protection, allowing for the rapid deployment of governed "AI Swarms."
 
