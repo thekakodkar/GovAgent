@@ -2,8 +2,7 @@ import pytest
 import asyncio
 import os
 from dotenv import load_dotenv 
-from govagent.hitl.manager import HITLManager
-from govagent.hitl.slack_adapter import SlackJudiciaryAdapter
+from govagent.hitl import HITLManager, SlackJudiciaryAdapter
 
 # Load environment variables
 load_dotenv()
@@ -11,8 +10,8 @@ load_dotenv()
 @pytest.mark.asyncio
 async def test_slack_interaction():
     """
-    v0.2.3 Integration Test: Verifies the Slack Judiciary escalation.
-    Ensures the 'triggered_by' context is correctly passed to the human reviewer.
+    v0.3.0 Integration Test: Verifies the Slack Judiciary escalation path.
+    Ensures that high-risk context is accurately rendered for the human reviewer.
     """
     
     # 1. Configuration Check
@@ -21,41 +20,44 @@ async def test_slack_interaction():
     channel_id = os.getenv("SLACK_CHANNEL_ID")
 
     if not all([bot_token, app_token, channel_id]):
-        pytest.fail("❌ Environment Error: Slack credentials missing from .env")
+        pytest.skip("⚠️ Skipping Slack integration test: Credentials missing from .env")
 
-    # 2. Initialize the Adapter (The article 14 Interface)
+    # 2. Initialize the Adapter (The Article 14 Interface)
     adapter = SlackJudiciaryAdapter(
         bot_token=bot_token,
         app_token=app_token,
         channel_id=channel_id
     )
     
-    # Start persistent Socket Mode connection
-    adapter.start()
-    
-    # 3. Initialize the Manager
-    manager = HITLManager(adapter=adapter)
-    
-    print(f"\n⚖️  ESCALATION TEST: Ping sent to channel {channel_id}...")
+    try:
+        # Start persistent Socket Mode connection
+        adapter.start()
+        
+        # 3. Initialize the Manager
+        manager = HITLManager(adapter=adapter)
+        
+        print(f"\n⚖️  ESCALATION TEST: Dispatching approval request to {channel_id}...")
 
-    # 4. The Parameterized Blocking Call
-    # We explicitly pass 'triggered_by' to test the new v0.2.3 context logic
-    approved = await manager.secure_approval(
-        agent_id="GovAgent-v0.2.3-Alpha",
-        reason="Manual sign-off required for high-risk tool call.",
-        triggered_by="judiciary",
-        context={
-            "tool": "authorize_disbursement",
-            "amount": "$1,200.00",
-            "compliance_tag": "EU-AI-ACT-HIGH-RISK"
-        }
-    )
+        # 4. The Parameterized Blocking Call
+        # v0.3.0 standard: Passing structured context for executive decision support
+        approved = await manager.secure_approval(
+            agent_id="GovAgent-v0.3.0-Scale",
+            reason="Institutional sign-off required for high-value disbursement.",
+            triggered_by="judiciary",
+            context={
+                "action": "authorize_disbursement",
+                "params": {"amount": 1200.0, "currency": "USD"},
+                "compliance_check": "EU-AI-ACT-ARTICLE-14"
+            }
+        )
 
-    # 5. Verification of Decision
-    decision_str = "APPROVED ✅" if approved else "REJECTED ❌"
-    print(f"\n🏛️  Decision Logged: {decision_str}")
-    
-    assert isinstance(approved, bool), "The Judiciary must return a binary decision."
+        # 5. Verification of Decision
+        decision_str = "APPROVED ✅" if approved else "REJECTED ❌"
+        print(f"\n🏛️  Judiciary Response: {decision_str}")
+        
+        assert isinstance(approved, bool), "Judiciary must return a binary Boolean result."
 
-if __name__ == "__main__":
-    asyncio.run(test_slack_interaction())
+    finally:
+        # 6. Lifecycle Management: Cleanly stop the adapter to prevent hanging threads
+        if hasattr(adapter, "stop"):
+            adapter.stop()

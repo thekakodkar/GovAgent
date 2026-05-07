@@ -1,13 +1,6 @@
-# src/govagent/__init__.py
-
 from .agent import ExecutiveAgent
 from .policy import Policy
-from .hitl.manager import HITLManager
-from .hitl.slack_adapter import SlackJudiciaryAdapter
+from .registry import tool, registry
+from .context import get_current_agent
 
-__all__ = [
-    "ExecutiveAgent",
-    "Policy",
-    "HITLManager",
-    "SlackJudiciaryAdapter"
-]
+__all__ = ["ExecutiveAgent", "Policy", "tool", "registry", "get_current_agent"]

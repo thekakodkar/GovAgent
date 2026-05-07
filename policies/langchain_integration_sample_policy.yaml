@@ -23,12 +23,11 @@ governance:
 
 # 3. DEFINE TOOLS & RISK LEVELS
 tools:
-  - name: "authorize_claim_payment"
-    risk_level: "high"             # Standardized: Use lowercase to match risk_hierarchy
-    require_human_approval: true 
-    guards: ["fiscal", "judiciary"] # Added: Explicit guard manifest for v0.2.3
-    description: "Financial transaction tool for procurement"
-    max_per_transaction: 2000.0
+  - name: "execute_financial_transaction" # MUST match the new name in code
+    risk_level: "high"
+    category: "financial"
+    guards: ["fiscal", "policy", "judiciary"]
+    description: "Generic financial execution tool for all departments."
 
   - name: "SearchTool"
     risk_level: "low"

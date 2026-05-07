@@ -5,78 +5,63 @@ from dotenv import load_dotenv
 
 # LangChain & OpenAI Imports
 from langchain_openai import ChatOpenAI
-from langchain_core.messages import HumanMessage
-from langchain_core.tools import tool as langchain_tool
-
-# GovAgent v0.2.3 Modular API
-from govagent import ExecutiveAgent, Policy, HITLManager, SlackJudiciaryAdapter
+from govagent import ExecutiveAgent, tool # Using our new v0.3.0 'tool' decorator
 
 load_dotenv()
 BASE_DIR = Path(__file__).parent
 
-@langchain_tool
-async def healthcare_payment_tool(amount: float) -> str:
+# v0.3.0: ZERO Boilerplate Tool. Governance is injected automatically.
+@tool(name="execute_financial_transaction", guards=["fiscal", "judiciary"], risk_level="high")
+async def execute_financial_transaction(amount: float, reference_id: str = "UNKNOWN") -> str:
     """
-    Authorizes payments for healthcare claims. 
-    Use this tool only when a specific disbursement amount is identified.
+    Authorizes and executes a financial disbursement.
+    Used for claims, refunds, payroll, or vendor payments.
     """
-    # Note: In a production environment, the agent and policy should be 
-    # initialized once at the application level, not inside the tool.
+    return f"SUCCESS: Transaction of ${amount} for Ref: {reference_id} processed."
+
+async def run_scenario(persona: str, policy_file: str, task: str, delay: int):
+    """Worker function to simulate concurrent governed sessions."""
+    await asyncio.sleep(delay) # Stagger start times
     
-    # Access the globally configured agent/policy (simplified for this demo)
-    # We use the centralized 'evaluate' to protect the OpenAI session ROI.
-    await agent.evaluate(
-        guards=["fiscal", "judiciary"],
-        value=amount,
-        intent={"action": "healthcare_payment_tool", "params": {"amount": amount}},
-        reason=f"LLM requested a healthcare disbursement of ${amount}"
+    print(f"🚀 [{persona}] Initializing Session...")
+    
+    # v0.3.0: One-line Institutional Bootstrap
+    agent = ExecutiveAgent.bootstrap(
+        policy_path=BASE_DIR / f"../policies/{policy_file}",
+        llm=ChatOpenAI(model="gpt-4o", temperature=0),
+        slack_channel=os.getenv("SLACK_CHANNEL_ID")
     )
 
-    return f"SUCCESS: Disbursement of ${amount} processed via Governed Pipe."
+    print(f"🤖 [{persona}] Task: {task}")
+    try:
+        report = await agent.execute(task)
+        print(f"🏁 [{persona}] Status: {report.status} | Cost: ${report.estimated_cost_usd}")
+    except Exception as e:
+        print(f"🛑 [{persona}] Governance Halt: {e}")
 
 async def main():
-    print("🚀 Initializing Governed LLM Session (OpenAI + Slack)...")
+    print("🏢 STARTING MULTI-AGENT GOVERNANCE STRESS TEST (v0.3.0)\n" + "="*55)
 
-    # 1. Initialize the LLM (The Engine)
-    # We use gpt-4o for complex reasoning while GovAgent handles the safety.
-    llm = ChatOpenAI(
-        model="gpt-4o", 
-        api_key=os.getenv("OPENAI_API_KEY"),
-        temperature=0
-    )
-
-    # 2. Setup GovAgent Control Plane
-    adapter = SlackJudiciaryAdapter(
-        bot_token=os.getenv("SLACK_BOT_TOKEN"),
-        app_token=os.getenv("SLACK_APP_TOKEN"),
-        channel_id=os.getenv("SLACK_CHANNEL_ID")
-    )
-    adapter.start()
+    # We run two different directors with different policies concurrently
+    # Scenario A: Billing Director (High Limit)
+    # Scenario B: Junior Clerk (Low Limit - should trigger rejection or block)
     
-    manager = HITLManager(adapter=adapter)
-    policy = Policy.from_yaml(BASE_DIR / "../policies/langchain_integration_sample_policy.yaml")
+    tasks = [
+        run_scenario(
+            persona="Billing_Director", 
+            policy_file="langchain_integration_sample_policy.yaml",
+            task="Process a reimbursement for claim #882 in the amount of $1200.",
+            delay=0
+        ),
+        run_scenario(
+            persona="Compliance_Auditor", 
+            policy_file="auditor_policy.yaml", # Assume this policy has lower fiscal limits
+            task="Approve urgent payment for claim #995 for $5000.00.",
+            delay=1 # Starts slightly after to test async context isolation
+        )
+    ]
 
-    # 3. Initialize the ExecutiveAgent
-    # Global 'agent' variable so the tool can access it (for demo purposes)
-    global agent
-    agent = ExecutiveAgent(
-        persona="Healthcare Billing Director",
-        policy=policy,
-        model_client=llm,
-        hitl_manager=manager
-    )
-
-    # 4. EXECUTING THE GOVERNED LOOP
-    # The LLM will parse this task, decide to use the tool, 
-    # and then be intercepted by your v0.2.3 Guards.
-    task = "I need to process a reimbursement for claim #882 in the amount of $1200."
-    
-    try:
-        print(f"🤖 Task: {task}")
-        result = await agent.execute(task)
-        print(f"\n🏁 Final System Output: {result.status}")
-    except Exception as e:
-        print(f"\n🛑 Governance Circuit Breaker: {e}")
+    await asyncio.gather(*tasks)
 
 if __name__ == "__main__":
     asyncio.run(main())

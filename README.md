@@ -6,7 +6,7 @@ GovAgent provides a high-abstraction **Control Plane** for agentic AI. With a cl
 
 <img width="1097" height="479" alt="ImagegoV" src="https://github.com/user-attachments/assets/4e05d505-63d6-4f14-9475-cc00b4f20d73" />
 
-The v0.2.3 Update transforms the framework into a proactive Triage Engine, introducing Modular Guards that intercept risky or expensive actions at the earliest possible stage, significantly increasing the Business ROI of autonomous sessions.
+The v0.3.0 "Institutional Scaling" update transforms the framework into an automated gatekeeper, introducing thread-safe context management and declarative tool protection, allowing for the rapid deployment of governed "AI Swarms."
 
 ---
 
@@ -38,57 +38,45 @@ GovAgent is engineered to facilitate compliance for **High-Risk AI Systems** as 
     
 ---
 
-## 🛠️ Key Capabilities (v0.2.3)
-* **🛡️ Modular Guard Engine:** Cascading triage (fiscal -> policy -> judiciary) to stop invalid or over-budget requests at zero token cost.
-* **🔗 Automated Model Adapter:** Standardizes ChatOpenAI patterns to the GovAgent contract, ensuring ROI and token telemetry are captured automatically.
-* **🔍 Dynamic Intent Extraction:** Replaces hardcoded parameters with regex-based parsing to identify Tool IDs and financial amounts directly from LLM reasoning.
-* **📂 Self-Healing Telemetry:** Automated management of the /logs directory and audit_trail.jsonl persistence for forensic-grade audit readiness.
-* **⚖️ High-Signal Judiciary:** Slack notifications are automatically summarized to provide executives with clear "Decision Support".
+## 🛠️ Key Capabilities (v0.3.0)
+*   **🛡️ Invisible Governance:** Declarative tool protection via the @tool decorator. Guards are injected automatically at runtime.
+*   **🏢 Institutional Bootstrap:** Single-line initialization (ExecutiveAgent.bootstrap()) for rapid enterprise setup.
+*   **🧵 Thread-Safe Scaling:** contextvars support enables multi-agent swarms without identity or budget leakage.
+*   **🛑 Terminal Integrity:** Built-in "Hard Stop" logic prevents infinite reasoning loops after a rejection or fiscal breach.
+
 ---
 ## 📖 Advanced Usage: High-Abstraction Governance
 In an enterprise environment, GovAgent acts as your digital "Control Plane" for high-stakes workflows like healthcare claim processing.
 
-### 1. Autonomous "Billing Director" Workflow
-Bridge the gap between LLM reasoning and financial policy:
+### 1. Define a Governed tool (Pillars 2 & 3)
 ```python
+from govagent import tool
 
+@tool(name="execute_financial_transaction", guards=["fiscal", "judiciary"], risk_level="high")
+async def process_payment(amount: float, reference_id: str):
+    """Executes a financial disbursement. Injected guards handle Pillar 2 & 3 automatically."""
+    return f"SUCCESS: Paid ${amount} for Ref: {reference_id}"
+```
+### 2. The Institutional session (Pillars 1 & 4)
+```python
 import asyncio
 from langchain_openai import ChatOpenAI
-from govagent import ExecutiveAgent, Policy, HITLManager, SlackJudiciaryAdapter
+from govagent import ExecutiveAgent
 
 async def run_governed_session():
-    # Load Enterprise Policy (Article 9 Compliance)
-    policy = Policy.from_yaml("policies/healthcare_ops_policy.yaml")
-    
-    # Initialize the Slack Judiciary (Article 14 Compliance)
-    judiciary = SlackJudiciaryAdapter(
-        bot_token="xoxb-...", 
-        app_token="xapp-...", 
-        channel_id="C12345"
-    )
-    judiciary.start()
-
-    # The Executive Agent: Your digital 'Control Plane'
-    agent = ExecutiveAgent(
-        persona="Healthcare Finance Director",
-        policy=policy,
-        model_client=ChatOpenAI(model="gpt-4o"), # Auto-wrapped by v0.2.3 Adapter
-        hitl_manager=HITLManager(adapter=judiciary)
+    # Load Policy (Pillar 1) & Initialize Session
+    agent = ExecutiveAgent.bootstrap(
+        policy_path="policies/finance_policy.yaml",
+        llm=ChatOpenAI(model="gpt-4o"),
+        slack_channel="C12345" # Judiciary Link
     )
 
-    # Task triggers cascading triage: Fiscal -> Policy -> Judiciary
-    task = "Process claim #7742 for $1,250.00 for the outpatient procedure."
+    # Telemetry (Pillar 4) is captured automatically during execution
+    task = "Process a reimbursement for claim #882 in the amount of $1200."
     report = await agent.execute(task)
     
     print(f"🏁 Session Status: {report.status}")
 ```
- 
-´### 2. The Cascading Triage Engine
-The v0.2.3 core intercepts intent through three distinct layers of defense:
-
-* **Stage 1:** Fiscal Guard: Blocks the action if the amount exceeds the max_per_transaction limit.
-* **Stage 2:** Policy Guard: Validates the tool (e.g., authorize_claim_payment) against the approved manifest for the persona.
-* **Stage 3:** Judiciary Guard: Escalates "High Risk" actions to Slack for synchronous human approval.
 
 ---
 
@@ -114,53 +102,15 @@ Every session generates an immutable JSONL snapshot in /logs/audit_trail.jsonl.
 
 ## 🗺️ Strategic Roadmap
 
-### ✅ v0.2.3: Modular Enforcement (Current)
-* **Cascading Triage:** Tiered guards to protect LLM budget and human attention.
-* **Dynamic Extraction:** Automated parsing of claim metadata from conversation strings.
-* **Forensic JSONL:** Ready-to-audit logs for Enterprise SOCs.
+### ✅ v0.3.0: Institutional Scaling (Current)
+* **Automated Interception:** Declarative tool protection via decorators.
+* **Context Management:** Thread-safe multi-agent session tracking.
+* **Terminal Logic:** Loop-breaking safety for judiciary rejections.
 
-### 🚀 v0.3.0: Enterprise Connectivity (Next)
-* **Fiscal Ceilings:** Recursive approval for multi-agent sub-tasks and "Total Cost of Operation" (TCO) guardrails.
-* **Cloud Exporters:** Native integrations for enterprise logging stacks (AWS CloudWatch / Azure Monitor).
-* **Dynamic Budgeting:** Real-time API pricing integration for penny-accurate cost tracking.
----
-
-## 📖 Usage Example: Governed LangChain Tool (Simplified API)
-
-GovAgent v0.2.2 introduces a streamlined import structure and native support for LangChain tool interception. The following example demonstrates how to gate a high-risk financial transaction with a synchronous Slack Judiciary.
-
-```python
-import os
-import asyncio
-from langchain_openai import ChatOpenAI
-from langchain_core.tools import tool as langchain_tool
-from govagent import ExecutiveAgent, Policy, HITLManager, SlackJudiciaryAdapter
-
-@langchain_tool
-async def healthcare_payment_tool(amount: float) -> str:
-    """Authorizes payments for healthcare claims. Input: amount."""
-    
-    # 1. UNIVERSAL INTERCEPTOR (v0.2.3 Modular Guard)
-    # This single call evaluates Fiscal limits, Policy rules, and triggers Slack Judiciary.
-    # Execution physically raises a GovernanceViolation if any guard fails.
-    await agent.evaluate(
-        guards=["fiscal", "judiciary"],
-        value=amount,
-        intent={"action": "healthcare_payment_tool", "params": {"amount": amount}},
-        reason=f"Processing healthcare disbursement of ${amount}"
-    )
-
-    # 2. Business logic proceeds ONLY if all guards pass
-    return f"SUCCESS: Payment of ${amount} authorized and processed."
-
-# Example Invocation
-async def main():
-    result = await healthcare_payment_tool.ainvoke({"amount": 1200.0})
-    print(result)
-
-if __name__ == "__main__":
-    asyncio.run(main())
-```
+### 🚀 v0.4.0: The "Sovereign Swarm" (Next)
+* **Recursive Fiscal Ceilings:** Multi-agent TCO (Total Cost of Operation) guardrails.
+* **Cloud Exporters:** Native integration for AWS CloudWatch and Azure Monitor.
+* **Dynamic Budgeting:** Real-time API pricing for penny-accurate cost tracking.---
 ---
 ## ⚙️ Installation
 
