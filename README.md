@@ -4,7 +4,7 @@
 
 GovAgent provides a high-abstraction **Control Plane** for agentic AI. With a clear chain of accountability, this lightweight framework helps move autonomous systems from experimental sandboxes into governed, production environments.
 
-<img width="1539" height="672" alt="ImagegoV" src="https://github.com/user-attachments/assets/a3184917-00e9-4766-91b2-064bb61ee1e1" />
+<img width="769" height="336" alt="ImagegoV" src="https://github.com/user-attachments/assets/3690aff2-68c7-4f9e-90eb-c73389809ac1" />
 
 The **v0.4.0 "Sovereign Swarm"** update introduces **Recursive Fiscal Control** and **Cloud SOC Integration**, allowing for the deployment of multi-agent swarms with penny-accurate cost tracking and immutable forensic audit trails.
 
