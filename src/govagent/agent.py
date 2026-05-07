@@ -1,14 +1,13 @@
-from typing import List, Optional, Any
+import re
+import os
+from typing import List, Optional, Any, Tuple
 from govagent.policy import Policy
 from govagent.guards import CircuitBreaker, GovernanceViolation
 from govagent.telemetry import TelemetryManager
-from govagent.hitl import HITLManager
+from govagent.hitl import HITLManager, SlackJudiciaryAdapter
+from govagent.context import set_current_agent, reset_current_agent
 
 class ExecutiveAgent:
-    """
-    The core execution engine. Orchestrates reasoning while 
-    enforcing governance constraints in real-time.
-    """
     def __init__(
         self, 
         persona: str, 
@@ -19,94 +18,155 @@ class ExecutiveAgent:
     ):
         self.persona = persona
         self.policy = policy
-        self.model = model_client
+        self.model = self._wrap_model(model_client)
         self.guard = CircuitBreaker(policy)
         self.telemetry = telemetry or TelemetryManager()
         self.hitl = hitl_manager or HITLManager()
 
+    @classmethod
+    def bootstrap(cls, policy_path: str, llm: Any, slack_channel: Optional[str] = None):
+        """Institutional Factory: One-line Enterprise Setup."""
+        policy = Policy.from_yaml(policy_path)
+        adapter = None
+        if slack_channel:
+            adapter = SlackJudiciaryAdapter(
+                bot_token=os.getenv("SLACK_BOT_TOKEN"),
+                app_token=os.getenv("SLACK_APP_TOKEN"),
+                channel_id=slack_channel
+            )
+            adapter.start()
+            
+        return cls(
+            persona=policy.metadata.get("agent_name", "ExecutiveAgent"),
+            policy=policy,
+            model_client=llm,
+            hitl_manager=HITLManager(adapter=adapter)
+        )
+
+    def _wrap_model(self, client: Any) -> Any:
+        if client is None: return None 
+        if hasattr(client, "ainvoke"):
+            class LangChainAdapter:
+                def __init__(self, lc_client):
+                    self.lc_client = lc_client
+                
+                async def generate_plan(self, task: str, persona: str) -> Tuple[dict, float, int]:
+                    prompt = (
+                        f"System: You are a {persona}. You MUST execute a transaction for the task below.\n"
+                        f"Task: {task}\n\n"
+                        "Mandatory Format: To pay, you MUST include 'ACTION: execute_financial_transaction', "
+                        "'ID: [reference_id]', and 'AMOUNT: [amount]' in your response."
+                    )
+                    response = await self.lc_client.ainvoke(prompt)
+                    content = response.content
+
+                    # Forgiving Regex for Enterprise IDs
+                    id_match = re.search(r"ID:\s*#?([A-Za-z0-9_]+)", content)
+                    amt_match = re.search(r"AMOUNT:\s*\$?\s*([\d,.]+)", content)
+                    
+                    ref_id = id_match.group(1) if id_match else "UNKNOWN"
+                    raw_amt = amt_match.group(1).replace(",", "") if amt_match else "0.0"
+                    
+                    action = "execute_financial_transaction" if (id_match or amt_match) else None
+                    if "complete" in content.lower(): action = "complete"
+
+                    intent = {
+                        "thought": content.split('\n\n')[0][:250] + "...", 
+                        "action": action,
+                        "params": {"reference_id": ref_id, "amount": float(raw_amt)},
+                        "full_audit_log": content 
+                    }
+                    
+                    meta = response.response_metadata.get("token_usage", {})
+                    tokens = meta.get("total_tokens", 0)
+                    cost = (tokens / 1000) * 0.02 
+                    return intent, cost, tokens
+            
+            return LangChainAdapter(client)
+        return client
+
+    async def evaluate(self, guards: List[str], intent: dict = None, value: float = 0.0):
+        """Modular Triage (Article 9 & 12)."""
+        if not self.telemetry.current_session:
+            self.telemetry.start_trace(self.persona, "Internal Evaluation")
+        
+        if "fiscal" in guards:
+            current_total = self.telemetry.current_session.estimated_cost_usd + value
+            self.guard.check_financial_risk(current_total)
+            self._log_evaluation("fiscal")
+            
+        if "policy" in guards and intent and intent.get("action"):
+            if intent["action"] != "complete":
+                self.guard.validate_policy(intent.get("action"), intent.get("params", {}))
+            self._log_evaluation("policy")
+
+        if "judiciary" in guards and intent and intent.get("action"):
+            action_name = intent["action"]
+            if action_name != "complete" and self.policy.is_high_risk(action_name):
+                approved = await self.hitl.secure_approval(
+                    agent_id=self.policy.agent_name,
+                    reason=f"Judiciary Authorization Required: {action_name}",
+                    context=intent,
+                    triggered_by="judiciary"
+                )
+                if not approved:
+                    raise GovernanceViolation(f"Human Judiciary denied the request for {action_name}")
+                self._log_evaluation("judiciary")
+        return True
+
+    def _log_evaluation(self, guard_name: str):
+        if guard_name not in self.telemetry.current_session.guards_evaluated:
+            self.telemetry.current_session.guards_evaluated.append(guard_name)
+
     async def execute(self, task: str):
-        """
-        The 'Governed Reasoning' Loop: Think -> Guard -> Act -> Record.
-        Strictly enforces a Hard-Stop on human rejection.
-        """
+        """Governed Reasoning Loop with Thread-Safe Context Enrollment."""
+        token = set_current_agent(self)
         self.telemetry.start_trace(self.persona, task)
-        current_step = 0
-        max_steps = 10 
+        current_step, total_tokens = 0, 0
         
         try:
-            while current_step < max_steps:
-                # 1. Financial Guard Check
-                self.guard.check_financial_risk(self.telemetry.current_session.estimated_cost_usd)
-                
-                # 2. Reasoning Phase
-                # We unpack the tuple. v0.2.0 ensures we have distinct vars for 
-                # Reasoning (thought), the executable (action/params), and metadata.
+            while current_step < 10:
+                # 1. Reasoning
                 response = await self.model.generate_plan(task, self.persona)
-
-                # Explicit Intent Extraction:
-                # We extract the intent (index 0) and the cost/telemetry (indices 1, 2)
-                # This prevents the 'Unauthorized Tool' error for numeric data.
                 intent, cost, tokens = response if isinstance(response, tuple) else (response, 0, 0)
+                total_tokens += tokens
                 
-                # Update session metrics immediately for financial oversight
+                # Terminal Check
+                if not intent.get("action") or intent["action"] == "complete":
+                    return self.telemetry.finalize(status="success", tokens=total_tokens)
+
+                # 2. Evaluation (The Circuit Breaker)
+                await self.evaluate(
+                    guards=["fiscal", "policy", "judiciary"],
+                    intent=intent,
+                    value=cost
+                )
+
+                # 3. Action
                 self.telemetry.current_session.estimated_cost_usd += cost
-
-                # 3. Action Validation Guard (Explicit Intent Validation)
-                # We only pass the action and params to the guard.
-                # We extract them from the intent if the intent is a dictionary.
-                if isinstance(intent, dict):
-                    action = intent.get("action")
-                    params = intent.get("params", {})
-                    thought = intent.get("thought", "Executing plan...")
-                else:
-                    # Fallback for reasoning-only steps
-                    action, params, thought = None, {}, intent
-
-                if action:
-                    self.guard.validate_action(action, params)
+                result = await self.perform_action(intent.get("action"), intent.get("params", {}))
+                self.telemetry.log_step(intent.get("thought", ""), intent.get("action"), str(result))
                 
-                # 4. Synchronous HITL Check (The Judiciary)
-                confidence = 0.9 
-                
-                if self.policy.is_high_risk(action) or confidence < self.policy.confidence_threshold:
-                    print(f"⚠️ Intervention required for action: {action}")
-                    
-                    approved = await self.hitl.secure_approval(
-                        agent_id=self.policy.agent_name,
-                        reason=f"High-risk action: {action}" if self.policy.is_high_risk(action) else "Low confidence",
-                        context={"action": action, "params": params, "thought": thought}
-                    )
+                # v0.3.0 CRITICAL: Financial transactions are TERMINAL. 
+                # This prevents the 10-step loop after a successful payment.
+                if intent.get("action") == "execute_financial_transaction":
+                    return self.telemetry.finalize(status="success: transaction finalized", tokens=total_tokens)
 
-                    # DEFENSIVE GATE: Only proceed if approved is explicitly True
-                    if approved is not True:
-                        print(f"🛑 HALTING: Rejection or timeout for {action}")
-                        return self.telemetry.finalize(
-                            status=f"rejected: Human denied {action}", 
-                            tokens=current_step * 100
-                        )
-
-                # 5. Execution (ONLY reachable if step 4 passed)
-                result = await self.perform_action(action, params)
-                
-                # 6. Logging & Completion check
-                self.telemetry.log_step(thought, action, result)
-                
-                if self.is_task_complete(result):
-                    break
+                if "success" in str(result).lower() or "complete" in str(result).lower(): 
+                    return self.telemetry.finalize(status="success", tokens=total_tokens)
                 
                 current_step += 1
 
-            return self.telemetry.finalize(status="success", tokens=current_step * 150)
+            return self.telemetry.finalize(status="timeout: max steps reached", tokens=total_tokens)
 
         except GovernanceViolation as gv:
-            return self.telemetry.finalize(status=f"blocked: {str(gv)}", tokens=current_step * 50)
+            # TERMINAL EXIT: One 'No' in Slack ends the session.
+            return self.telemetry.finalize(status=f"blocked: {str(gv)}", tokens=total_tokens)
         except Exception as e:
-            return self.telemetry.finalize(status=f"error: {str(e)}", tokens=0)
+            return self.telemetry.finalize(status=f"error: {str(e)}", tokens=total_tokens)
+        finally:
+            reset_current_agent(token)
 
-    async def perform_action(self, action: str, params: dict):
-        """Standard tool execution simulation."""
-        return f"Executed {action} with success. Task complete."
-
-    def is_task_complete(self, result: str) -> bool:
-        """Determines if the session objectives are met."""
-        return "complete" in result.lower()
+    async def perform_action(self, action: str, params: dict) -> str:
+        if not action or action == "complete": return "Task complete."
+        return f"Action {action} executed with params {params}"

@@ -1,6 +1,5 @@
-from typing import Any, Dict
+from typing import Any, Dict, List
 from govagent.policy import Policy
-from govagent.telemetry import ExecutionSnapshot
 
 class GovernanceViolation(Exception):
     """Custom exception for audit-ready error handling."""
@@ -9,35 +8,66 @@ class GovernanceViolation(Exception):
 class CircuitBreaker:
     """
     Real-time enforcement of the Governance Manifest.
+    Provides parameterized circuit breakers for cascading triage.
     """
     def __init__(self, policy: Policy):
         self.policy = policy
 
-    def check_financial_risk(self, current_spend: float):
-        """Prevents further execution if budget is exceeded."""
-        if current_spend >= self.policy.max_spend_usd:
+    def check_financial_risk(self, value: float, current_session_spend: float = 0.0):
+        """
+        STAGE 1: Fiscal Circuit Breaker.
+        Evaluates transaction value and session totals against policy ceilings.
+        """
+        # Tool-specific ceiling check
+        if value > self.policy.global_limits.get("max_per_transaction", 2000.0):
             raise GovernanceViolation(
-                f"Budget Exceeded: Current spend ${current_spend:.4f} "
-                f"exceeds limit of ${self.policy.max_spend_usd}"
+                f"FISCAL REJECT: Transaction value ${value} exceeds per-action ceiling."
             )
 
-    def validate_action(self, tool_name: str, parameters: Dict[str, Any]):
+        # Global budget check
+        total_projected = current_session_spend + value
+        if total_projected > self.policy.global_limits.get("daily_budget_usd", 100.0):
+            raise GovernanceViolation(
+                f"FISCAL REJECT: Total spend ${total_projected} exceeds daily budget."
+            )
+
+    def check_operational(self, metrics: Dict[str, Any]):
         """
-        Validates the intended action against the whitelist 
-        and inspects for restricted domains.
+        STAGE 2: Operational Circuit Breaker.
+        Validates technical constraints like token counts or rate limits.
         """
-        # Whitelist check
+        max_tokens = self.policy.global_limits.get("max_tokens_per_run", 4000)
+        current_tokens = metrics.get("tokens", 0)
+        
+        if current_tokens > max_tokens:
+            raise GovernanceViolation(
+                f"OPERATIONAL REJECT: Token usage {current_tokens} exceeds limit of {max_tokens}."
+            )
+
+    def validate_policy(self, tool_name: str, parameters: Dict[str, Any]):
+        """
+        STAGE 3: Policy Circuit Breaker.
+        Whitelist check and domain-specific parameter scrubbing.
+        """
+        # 1. Whitelist enforcement
         if tool_name not in self.policy.allowed_tools:
-            raise GovernanceViolation(f"Unauthorized Tool: {tool_name} is not in the allowed manifest.")
+            raise GovernanceViolation(
+                f"UNAUTHORIZED: {tool_name} is not present in the allowed manifest."
+            )
 
-        # Restricted domain check (e.g., blocking specific URLs or IPs)
-        for domain in self.policy.restricted_domains:
+        # 2. Parameter scrubbing for restricted domains
+        restricted = self.policy.restricted_domains
+        for domain in restricted:
             if any(domain in str(val) for val in parameters.values()):
-                raise GovernanceViolation(f"Access Denied: Parameter contains restricted domain '{domain}'")
+                raise GovernanceViolation(
+                    f"POLICY VIOLATION: Parameter contains restricted domain '{domain}'"
+                )
 
-    def assess_confidence(self, score: float):
-        """Forces Human-in-the-Loop if AI confidence is low."""
-        if score < self.policy.confidence_threshold:
-            # In a production loop, this would trigger the HITL protocol
-            return "ESCALATE_TO_HUMAN"
-        return "PROCEED"
+    def check_risk_level(self, tool_name: str) -> str:
+        """
+        Determines if an action requires Judiciary (Human) escalation.
+        Returns: 'ESCALATE' or 'AUTO_APPROVE'
+        """
+        if self.policy.is_high_risk(tool_name):
+            return "ESCALATE"
+        return "AUTO_APPROVE"
