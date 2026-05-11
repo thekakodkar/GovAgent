@@ -6,8 +6,30 @@ GovAgent provides a high-abstraction **Control Plane** for agentic AI. With a cl
 
 <img width="769" height="336" alt="ImagegoV" src="https://github.com/user-attachments/assets/3690aff2-68c7-4f9e-90eb-c73389809ac1" />
 
-The **v0.4.0 "Sovereign Swarm"** update introduces **Recursive Fiscal Control** and **Cloud SOC Integration**, allowing for the deployment of multi-agent swarms with penny-accurate cost tracking and immutable forensic audit trails.
+The **v0.4.3 "Sovereign Swarm"** update introduces **Recursive Fiscal Control** and **Cloud SOC Integration**, allowing for the deployment of multi-agent swarms with penny-accurate cost tracking and immutable forensic audit trails.
 
+---
+
+## ⚡ 60-Second Quickstart: Institutional Sovereignty
+Achieve Article 12 and 14 compliance in three commands. This setup orchestrates a containerized environment with native support for AWS CloudWatch, Pydantic V2 validation, and Recursive TCO tracking.
+
+1. **Initialize the Control Plane**
+Ensure your .env file contains your OPENAI_API_KEY and Slack credentials in the root directory.
+
+```bash
+# Clone the Sovereign Repository
+git clone https://github.com/thekakodkar/govagent.git
+cd govagent
+
+# Launch the Governed Container Stack
+docker-compose up -d
+```
+2. **Verify the Governance Loop**
+Execute the Institutional Demo to witness real-time PII redaction and fiscal gating.
+
+```bash
+docker-compose exec govagent-demo python examples/demo.py
+```
 ---
 
 ## 🏗️ Core Pillars: The Chain of Accountability
@@ -19,6 +41,23 @@ GovAgent replaces "Black Box" reasoning with a transparent, governed loop:
 4.  **Telemetry (The Evidence):** Forensic-grade audit trails providing an immutable ledger of compliance and real-world ROI.
 
 ---
+
+## ⚖️ Comparative Analysis: Governance Superiority
+
+In an institutional setting, "State Management" is insufficient—you need **Sovereignty**. GovAgent is engineered to meet the specific requirements of Big 4 audit and compliance, transforming "Black Box" reasoning into a transparent, governed lifecycle.
+
+| Feature | **GovAgent** | LangGraph | CrewAI |
+| :--- | :--- | :--- | :--- |
+| **Policy Enforcement** | ✅ **Deterministic Enforcement** | ⚠️ Partial / Manual | ❌ None |
+| **Audit Trails** | ✅ **Cloud SOC (AWS/Azure)** | ⚠️ Local / LangSmith | ❌ Console Logs |
+| **Human Approval Gates** | ✅ **Synchronous & Blocking** | ⚠️ Manual Interrupts | ❌ Optional |
+| **Recursive TCO Tracking** | ✅ **Aggregated Swarm Cost** | ❌ Per-run only | ❌ None |
+| **Enterprise Governance** | ✅ **EU AI Act Ready** | ❌ Experimental | ❌ Experimental |
+
+> **Strategic Directive:** While LangGraph and CrewAI focus on agent capability and roleplay, GovAgent operates as the **Institutional Control Plane** that ensures every action is legislated, evaluated, and forensically recorded.
+
+---
+
 
 ## ⚖️ Regulatory Compliance: EU AI Act (Regulation 2024/1689)
 
@@ -163,6 +202,6 @@ OPENAI_API_KEY=sk-your-key
 **"Governance is not a constraint; it is the catalyst for enterprise AI adoption."**
 ---
 ### Author Stamp
-*   **Framework:** GovAgent v0.4.2 (Stable)
+*   **Framework:** GovAgent v0.4.3 (Stable)
 *   **Status:** Active / Open-Source Standard
 *   **Compliance:** Designed for Enterprise-Grade Accountability
