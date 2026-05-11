@@ -1,0 +1,29 @@
+metadata:
+  agent_name: "Healthcare Finance Director"
+  version: "0.4.0"
+  compliance_standard: "EU AI Act - Article 9 & 12"
+
+# Pillar 2: Fiscal Sovereignty
+governance:
+  fiscal_guardrails:
+    max_spend_usd: 100.00          # Institutional Ceiling
+    recursive_tco_limit: 500.00   # Aggregate Swarm Ceiling
+    currency: "USD"
+
+# Pillar 3: Judiciary Oversight
+tools:
+  - name: "execute_financial_transaction"
+    description: "Authorizes and executes a financial disbursement."
+    risk_level: "high"             # Triggers mandatory Slack HITL
+    require_human_approval: true
+    fiscal_impact: true
+
+  - name: "audit_transaction_logs"
+    description: "Reads local telemetry for reconciliation."
+    risk_level: "low"
+    require_human_approval: false
+
+# Pillar 1: PII Redaction Strategy
+privacy:
+  redaction_level: "strict"
+  target_entities: ["PERSON", "LOCATION", "CREDIT_CARD", "PHONE_NUMBER"]

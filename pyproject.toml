@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "govagent"
-version = "0.4.2"
+version = "0.4.3"
 description = "The Governance-First Framework for Agentic AI"
 readme = "README.md"
 requires-python = ">=3.10"

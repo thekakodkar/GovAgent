@@ -1,0 +1,7 @@
+services:
+  govagent-demo:
+    build: .
+    volumes:
+      - .:/app
+    env_file: .env
+    command: python examples/demo.py
