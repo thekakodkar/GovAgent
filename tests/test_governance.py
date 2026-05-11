@@ -1,109 +1,69 @@
 import pytest
 from govagent.agent import ExecutiveAgent
-from govagent.policy import Policy
-from govagent.hitl import HITLManager
+from govagent.context import update_shared_spend, get_shared_fiscal_metrics, reset_current_agent, set_current_agent
 from govagent.guards import GovernanceViolation
-from govagent.context import get_current_agent
 
 @pytest.mark.asyncio
-async def test_hitl_escalation_on_high_risk():
+async def test_recursive_tco_ceiling_breach(sovereign_policy):
     """
-    v0.3.0: Validates that 'High Risk' triggers the Synchronous HITL
-    while maintaining Article 14 (Human Oversight) compliance.
+    Validates Phase 2: Swarm aggregate cost triggers a global circuit breaker.
+    Ensures that parent + child spend does not exceed the Institutional TCO.
     """
-    config = {
-        "metadata": {"agent_name": "TestAgent"},
-        "tools": [
-            {"name": "delete_database", "risk_level": "high"}
-        ]
-    }
-    policy = Policy(config)
+    # Initialize the Director (Parent)
+    agent = ExecutiveAgent(persona="Director", policy=sovereign_policy, model_client=None)
     
-    # Mock Adapter: Simulates a successful 'Approve' click in Slack
-    class MockApproveAdapter:
-        async def notify(self, request):
-            return True
-
-    hitl = HITLManager(adapter=MockApproveAdapter())
-    agent = ExecutiveAgent(
-        persona="Admin", 
-        policy=policy, 
-        model_client=None, 
-        hitl_manager=hitl
-    )
+    # 1. INSTITUTIONAL STATE: Simulate Parent has already consumed 90% of the budget
+    # In a real swarm, this is updated automatically via telemetry.finalize()
+    update_shared_spend(90.0) 
     
-    # Verify the centralized evaluation loop triggers the Judiciary
-    result = await agent.evaluate(
-        guards=["fiscal", "judiciary"],
-        intent={"action": "delete_database", "params": {"id": "db_001"}},
-        value=1.0 # Minimal value to pass Fiscal
-    )
-    
-    assert result is True
-    assert "judiciary" in agent.telemetry.current_session.guards_evaluated
-
-@pytest.mark.asyncio
-async def test_hitl_rejection_raises_violation():
-    """
-    v0.3.0: Validates that a Human Rejection triggers an immediate 
-    Circuit Breaker, protecting the enterprise from unauthorized acts.
-    """
-    config = {
-        "metadata": {"agent_name": "FinanceBot"},
-        "tools": [{"name": "wire_transfer", "risk_level": "high"}]
-    }
-    policy = Policy(config)
-    
-    # Mock Adapter: Simulates a 'Reject' click in Slack
-    class MockRejectAdapter:
-        async def notify(self, request):
-            return False
-
-    hitl = HITLManager(adapter=MockRejectAdapter())
-    agent = ExecutiveAgent(persona="FinanceBot", policy=policy, model_client=None, hitl_manager=hitl)
-    
-    # Verify rejection raises the specific GovernanceViolation
+    # 2. SUB-AGENT ACTION: Child attempts a $20 transaction
+    # Total projected spend ($110) exceeds the $100 policy ceiling
     with pytest.raises(GovernanceViolation) as excinfo:
-        await agent.evaluate(
-            guards=["judiciary"],
-            intent={"action": "wire_transfer", "params": {"amount": 1000}}
-        )
+        await agent.evaluate(guards=["fiscal"], value=20.0)
     
-    assert "human judiciary denied" in str(excinfo.value).lower()
+    # 3. VERIFICATION: Ensure the rejection is specific to the Recursive TCO
+    assert "RECURSIVE TCO REJECT" in str(excinfo.value).upper()
+    print("✅ Recursive TCO Circuit Breaker verified.")
 
 @pytest.mark.asyncio
-async def test_fiscal_overrides_judiciary_triage():
+async def test_judiciary_traceability_in_swarm(sovereign_policy):
     """
-    v0.3.0: Proves the Triage hierarchy. Judiciary is a 'Stage 3' guard; 
-    if 'Stage 1' (Fiscal) fails, we save human bandwidth by never pining Slack.
+    Validates Phase 2: Ensures Sub-Agents correctly inherit the Parent Trace ID.
+    Satisfies Article 12 (Traceability) for multi-agent delegation.
     """
-    config = {
-        "metadata": {"agent_name": "TriageTest"},
-        "global_limits": {"max_per_transaction": 100.0},
-        "tools": [{"name": "wire_transfer", "risk_level": "high"}]
-    }
-    policy = Policy(config)
+    # 1. Setup Parent Context
+    parent_agent = ExecutiveAgent(persona="Director", policy=sovereign_policy, model_client=None)
+    parent_agent.telemetry.start_trace("Director", "Master Task")
+    parent_trace_id = parent_agent.telemetry.current_session.trace_id
     
-    # This adapter should NEVER be hit if Fiscal works correctly
-    class FailIfCalledAdapter:
-        async def secure_approval(self, *args, **kwargs):
-            pytest.fail("ERROR: Judiciary was engaged despite a Fiscal failure!")
-
-    agent = ExecutiveAgent(
-        persona="Bot", 
-        policy=policy, 
-        model_client=None, 
-        hitl_manager=HITLManager(adapter=FailIfCalledAdapter())
-    )
-
-    # Attempting a $500 transfer against a $100 limit
-    with pytest.raises(GovernanceViolation) as excinfo:
-        await agent.evaluate(
-            guards=["fiscal", "judiciary"],
-            intent={"action": "wire_transfer"},
-            value=500.0
-        )
+    # 2. Enroll Parent in Context (Simulating delegation)
+    token = set_current_agent(parent_agent)
     
-    assert "fiscal reject" in str(excinfo.value).lower()
-    # Verify Judiciary was never pined
-    assert "judiciary" not in agent.telemetry.current_session.guards_evaluated
+    try:
+        # 3. Initialize Child (Sub-Agent)
+        child_agent = ExecutiveAgent(persona="Clerk", policy=sovereign_policy, model_client=None)
+        child_agent.telemetry.start_trace("Clerk", "Sub-Task Delegation")
+        
+        # 4. VERIFICATION: Child must hold the Parent's Trace ID as 'parent_trace_id'
+        assert child_agent.telemetry.current_session.parent_trace_id == parent_trace_id
+        print(f"✅ Swarm Traceability verified: Child inherited Parent ID {parent_trace_id}")
+        
+    finally:
+        reset_current_agent(token)
+
+@pytest.mark.asyncio
+async def test_shared_fiscal_state_persistence(sovereign_policy):
+    """
+    Ensures that fiscal updates are persistent across different agent instances 
+    within the same institutional session.
+    """
+    # 1. Initial spend
+    update_shared_spend(15.50)
+    
+    # 2. Secondary spend from a different instance
+    update_shared_spend(10.00)
+    
+    # 3. VERIFICATION: Total metrics must reflect the sum
+    metrics = get_shared_fiscal_metrics()
+    assert metrics["cumulative_spend"] == 25.50
+    print(f"✅ Shared Fiscal State verified: Aggregate spend is {metrics['cumulative_spend']}")

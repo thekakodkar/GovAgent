@@ -2,6 +2,28 @@
 
 All notable changes to the **GovAgent** framework are documented in this file. This project adheres to a "Governance-First" versioning strategy, prioritizing human oversight and fiscal accountability.
 
+## [0.4.0] - 2026-05-07
+### "Sovereign Swarm" Release: Cloud-Native Governance & Recursive Fiscal Control
+
+### 💸 Added: Phase 2 - Recursive Fiscal Sovereignty
+- **Recursive TCO Tracking**: Introduced an institutional context that aggregates **Total Cost of Operation (TCO)** across parent and sub-agents, preventing "Budget Fragmentation" in complex swarms.
+- **Shared Fiscal Metrics**: Implemented `get_shared_fiscal_metrics` and `update_shared_spend` to provide a single source of truth for financial ceilings across async threads.
+- **Penny-Accurate Pricing**: Integrated a dedicated pricing engine in `telemetry.py` to calculate exact token costs before finalization.
+
+### ☁️ Added: Phase 3 - Institutional Evidence (Cloud SOC)
+- **Multi-Sink Dispatch**: Refactored `TelemetryManager.finalize` as an asynchronous engine capable of broadcasting forensic snapshots to multiple destinations simultaneously.
+- **AWS CloudWatch Exporter**: Launched native integration for real-time log ingestion into AWS, supporting enterprise-grade security monitoring.
+- **Azure Monitor Exporter**: Provided architectural support for Azure Data Collection Rules (DCR) for long-term regulatory record-keeping.
+- **Mock Forensic Sink**: Developed a high-fidelity `MockSOCExporter` for local validation of telemetry dispatch without requiring cloud credentials.
+
+### 🛡️ Added: Phase 1 - Structural Hardening
+- **Article 9 Privacy Guard**: Integrated an automated **Stage 0** defense using Microsoft Presidio to redact PII (Personally Identifiable Information) before tasks reach the LLM.
+- **Type-Safe Intent Validation**: Replaced regex-based extraction with **Pydantic V2 Schema Enforcement** in the tool registry to ensure deterministic integrity of all tool parameters.
+
+### 🛠️ Fixed: Async Lifecycle & Finalization
+- **Coroutine Resolution**: Patched `ExecutiveAgent.execute` to fully `await` all telemetry paths, resolving a critical `AttributeError` where audit reports were returned as unresolved coroutines.
+- **Address Leakage Patch**: Hardened the `PrivacyGuard` with a regex-based "Safety Net" to ensure physical addresses (e.g., "123 Main St") are successfully captured as `LOCATION` entities.
+
 ## [0.3.0] - 2026-05-07
 ### Major Release: Institutional Scaling & Terminal Integrity
 

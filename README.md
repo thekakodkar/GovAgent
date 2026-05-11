@@ -4,10 +4,32 @@
 
 GovAgent provides a high-abstraction **Control Plane** for agentic AI. With a clear chain of accountability, this lightweight framework helps move autonomous systems from experimental sandboxes into governed, production environments.
 
-<img width="1097" height="479" alt="ImagegoV" src="https://github.com/user-attachments/assets/4e05d505-63d6-4f14-9475-cc00b4f20d73" />
+<img width="769" height="336" alt="ImagegoV" src="https://github.com/user-attachments/assets/3690aff2-68c7-4f9e-90eb-c73389809ac1" />
 
-The v0.3.0 "Institutional Scaling" update transforms the framework into an automated gatekeeper, introducing thread-safe context management and declarative tool protection, allowing for the rapid deployment of governed "AI Swarms."
+The **v0.4.3 "Sovereign Swarm"** update introduces **Recursive Fiscal Control** and **Cloud SOC Integration**, allowing for the deployment of multi-agent swarms with penny-accurate cost tracking and immutable forensic audit trails.
 
+---
+
+## ⚡ 60-Second Quickstart: Institutional Sovereignty
+Achieve Article 12 and 14 compliance in three commands. This setup orchestrates a containerized environment with native support for AWS CloudWatch, Pydantic V2 validation, and Recursive TCO tracking.
+
+1. **Initialize the Control Plane**
+Ensure your .env file contains your OPENAI_API_KEY and Slack credentials in the root directory.
+
+```bash
+# Clone the Sovereign Repository
+git clone https://github.com/thekakodkar/govagent.git
+cd govagent
+
+# Launch the Governed Container Stack
+docker-compose up -d
+```
+2. **Verify the Governance Loop**
+Execute the Institutional Demo to witness real-time PII redaction and fiscal gating.
+
+```bash
+docker-compose exec govagent-demo python examples/demo.py
+```
 ---
 
 ## 🏗️ Core Pillars: The Chain of Accountability
@@ -20,29 +42,38 @@ GovAgent replaces "Black Box" reasoning with a transparent, governed loop:
 
 ---
 
+## ⚖️ Comparative Analysis: Governance Superiority
+
+In an institutional setting, "State Management" is insufficient—you need **Sovereignty**. GovAgent is engineered to meet the specific requirements of Big 4 audit and compliance, transforming "Black Box" reasoning into a transparent, governed lifecycle.
+
+| Feature | **GovAgent** | LangGraph | CrewAI |
+| :--- | :--- | :--- | :--- |
+| **Policy Enforcement** | ✅ **Deterministic Enforcement** | ⚠️ Partial / Manual | ❌ None |
+| **Audit Trails** | ✅ **Cloud SOC (AWS/Azure)** | ⚠️ Local / LangSmith | ❌ Console Logs |
+| **Human Approval Gates** | ✅ **Synchronous & Blocking** | ⚠️ Manual Interrupts | ❌ Optional |
+| **Recursive TCO Tracking** | ✅ **Aggregated Swarm Cost** | ❌ Per-run only | ❌ None |
+| **Enterprise Governance** | ✅ **EU AI Act Ready** | ❌ Experimental | ❌ Experimental |
+
+> **Strategic Directive:** While LangGraph and CrewAI focus on agent capability and roleplay, GovAgent operates as the **Institutional Control Plane** that ensures every action is legislated, evaluated, and forensically recorded.
+
+---
+
+
 ## ⚖️ Regulatory Compliance: EU AI Act (Regulation 2024/1689)
 
-GovAgent is engineered to facilitate compliance for **High-Risk AI Systems** as defined under the EU AI Act. The framework provides the technical primitives required to satisfy key transparency and oversight mandates:
+GovAgent satisfies key transparency and oversight mandates for **High-Risk AI Systems**:
 
-*   **Article 14: Human Oversight**  
-    Native **Synchronous HITL** (Human-in-the-Loop) adapters ensure that high-risk tool execution is physically gated by natural persons in real-time.
-    
-*   **Article 9: Risk Management System**  
-    Automated, policy-driven enforcement (via `policy.yaml`) identifies and mitigates operational and financial risks *prior* to tool deployment.
-    
-*   **Article 12: Record-Keeping & Traceability**  
-    Immutable **Forensic Telemetry** captures the full "Chain of Accountability," including agent reasoning, tool parameters, and the identity of the human overseer who authorized the action.
-
-*   **Article 13: Transparency & Provision of Information**  
-    Automated generation of Execution Snapshots allows for the clear explanation of AI-driven outputs to end-users and regulators.
+* **Article 9: Risk Management & Privacy** Automated PII redaction (Stage 0) and policy-driven intent interception.
+* **Article 12: Record-Keeping & Traceability** Immutable **Forensic Telemetry** with native cloud exporters and recursive `parent_trace_id` tracking.
+* **Article 14: Human Oversight** Physical gating of high-risk actions through synchronous human authorization.
     
 ---
 
-## 🛠️ Key Capabilities (v0.3.0)
-*   **🛡️ Invisible Governance:** Declarative tool protection via the @tool decorator. Guards are injected automatically at runtime.
-*   **🏢 Institutional Bootstrap:** Single-line initialization (ExecutiveAgent.bootstrap()) for rapid enterprise setup.
-*   **🧵 Thread-Safe Scaling:** contextvars support enables multi-agent swarms without identity or budget leakage.
-*   **🛑 Terminal Integrity:** Built-in "Hard Stop" logic prevents infinite reasoning loops after a rejection or fiscal breach.
+## 🛠️ Key Capabilities (v0.4.0)
+* **💸 Recursive Fiscal Ceilings:** Aggregate TCO (Total Cost of Operation) tracking across parent and sub-agents to prevent budget fragmentation.
+* **☁️ Cloud-Native SOC:** Native telemetry exporters for **AWS CloudWatch** and **Azure Monitor**.
+* **🛡️ Article 9 Privacy Guard:** Stage 0 PII scrubbing before tasks reach the LLM.
+* **📐 Type-Safe Intent:** Pydantic-hardened tool parameters for deterministic integrity.
 
 ---
 ## 📖 Advanced Usage: High-Abstraction Governance
@@ -54,47 +85,66 @@ from govagent import tool
 
 @tool(name="execute_financial_transaction", guards=["fiscal", "judiciary"], risk_level="high")
 async def process_payment(amount: float, reference_id: str):
-    """Executes a financial disbursement. Injected guards handle Pillar 2 & 3 automatically."""
+    """
+    Executes a financial disbursement. 
+    Injected guards handle Recursive TCO and Judiciary gating automatically.
+    """
     return f"SUCCESS: Paid ${amount} for Ref: {reference_id}"
 ```
-### 2. The Institutional session (Pillars 1 & 4)
+### 2. The Institutional session (Pillars 1, 4 & Cloud SOC)
 ```python
 import asyncio
+import os
 from langchain_openai import ChatOpenAI
 from govagent import ExecutiveAgent
+from govagent.exporters.cloudwatch import CloudWatchExporter
 
 async def run_governed_session():
-    # Load Policy (Pillar 1) & Initialize Session
+    # 1. Load Policy (Pillar 1) & Initialize Session
     agent = ExecutiveAgent.bootstrap(
         policy_path="policies/finance_policy.yaml",
         llm=ChatOpenAI(model="gpt-4o"),
-        slack_channel="C12345" # Judiciary Link
+        slack_channel="C12345" # Synchronous Judiciary Link
     )
 
-    # Telemetry (Pillar 4) is captured automatically during execution
-    task = "Process a reimbursement for claim #882 in the amount of $1200."
+    # 2. Enroll Cloud SOC (Pillar 4 - Phase 3)
+    # Dispatches forensic evidence to AWS CloudWatch in real-time
+    agent.telemetry.add_exporter(CloudWatchExporter(log_group="/aws/govagent/audit"))
+
+    # 3. Execution (Stage 0 Privacy & Stage 2 Fiscal)
+    task = "Process a reimbursement for John Doe in the amount of $1200."
     report = await agent.execute(task)
     
-    print(f"🏁 Session Status: {report.status}")
+    # 4. Institutional Audit Report
+    print(f"🏁 Session Status: {report.status.upper()}")
+    print(f"💰 Recursive Swarm TCO: ${report.recursive_tco_usd:.4f}")
+    print(f"🆔 Global Trace ID: {report.trace_id}")
 ```
-
 ---
 
 ### 📊 Forensic Telemetry: Article 12 Readiness
-Every session generates an immutable JSONL snapshot in /logs/audit_trail.jsonl.
+Every session generates an immutable snapshot dispatched to your enrolled cloud SOC or stored locally in /logs/audit_trail.jsonl.
 
 ```python
 
 {
-  "timestamp": "2026-05-06T12:24:25",
+  "timestamp": "2026-05-07T15:30:00Z",
+  "trace_id": "exec-882-9934",
+  "parent_trace_id": "director-main-771", 
   "persona": "Healthcare Finance Director",
-  "task": "Process claim #7742 for $1,250.00",
-  "guards_evaluated": ["fiscal", "policy", "judiciary"],
-  "decision": "Approved by Judiciary (Slack)",
-  "metadata": {
-    "tokens": 450,
-    "cost_usd": 0.009,
-    "intent": {"action": "authorize_claim_payment", "params": {"amount": 1250.0}}
+  "task": "Process claim #882 for $1200.00",
+  "status": "SUCCESS: TRANSACTION FINALIZED",
+  "guards_evaluated": ["privacy", "fiscal", "policy", "judiciary"],
+  "metrics": {
+    "tokens": 850,
+    "individual_cost_usd": 0.012,
+    "recursive_tco_usd": 0.045,
+    "pii_entities_redacted": 2
+  },
+  "judiciary_audit": {
+    "approver": "U12345 (Slack)",
+    "decision": "APPROVED",
+    "timestamp": "2026-05-07T15:28:45Z"
   }
 }
 
@@ -102,15 +152,15 @@ Every session generates an immutable JSONL snapshot in /logs/audit_trail.jsonl.
 
 ## 🗺️ Strategic Roadmap
 
-### ✅ v0.3.0: Institutional Scaling (Current)
-* **Automated Interception:** Declarative tool protection via decorators.
-* **Context Management:** Thread-safe multi-agent session tracking.
-* **Terminal Logic:** Loop-breaking safety for judiciary rejections.
+### ✅ v0.4.0: The Sovereign Swarm (Current)
+* **Cloud Exporters:** AWS/Azure telemetry sinks.
+* **Recursive TCO:** Shared fiscal context for multi-agent swarms.
+* **Privacy Guard:** Stage 0 PII redaction.
 
-### 🚀 v0.4.0: The "Sovereign Swarm" (Next)
-* **Recursive Fiscal Ceilings:** Multi-agent TCO (Total Cost of Operation) guardrails.
-* **Cloud Exporters:** Native integration for AWS CloudWatch and Azure Monitor.
-* **Dynamic Budgeting:** Real-time API pricing for penny-accurate cost tracking.---
+### 🚀 v0.5.0: The Federated Judiciary (Next)
+* **Multi-Party Approval:** M-of-N consensus for ultra-high-risk financial moves.
+* **Semantic Policy Alignment:** Vector-based guardrails for qualitative boundaries.
+* **Self-Healing Telemetry:** Automated retry logic for failed cloud SOC dispatches.
 ---
 ## ⚙️ Installation
 
@@ -140,18 +190,18 @@ pip install -e ".[langchain]"
 Ensure your .env file is configured with the necessary tokens for the Judiciary Layer to function:
 
 Code snippet
-# Slack Credentials (Socket Mode)
+### Slack Credentials (Socket Mode)
 SLACK_BOT_TOKEN=xoxb-your-token
 SLACK_APP_TOKEN=xapp-your-token
 SLACK_CHANNEL_ID=C12345678
 
-# Model Provider
+### Model Provider
 OPENAI_API_KEY=sk-your-key
 
 ---
 **"Governance is not a constraint; it is the catalyst for enterprise AI adoption."**
 ---
 ### Author Stamp
-*   **Framework:** GovAgent v0.2.3 (Stable)
+*   **Framework:** GovAgent v0.4.3 (Stable)
 *   **Status:** Active / Open-Source Standard
 *   **Compliance:** Designed for Enterprise-Grade Accountability

@@ -1,67 +1,73 @@
 import asyncio
 import os
 from pathlib import Path
+from typing import Dict, Any
 from dotenv import load_dotenv
 
 # LangChain & OpenAI Imports
 from langchain_openai import ChatOpenAI
-from govagent import ExecutiveAgent, tool # Using our new v0.3.0 'tool' decorator
+from govagent import ExecutiveAgent, tool 
+from govagent.exporters.base import BaseExporter
+from govagent.exporters.cloudwatch import CloudWatchExporter
 
 load_dotenv()
 BASE_DIR = Path(__file__).parent
 
-# v0.3.0: ZERO Boilerplate Tool. Governance is injected automatically.
+# --- PILLAR 4: INSTITUTIONAL MOCK EXPORTER ---
+class MockSOCExporter(BaseExporter):
+    """Forensic Sink for Local Validation."""
+    async def export(self, snapshot_data: Dict[str, Any]) -> bool:
+        print(f"📡 [MOCK SOC] Dispatching Trace: {snapshot_data.get('trace_id')}")
+        print(f"💰 [MOCK SOC] Recursive TCO: ${snapshot_data.get('recursive_tco_usd', 0):.4f}")
+        return True
+
+# --- PILLAR 1: DETERMINISTIC TOOLING ---
 @tool(name="execute_financial_transaction", guards=["fiscal", "judiciary"], risk_level="high")
 async def execute_financial_transaction(amount: float, reference_id: str = "UNKNOWN") -> str:
-    """
-    Authorizes and executes a financial disbursement.
-    Used for claims, refunds, payroll, or vendor payments.
-    """
+    """Authorizes and executes a financial disbursement."""
     return f"SUCCESS: Transaction of ${amount} for Ref: {reference_id} processed."
 
-async def run_scenario(persona: str, policy_file: str, task: str, delay: int):
-    """Worker function to simulate concurrent governed sessions."""
-    await asyncio.sleep(delay) # Stagger start times
+async def run_governed_swarm():
+    """
+    v0.4.0 Stress Test: Full Control Plane Activation.
+    """
+    print("🏢 INITIALIZING INSTITUTIONAL CONTROL PLANE (v0.4.0)\n" + "="*55)
     
-    print(f"🚀 [{persona}] Initializing Session...")
-    
-    # v0.3.0: One-line Institutional Bootstrap
+    # 1. COMMISSION THE DIRECTOR (Must happen first to avoid UnboundLocalError)
+    # This establishes the base context and policy alignment.
     agent = ExecutiveAgent.bootstrap(
-        policy_path=BASE_DIR / f"../policies/{policy_file}",
+        policy_path=BASE_DIR / "../policies/langchain_integration_sample_policy.yaml",
         llm=ChatOpenAI(model="gpt-4o", temperature=0),
         slack_channel=os.getenv("SLACK_CHANNEL_ID")
     )
 
-    print(f"🤖 [{persona}] Task: {task}")
-    try:
-        report = await agent.execute(task)
-        print(f"🏁 [{persona}] Status: {report.status} | Cost: ${report.estimated_cost_usd}")
-    except Exception as e:
-        print(f"🛑 [{persona}] Governance Halt: {e}")
-
-async def main():
-    print("🏢 STARTING MULTI-AGENT GOVERNANCE STRESS TEST (v0.3.0)\n" + "="*55)
-
-    # We run two different directors with different policies concurrently
-    # Scenario A: Billing Director (High Limit)
-    # Scenario B: Junior Clerk (Low Limit - should trigger rejection or block)
+    # 2. ENROLL FORENSIC SINKS (The Hybrid SOC Handshake)
+    # We check for credentials to determine the destination of the Evidence Stream.
+    aws_ready = all([os.getenv("AWS_ACCESS_KEY_ID"), os.getenv("AWS_DEFAULT_REGION")])
     
-    tasks = [
-        run_scenario(
-            persona="Billing_Director", 
-            policy_file="langchain_integration_sample_policy.yaml",
-            task="Process a reimbursement for claim #882 in the amount of $1200.",
-            delay=0
-        ),
-        run_scenario(
-            persona="Compliance_Auditor", 
-            policy_file="auditor_policy.yaml", # Assume this policy has lower fiscal limits
-            task="Approve urgent payment for claim #995 for $5000.00.",
-            delay=1 # Starts slightly after to test async context isolation
-        )
-    ]
+    if aws_ready:
+        print("☁️ [SOC] AWS Credentials detected. Enrolling CloudWatch Exporter.")
+        cw_exporter = CloudWatchExporter(log_group="/aws/govagent/stress-test")
+        agent.telemetry.add_exporter(cw_exporter)
+    else:
+        print("⚠️ [SOC] AWS Credentials missing. Enrolling Mock Forensic Sink.")
+        agent.telemetry.add_exporter(MockSOCExporter())
 
-    await asyncio.gather(*tasks)
+    # 3. TASK EXECUTION: Triggers PII scrubbing and Recursive TCO
+    task = "Process claim #882 for John Doe ($1200.00) and audit the transaction logs."
+    
+    print(f"🤖 [Director] Sanitizing task and initiating governance cycle...")
+     
+    # FIX: Explicitly await the execution to resolve the Snapshot object
+    report = await agent.execute(task) 
+    
+    # Now that the coroutine is resolved, 'report' is an ExecutionSnapshot
+    print(f"\n📊 --- INSTITUTIONAL AUDIT REPORT ---")
+    print(f"Status: {report.status.upper()}")
+    print(f"Trace ID: {report.trace_id}")
+    print(f"Individual Cost: ${report.estimated_cost_usd:.4f}")
+    print(f"Recursive Swarm TCO: ${report.recursive_tco_usd:.4f}") #
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    # Standard entry point for async institutional workloads
+    asyncio.run(run_governed_swarm())

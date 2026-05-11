@@ -6,6 +6,7 @@ from govagent.guards import CircuitBreaker, GovernanceViolation
 from govagent.telemetry import TelemetryManager
 from govagent.hitl import HITLManager, SlackJudiciaryAdapter
 from govagent.context import set_current_agent, reset_current_agent
+from govagent.registry import registry  # Institutional Registry
 
 class ExecutiveAgent:
     def __init__(
@@ -19,7 +20,7 @@ class ExecutiveAgent:
         self.persona = persona
         self.policy = policy
         self.model = self._wrap_model(model_client)
-        self.guard = CircuitBreaker(policy)
+        self.guard = CircuitBreaker(policy) # Injected with PrivacyGuard
         self.telemetry = telemetry or TelemetryManager()
         self.hitl = hitl_manager or HITLManager()
 
@@ -60,7 +61,6 @@ class ExecutiveAgent:
                     response = await self.lc_client.ainvoke(prompt)
                     content = response.content
 
-                    # Forgiving Regex for Enterprise IDs
                     id_match = re.search(r"ID:\s*#?([A-Za-z0-9_]+)", content)
                     amt_match = re.search(r"AMOUNT:\s*\$?\s*([\d,.]+)", content)
                     
@@ -86,7 +86,7 @@ class ExecutiveAgent:
         return client
 
     async def evaluate(self, guards: List[str], intent: dict = None, value: float = 0.0):
-        """Modular Triage (Article 9 & 12)."""
+        """Modular Triage with Forensic Tracking."""
         if not self.telemetry.current_session:
             self.telemetry.start_trace(self.persona, "Internal Evaluation")
         
@@ -119,21 +119,39 @@ class ExecutiveAgent:
             self.telemetry.current_session.guards_evaluated.append(guard_name)
 
     async def execute(self, task: str):
-        """Governed Reasoning Loop with Thread-Safe Context Enrollment."""
+        """
+        Governed Reasoning Loop: Hardened for Phase 3.
+        Ensures all telemetry paths are fully awaited to resolve audit snapshots.
+        """
         token = set_current_agent(self)
-        self.telemetry.start_trace(self.persona, task)
+        
+        # STAGE 0: Privacy Redaction (Article 9 Protection)
+        sanitized_task = self.guard.privacy.redact_task(task)
+        
+        self.telemetry.start_trace(self.persona, sanitized_task)
         current_step, total_tokens = 0, 0
         
         try:
             while current_step < 10:
-                # 1. Reasoning
-                response = await self.model.generate_plan(task, self.persona)
+                # 1. Reasoning (On Sanitized Data)
+                response = await self.model.generate_plan(sanitized_task, self.persona)
                 intent, cost, tokens = response if isinstance(response, tuple) else (response, 0, 0)
                 total_tokens += tokens
                 
                 # Terminal Check
                 if not intent.get("action") or intent["action"] == "complete":
-                    return self.telemetry.finalize(status="success", tokens=total_tokens)
+                    # PATCH 1: Must await finalization to return the resolved object
+                    return await self.telemetry.finalize(status="success", tokens=total_tokens)
+
+                # STAGE 1: Schema Validation (Pillar 1 Integrity)
+                try:
+                    intent["params"] = registry.validate_intent_schema(
+                        intent.get("action"), 
+                        intent.get("params", {})
+                    )
+                except Exception as e:
+                    # PATCH 2: Await schema violation finalization
+                    return await self.telemetry.finalize(status=f"blocked: Schema Violation - {str(e)}")
 
                 # 2. Evaluation (The Circuit Breaker)
                 await self.evaluate(
@@ -147,23 +165,21 @@ class ExecutiveAgent:
                 result = await self.perform_action(intent.get("action"), intent.get("params", {}))
                 self.telemetry.log_step(intent.get("thought", ""), intent.get("action"), str(result))
                 
-                # v0.3.0 CRITICAL: Financial transactions are TERMINAL. 
-                # This prevents the 10-step loop after a successful payment.
-                if intent.get("action") == "execute_financial_transaction":
-                    return self.telemetry.finalize(status="success: transaction finalized", tokens=total_tokens)
-
-                if "success" in str(result).lower() or "complete" in str(result).lower(): 
-                    return self.telemetry.finalize(status="success", tokens=total_tokens)
+                # Check for financial finalization or general success
+                if intent.get("action") == "execute_financial_transaction" or \
+                   "success" in str(result).lower() or "complete" in str(result).lower(): 
+                    return await self.telemetry.finalize(status="success", tokens=total_tokens)
                 
                 current_step += 1
 
-            return self.telemetry.finalize(status="timeout: max steps reached", tokens=total_tokens)
+            return await self.telemetry.finalize(status="timeout: max steps reached", tokens=total_tokens)
 
         except GovernanceViolation as gv:
-            # TERMINAL EXIT: One 'No' in Slack ends the session.
-            return self.telemetry.finalize(status=f"blocked: {str(gv)}", tokens=total_tokens)
+            # PATCH 3: Await governance block finalization
+            return await self.telemetry.finalize(status=f"blocked: {str(gv)}", tokens=total_tokens)
         except Exception as e:
-            return self.telemetry.finalize(status=f"error: {str(e)}", tokens=total_tokens)
+            # PATCH 4: Await generic error finalization
+            return await self.telemetry.finalize(status=f"error: {str(e)}", tokens=total_tokens)
         finally:
             reset_current_agent(token)
 
