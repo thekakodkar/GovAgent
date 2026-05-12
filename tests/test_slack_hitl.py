@@ -3,9 +3,34 @@ import asyncio
 import os
 from dotenv import load_dotenv 
 from govagent.hitl import HITLManager, SlackJudiciaryAdapter
+from unittest.mock import AsyncMock
 
 # Load environment variables
 load_dotenv()
+
+
+@pytest.mark.asyncio
+async def test_federated_quorum_logic():
+    """
+    v0.5.0 Validation: Verifies M-of-N quorum without live Slack connectivity.
+    """
+    # 1. Initialize a Mock Adapter to bypass live auth
+    mock_adapter = AsyncMock()
+    mock_adapter.notify.return_value = True # Simulate board approval
+    
+    manager = HITLManager(adapter=mock_adapter)
+    
+    federated_config = {"min_approvals": 2, "quorum_size": 3}
+    
+    approved = await manager.secure_approval(
+        agent_id="GovAgent-v0.5.0",
+        reason="High-value disbursement ($1200.00)",
+        triggered_by="judiciary",
+        config=federated_config
+    )
+
+    assert approved is True
+    assert mock_adapter.notify.called
 
 @pytest.mark.asyncio
 async def test_slack_interaction():

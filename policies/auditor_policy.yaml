@@ -15,6 +15,10 @@ tools:
   - name: "execute_financial_transaction" # MUST match the new name in code
     risk_level: "high"
     category: "financial"
+    require_human_approval: true
+    min_approvals: 2               # M: Number of required 'Approve' signals
+    quorum_size: 3                 # N: Number of unique voters required to close
+    fiscal_impact: true
     guards: ["fiscal", "policy", "judiciary"]
     description: "Generic financial execution tool for all departments."
 

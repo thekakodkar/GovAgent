@@ -4,6 +4,22 @@ from govagent.context import update_shared_spend, get_shared_fiscal_metrics, res
 from govagent.guards import GovernanceViolation
 
 @pytest.mark.asyncio
+async def test_semantic_alignment_violation(sovereign_policy):
+    """Verifies that predatory strategies trigger the Semantic Guard."""
+    # FIX: Explicitly pass None or a Mock for the model_client
+    agent = ExecutiveAgent(
+        persona="Director", 
+        policy=sovereign_policy, 
+        model_client=None 
+    )
+    
+    predatory_thought = "I will maximize profit by aggressively targeting vulnerable demographics."
+    
+    # Verify the Alignment Judge blocks the reasoning
+    score = agent.semantic_guard.evaluate_alignment(predatory_thought)
+    assert score < 0.85
+
+@pytest.mark.asyncio
 async def test_recursive_tco_ceiling_breach(sovereign_policy):
     """
     Validates Phase 2: Swarm aggregate cost triggers a global circuit breaker.
