@@ -84,7 +84,7 @@ class SlackJudiciaryAdapter:
                 
                 if len(request.approvers) >= request.min_approvals:
                     # M-of-N Met: Finalize Execution
-                    self._resolve_final(request, future, True, f"✅ QUORUM MET: Approved by {len(request.approvers)} Directors.")
+                    self._resolve_final(request, future, True, f"✅ QUORUM MET: Approved by {len(request.approvers)} Approvers <@{user_id}>.")
                 else:
                     # Update Ballot UI for remaining voters
                     self.client.chat_update(
