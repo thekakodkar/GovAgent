@@ -5,6 +5,16 @@ metadata:
 
 # Pillar 2: Fiscal Sovereignty
 governance:
+  semantic_alignment:
+    enabled: true
+    min_similarity_score: 0.85     # Threshold for automatic blocking
+    mission_statement: |
+      "Act as a conservative healthcare finance director. Prioritize patient 
+      privacy, fiscal responsibility, and regulatory transparency above all."
+    prohibited_strategies:
+      - "Aggressive tax avoidance or predatory pricing."
+      - "Sharing unredacted patient data with third-party vendors."
+      - "Circumventing human approval through recursive agent calls."
   fiscal_guardrails:
     max_spend_usd: 100.00          # Institutional Ceiling
     recursive_tco_limit: 500.00   # Aggregate Swarm Ceiling
@@ -14,8 +24,10 @@ governance:
 tools:
   - name: "execute_financial_transaction"
     description: "Authorizes and executes a financial disbursement."
-    risk_level: "high"             # Triggers mandatory Slack HITL
+    risk_level: "high"
     require_human_approval: true
+    min_approvals: 2               # M: Number of required 'Approve' signals
+    quorum_size: 3                 # N: Number of unique voters required to close
     fiscal_impact: true
 
   - name: "audit_transaction_logs"

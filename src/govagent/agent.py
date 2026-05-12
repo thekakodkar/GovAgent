@@ -1,29 +1,42 @@
 import re
 import os
 from typing import List, Optional, Any, Tuple
+from govagent import policy
 from govagent.policy import Policy
-from govagent.guards import CircuitBreaker, GovernanceViolation
+from govagent.guards import CircuitBreaker, GovernanceViolation, SemanticGuard
 from govagent.telemetry import TelemetryManager
 from govagent.hitl import HITLManager, SlackJudiciaryAdapter
 from govagent.context import set_current_agent, reset_current_agent
 from govagent.registry import registry  # Institutional Registry
-
+from govagent.guards.semantic import SemanticGuard # Import the new guard
 class ExecutiveAgent:
     def __init__(
-        self, 
-        persona: str, 
-        policy: Policy, 
+        self,
+        persona: str,
+        policy: Policy,
         model_client: Any,
         telemetry: Optional[TelemetryManager] = None,
         hitl_manager: Optional[HITLManager] = None
     ):
         self.persona = persona
         self.policy = policy
+        
+        # 1. Initialize the Alignment Judge (v0.5.0)
+        semantic_config = getattr(policy, 'governance', {}).get('semantic_alignment', {})
+        self.semantic_guard = SemanticGuard(
+            mission=semantic_config.get('mission_statement', ""),
+            prohibited=semantic_config.get('prohibited_strategies', []),
+            threshold=semantic_config.get('min_similarity_score', 0.85)
+        )
+
+        # 2. Inject both Policy and SemanticGuard into the CircuitBreaker
+        self.guard = CircuitBreaker(policy, self.semantic_guard) 
+        
+        # 3. Model Wrapping & Telemetry
         self.model = self._wrap_model(model_client)
-        self.guard = CircuitBreaker(policy) # Injected with PrivacyGuard
         self.telemetry = telemetry or TelemetryManager()
         self.hitl = hitl_manager or HITLManager()
-
+        
     @classmethod
     def bootstrap(cls, policy_path: str, llm: Any, slack_channel: Optional[str] = None):
         """Institutional Factory: One-line Enterprise Setup."""
@@ -86,33 +99,46 @@ class ExecutiveAgent:
         return client
 
     async def evaluate(self, guards: List[str], intent: dict = None, value: float = 0.0):
-        """Modular Triage with Forensic Tracking."""
-        if not self.telemetry.current_session:
-            self.telemetry.start_trace(self.persona, "Internal Evaluation")
-        
-        if "fiscal" in guards:
-            current_total = self.telemetry.current_session.estimated_cost_usd + value
-            self.guard.check_financial_risk(current_total)
-            self._log_evaluation("fiscal")
+            """
+            Modular Triage with Federated M-of-N support.
+            Orchestrates Stage 1 (Semantic), Stage 2 (Fiscal), and Stage 3 (Judiciary).
+            """
+            if not self.telemetry.current_session:
+                self.telemetry.start_trace(self.persona, "Internal Evaluation")
             
-        if "policy" in guards and intent and intent.get("action"):
-            if intent["action"] != "complete":
-                self.guard.validate_policy(intent.get("action"), intent.get("params", {}))
-            self._log_evaluation("policy")
-
-        if "judiciary" in guards and intent and intent.get("action"):
-            action_name = intent["action"]
-            if action_name != "complete" and self.policy.is_high_risk(action_name):
-                approved = await self.hitl.secure_approval(
-                    agent_id=self.policy.agent_name,
-                    reason=f"Judiciary Authorization Required: {action_name}",
-                    context=intent,
-                    triggered_by="judiciary"
+            # 1. SEMANTIC ALIGNMENT CHECK
+            if intent and intent.get("thought"):
+                # Triggers the Alignment Judge to evaluate 'Thought' against 'Mission'
+                await self.guard.evaluate(
+                    tool_name=intent.get("action", "unknown"), 
+                    args=intent.get("params", {}), 
+                    thought=intent["thought"]
                 )
-                if not approved:
-                    raise GovernanceViolation(f"Human Judiciary denied the request for {action_name}")
-                self._log_evaluation("judiciary")
-        return True
+
+            # 2. FISCAL SOVEREIGNTY CHECK
+            if "fiscal" in guards:
+                current_total = self.telemetry.current_session.estimated_cost_usd + value
+                self.guard.check_financial_risk(current_total)
+                self._log_evaluation("fiscal")
+
+            # 3. FEDERATED JUDICIARY CHECK (M-of-N Quorum)
+            if "judiciary" in guards and intent and intent.get("action") != "complete":
+                if self.policy.is_high_risk(intent["action"]):
+                    # Retrieve the tool-specific M-of-N configuration from policy
+                    tool_cfg = next((t for t in self.policy.tools if t["name"] == intent["action"]), {})
+                    
+                    approved = await self.hitl.secure_approval(
+                        agent_id=self.persona,
+                        reason=f"Judiciary Authorization Required: {intent['action']}",
+                        context=intent,
+                        triggered_by="judiciary",
+                        config=tool_cfg # Pass min_approvals and quorum_size
+                    )
+                    if not approved:
+                        raise GovernanceViolation(f"Human Judiciary denied the request for {intent['action']}")
+                    self._log_evaluation("judiciary")
+            
+            return True
 
     def _log_evaluation(self, guard_name: str):
         if guard_name not in self.telemetry.current_session.guards_evaluated:

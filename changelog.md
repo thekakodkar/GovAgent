@@ -2,6 +2,26 @@
 
 All notable changes to the **GovAgent** framework are documented in this file. This project adheres to a "Governance-First" versioning strategy, prioritizing human oversight and fiscal accountability.
 
+### [0.5.0] - 2026-05-12
+### "Federated Judiciary" Release: Consensus-Driven Governance & Forensic Resilience
+### ⚖️ Added: Phase 1 - Federated M-of-N Consensus
+- **Federated Quorum Logic:** Introduced the ApprovalRequest model with min_approvals support, requiring multiple human stakeholders to reach consensus before high-risk execution.
+- **M-of-N Quorum Extraction:** Enhanced ExecutiveAgent and HITLManager to dynamically extract quorum requirements from the institutional policy manifest.
+- **Threaded Slack Judiciary:** Implemented message_ts tracking in the SlackJudiciaryAdapter to support persistent, threaded voting within Slack channels.
+
+### 🧠 Added: Phase 2 - Qualitative Semantic Guardrails
+- **Semantic Alignment Judge:** Integrated a vector-based SemanticGuard that evaluates agent "Thoughts" against institutional mission statements and prohibited strategies.
+- **Intent Alignment Scoring:** Implemented a similarity-threshold check (default 0.85) to block predatory or non-compliant reasoning before tool selection.
+
+### 📡 Added: Phase 3 - Forensic Self-Healing (DLQ)
+- **Local Dead Letter Queue (DLQ):** Developed a self-healing mechanism in TelemetryManager that automatically buffers forensic snapshots to logs/audit_buffer.jsonl if cloud sinks (AWS/Azure) are unreachable.
+- **Execution Snapshot Hardening:** Expanded the ExecutionSnapshot schema to include guards_evaluated, ensuring a deterministic record of which triage stages (Fiscal, Semantic, Judiciary) were passed.
+
+### 🛡️ Fixed: Privacy & Logic Integrity
+- **Stage 0 Address Redaction:** Hardened the PrivacyGuard with a custom regex-based Pattern Recognizer to successfully scrub street-level PII (e.g., "123 Main St"), resolving an Article 9 compliance gap.
+- **Safe Policy Accessors:** Refactored CircuitBreaker and ExecutiveAgent to use getattr for policy configuration, preventing AttributeError crashes during partial policy loads.
+- **Indentation & Syntax:** Resolved critical indentation errors in the ExecutiveAgent.evaluate method that previously blocked institutional test suites.
+
 ## [0.4.0] - 2026-05-07
 ### "Sovereign Swarm" Release: Cloud-Native Governance & Recursive Fiscal Control
 

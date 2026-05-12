@@ -6,7 +6,7 @@ GovAgent provides a high-abstraction **Control Plane** for agentic AI. With a cl
 
 <img width="769" height="336" alt="ImagegoV" src="https://github.com/user-attachments/assets/3690aff2-68c7-4f9e-90eb-c73389809ac1" />
 
-The **v0.4.3 "Sovereign Swarm"** update introduces **Recursive Fiscal Control** and **Cloud SOC Integration**, allowing for the deployment of multi-agent swarms with penny-accurate cost tracking and immutable forensic audit trails.
+The **v0.5.0** "Federated Judiciary" update introduces M-of-N Multi-Signature Approval and Vector-Based Semantic Guardrails, allowing for the deployment of ultra-high-risk agent swarms with absolute institutional consensus and self-healing forensic audit trails.
 
 ---
 
@@ -48,11 +48,11 @@ In an institutional setting, "State Management" is insufficient—you need **Sov
 
 | Feature | **GovAgent** | LangGraph | CrewAI |
 | :--- | :--- | :--- | :--- |
-| **Policy Enforcement** | ✅ **Deterministic Enforcement** | ⚠️ Partial / Manual | ❌ None |
-| **Audit Trails** | ✅ **Cloud SOC (AWS/Azure)** | ⚠️ Local / LangSmith | ❌ Console Logs |
+| **Policy Enforcement** | ✅ **Deterministic & Semantic** | ⚠️ Partial / Manual | ❌ None |
+| **Federated Judiciary** | ✅ **M-of-N Consesus** | ⚠️ Local / LangSmith | ❌ Console Logs |
 | **Human Approval Gates** | ✅ **Synchronous & Blocking** | ⚠️ Manual Interrupts | ❌ Optional |
-| **Recursive TCO Tracking** | ✅ **Aggregated Swarm Cost** | ❌ Per-run only | ❌ None |
-| **Enterprise Governance** | ✅ **EU AI Act Ready** | ❌ Experimental | ❌ Experimental |
+| **Forensic Resilience** | ✅ **Self Healing Local DLQ** | ❌ Per-run only | ❌ None |
+| **Regulatory Status** | ✅ **EU AI Act Article 9,12,14 Ready** | ❌ Experimental | ❌ Experimental |
 
 > **Strategic Directive:** While LangGraph and CrewAI focus on agent capability and roleplay, GovAgent operates as the **Institutional Control Plane** that ensures every action is legislated, evaluated, and forensically recorded.
 
@@ -61,25 +61,25 @@ In an institutional setting, "State Management" is insufficient—you need **Sov
 
 ## ⚖️ Regulatory Compliance: EU AI Act (Regulation 2024/1689)
 
-GovAgent satisfies key transparency and oversight mandates for **High-Risk AI Systems**:
+GovAgent satisfies key mandates for **High-Risk AI Systems**:
 
-* **Article 9: Risk Management & Privacy** Automated PII redaction (Stage 0) and policy-driven intent interception.
-* **Article 12: Record-Keeping & Traceability** Immutable **Forensic Telemetry** with native cloud exporters and recursive `parent_trace_id` tracking.
-* **Article 14: Human Oversight** Physical gating of high-risk actions through synchronous human authorization.
+* **Article 9: Risk Management & Privacy:** Automated Stage 0 PII redaction and proactive semantic intent interception.
+* **Article 12: Record-Keeping & Traceability:** Immutable Forensic Telemetry with local failover (DLQ) for 100% audit continuity.
+* **Article 14: Human Oversight:** Physical gating of high-risk actions through Federated M-of-N Consensus.
     
 ---
 
-## 🛠️ Key Capabilities (v0.4.0)
-* **💸 Recursive Fiscal Ceilings:** Aggregate TCO (Total Cost of Operation) tracking across parent and sub-agents to prevent budget fragmentation.
-* **☁️ Cloud-Native SOC:** Native telemetry exporters for **AWS CloudWatch** and **Azure Monitor**.
-* **🛡️ Article 9 Privacy Guard:** Stage 0 PII scrubbing before tasks reach the LLM.
-* **📐 Type-Safe Intent:** Pydantic-hardened tool parameters for deterministic integrity.
+## 🛠️ Key Capabilities (v0.5.0)
+* **⚖️Federated M-of-N Quorum:** Require $M$ approvals from a board of $N$ reviewers before high-risk execution.
+* **🧠 Semantic Alignment Judge:** Vector-based Similarity Checks to ensure agent reasoning adheres to qualitative "Mission Statements".
+* **💸 Recursive Fiscal Ceilings:** Aggregate TCO tracking across parent and sub-agents to prevent budget fragmentation.
+* **📡 Self-Healing Telemetry:** Automated local buffering (DLQ) if Cloud SOC sinks (AWS/Azure) are unreachable.
 
 ---
 ## 📖 Advanced Usage: High-Abstraction Governance
 In an enterprise environment, GovAgent acts as your digital "Control Plane" for high-stakes workflows like healthcare claim processing.
 
-### 1. Define a Governed tool (Pillars 2 & 3)
+### 1. Define a Legislated Tool (Pillars 2 & 3)
 ```python
 from govagent import tool
 
@@ -87,38 +87,31 @@ from govagent import tool
 async def process_payment(amount: float, reference_id: str):
     """
     Executes a financial disbursement. 
-    Injected guards handle Recursive TCO and Judiciary gating automatically.
+    Injected guards handle Recursive TCO and M-of-N Judiciary gating automatically.
     """
     return f"SUCCESS: Paid ${amount} for Ref: {reference_id}"
 ```
-### 2. The Institutional session (Pillars 1, 4 & Cloud SOC)
+### 2. The Institutional session (v0.5.0 standard)
+
 ```python
 import asyncio
-import os
-from langchain_openai import ChatOpenAI
 from govagent import ExecutiveAgent
-from govagent.exporters.cloudwatch import CloudWatchExporter
 
 async def run_governed_session():
-    # 1. Load Policy (Pillar 1) & Initialize Session
+    # 1. Bootstrap: Loads Policy & Federated Judiciary Adapters
     agent = ExecutiveAgent.bootstrap(
         policy_path="policies/finance_policy.yaml",
         llm=ChatOpenAI(model="gpt-4o"),
-        slack_channel="C12345" # Synchronous Judiciary Link
+        slack_channel="C082PBLPN9X" # Federated Slack Courtroom
     )
 
-    # 2. Enroll Cloud SOC (Pillar 4 - Phase 3)
-    # Dispatches forensic evidence to AWS CloudWatch in real-time
-    agent.telemetry.add_exporter(CloudWatchExporter(log_group="/aws/govagent/audit"))
-
-    # 3. Execution (Stage 0 Privacy & Stage 2 Fiscal)
-    task = "Process a reimbursement for John Doe in the amount of $1200."
+    # 2. Execution (Stage 0 Privacy, Stage 1 Semantic Alignment, Stage 2 Fiscal)
+    task = "Process a reimbursement for Marko P at 123 Main St ($1200.00)."
     report = await agent.execute(task)
     
-    # 4. Institutional Audit Report
+    # 3. Institutional Audit Report (Article 12)
     print(f"🏁 Session Status: {report.status.upper()}")
     print(f"💰 Recursive Swarm TCO: ${report.recursive_tco_usd:.4f}")
-    print(f"🆔 Global Trace ID: {report.trace_id}")
 ```
 ---
 
@@ -152,16 +145,15 @@ Every session generates an immutable snapshot dispatched to your enrolled cloud 
 
 ## 🗺️ Strategic Roadmap
 
-### ✅ v0.4.0: The Sovereign Swarm (Current)
-* **Cloud Exporters:** AWS/Azure telemetry sinks.
-* **Recursive TCO:** Shared fiscal context for multi-agent swarms.
-* **Privacy Guard:** Stage 0 PII redaction.
+### ✅ v0.5.0: The Federated Judiciary (Current)
+* **M-of-N Consensus:** Multi-party board approvals.
+* **Semantic Alignment:** Vector-based qualitative guardrails.
+* **Self-Healing Telemetry:** Local DLQ for forensic resilience.
 
-### 🚀 v0.5.0: The Federated Judiciary (Next)
-* **Multi-Party Approval:** M-of-N consensus for ultra-high-risk financial moves.
-* **Semantic Policy Alignment:** Vector-based guardrails for qualitative boundaries.
-* **Self-Healing Telemetry:** Automated retry logic for failed cloud SOC dispatches.
----
+### 🚀 v0.6.0: The Self-Healing Swarm (Next)
+* **Automated Policy Tuning:** AI-assisted guardrail calibration.
+* **Cross-Org Telemetry:** Federated audit trails across different corporate entities.---
+
 ## ⚙️ Installation
 
 GovAgent is designed to be lightweight and modular. You can install the core framework or include specific integrations as needed.
@@ -171,11 +163,11 @@ Recommended for users building custom agents or those who only require the Judic
 ```bash
 pip install govagent
 ```
-### 2. Full Integration (With LangChain)
+### 2. Full Integration (With LangChain & PII Protection)
 Includes all dependencies required to run governed LangChain sessions, including the langchain_tool wrappers and OpenAI clients.
 
 ```bash
-pip install "govagent[langchain]"
+pip install "govagent[full]"
 ```
 ### 3. Development Installation
 If you are contributing to the framework or running the examples in this repository, install in editable mode:
@@ -202,6 +194,6 @@ OPENAI_API_KEY=sk-your-key
 **"Governance is not a constraint; it is the catalyst for enterprise AI adoption."**
 ---
 ### Author Stamp
-*   **Framework:** GovAgent v0.4.3 (Stable)
+*   **Framework: GovAgent v0.5.0 (Federated)
+*   **Compliance: Designed for Article 9, 12, and 14 Accountability
 *   **Status:** Active / Open-Source Standard
-*   **Compliance:** Designed for Enterprise-Grade Accountability
