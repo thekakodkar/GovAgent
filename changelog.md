@@ -2,6 +2,23 @@
 
 All notable changes to the **GovAgent** framework are documented in this file. This project adheres to a "Governance-First" versioning strategy, prioritizing human oversight and fiscal accountability.
 
+## [0.5.1] - 2026-05-12
+### "Institutional Alignment" Release: Modular Architecture & Forensic Hardening
+
+### 🏛️ Added: Phase 4 - Sovereign Package Refactoring
+- **Modular Namespace Migration:** Refactored the core framework into dedicated legislative packages: `govagent.context` (State), `govagent.registry` (Tools), and `govagent.telemetry` (Evidence).
+- **Institutional Registry Manager:** Introduced the `GlobalRegistry` singleton to centralize tool legislation and prevent "Shadow IT" execution.
+- **Schema Sovereignty:** Formally defined `ToolManifest` and `ExecutionSnapshot` in Pydantic V2 to ensure forensic-grade data consistency.
+
+### ⚖️ Added: Phase 5 - Compliance & Test Certification
+- **Fiscal Reset Engine:** Implemented `reset_fiscal_ledger` to ensure state isolation between transactions, satisfying Article 12 audit requirements.
+- **100% Test Certification:** Verified 9/9 institutional test cases covering Privacy (Article 9), Fiscal Ceilings (Recursive TCO), and Federated Judiciary (Article 14).
+- **Federated Swarm Inheritance:** Hardened the inheritance logic to ensure sub-agents automatically inherit Parent Trace IDs during delegation.
+
+### 🛡️ Fixed: Registry & Schema Integrity
+- **Intent Schema Hardening:** Patched `validate_intent_schema` to strictly enforce numeric types for financial transactions, preventing "Type-Spoofing" attacks.
+- **Namespace Export Sync:** Resolved `ImportError` issues by formally legislating exports in all package `__init__.py` files.
+
 ### [0.5.0] - 2026-05-12
 ### "Federated Judiciary" Release: Consensus-Driven Governance & Forensic Resilience
 ### ⚖️ Added: Phase 1 - Federated M-of-N Consensus

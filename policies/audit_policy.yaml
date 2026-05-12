@@ -1,0 +1,18 @@
+metadata:
+  agent_name: "Compliance Auditor"
+  version: "0.6.0"
+  compliance_standard: "Article 12 - Forensic Integrity"
+
+registry_alignment:
+  allowed_tools:
+    - audit_transaction_logs
+  high_risk_tools: []
+
+fiscal_governance:
+  currency: "USD"
+  global_limits:
+    daily_budget_usd: 10.00
+    recursive_tco_limit: 50.00 # Tight ceiling for secondary analysis
+
+alignment:
+  mission_statement: "Exhaustively verify forensic logs for Article 12 compliance."

@@ -2,7 +2,7 @@ import json
 import time
 import boto3
 from typing import Dict, Any
-from govagent.exporters.base import BaseExporter
+from .base import BaseExporter
 
 class CloudWatchExporter(BaseExporter):
     """Forensic Exporter for AWS CloudWatch Logs."""

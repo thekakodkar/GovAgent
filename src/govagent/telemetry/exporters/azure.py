@@ -2,7 +2,8 @@ import os
 import json
 from azure.monitor.ingestion import LogsIngestionClient
 from azure.identity import DefaultAzureCredential
-from govagent.exporters.base import BaseExporter
+from .base import BaseExporter
+from typing import Dict, Any
 
 class AzureMonitorExporter(BaseExporter):
     """Forensic Exporter for Azure Log Analytics."""

@@ -1,39 +1,53 @@
 import asyncio
 import os
 from dotenv import load_dotenv
-from pathlib import Path
-from govagent import ExecutiveAgent, tool 
 from langchain_openai import ChatOpenAI
+from govagent import ExecutiveAgent, tool
+from govagent.telemetry.exporters import MockSOCExporter
 
-# 1. Load institutional credentials
 load_dotenv()
 
-@tool(name="execute_financial_transaction", guards=["fiscal", "judiciary"], risk_level="high")
-async def process_payment(amount: float, reference_id: str):
-    """Executes a financial disbursement under institutional oversight."""
-    return f"SUCCESS: Paid ${amount} for Ref: {reference_id}"
+# 1. DEFINE SHARED TOOLS
+@tool(name="execute_financial_transaction", risk_level="high")
+async def pay(amount: float, reference_id: str):
+    return f"SUCCESS: Transacted ${amount}"
+
+@tool(name="audit_transaction_logs", risk_level="low")
+async def audit():
+    return "SUCCESS: Audit trail verified for Article 12."
 
 async def main():
-    print("🏢 GOVAGENT v0.5.0: FEDERATED JUDICIARY QUICKSTART\n" + "="*45)
-    
-    # Bootstrap initializes Judiciary, Alignment, and Telemetry layers
-    agent = ExecutiveAgent.bootstrap(
+    print("🏢 GOVAGENT v0.6.0: FEDERATED SWARM ORCHESTRATION\n" + "="*55)
+
+    # 2. INITIALIZE THE DIRECTOR (Healthcare Finance Policy)
+    director = ExecutiveAgent.bootstrap(
         policy_path="policies/finance_policy.yaml",
         llm=ChatOpenAI(model="gpt-4o", temperature=0)
     )
 
-    # Triggering Article 9 Privacy Redaction (Stage 0)
-    task = "Process claim #882 for John Doe in the amount of $1200.00"
-    print(f"🤖 Initializing Governed Execution for: {task}")
+    # 3. INITIALIZE THE AUDITOR (Audit Policy)
+    auditor = ExecutiveAgent.bootstrap(
+        policy_path="policies/audit_policy.yaml",
+        llm=ChatOpenAI(model="gpt-4o", temperature=0)
+    )
+
+    # 4. ENROLL SHARED FORENSIC SINK
+    shared_soc = MockSOCExporter()
+    director.telemetry.add_exporter(shared_soc)
+    auditor.telemetry.add_exporter(shared_soc)
+
+    # 5. EXECUTION: Director performs transaction, then delegates audit to Auditor
+    print("🤖 [Director] Processing high-risk transaction...")
+    tx_report = await director.execute("Reimburse patient #442 for $150.00")
     
-    # Resolved report is now an ExecutionSnapshot with Federated Quorum data
-    report = await agent.execute(task)
-    
-    print(f"\n📊 --- INSTITUTIONAL AUDIT ---")
-    print(f"Status: {report.status.upper()}")
-    print(f"Recursive TCO: ${report.recursive_tco_usd:.4f}") # Swarm-wide fiscality
-    print(f"Trace ID: {report.trace_id}") # Forensic ID for Article 12
-    print(f"Guards Evaluated: {', '.join(report.guards_evaluated)}") # Verification trail
+    print(f"\n🤖 [Director] Delegating forensic verification to Auditor...")
+    # Trace ID inheritance ensures Article 12 continuity
+    audit_report = await auditor.execute(f"Verify the logs for Trace ID: {tx_report.trace_id}")
+
+    print(f"\n📊 --- FEDERATED SWARM AUDIT ---")
+    print(f"Director Status: {tx_report.status.upper()}")
+    print(f"Auditor Status: {audit_report.status.upper()}")
+    print(f"Aggregated Traceability: {'VERIFIED' if tx_report.trace_id else 'FAILED'}")
 
 if __name__ == "__main__":
     asyncio.run(main())

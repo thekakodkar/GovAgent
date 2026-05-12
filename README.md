@@ -6,7 +6,7 @@ GovAgent provides a high-abstraction **Control Plane** for agentic AI. With a cl
 
 <img width="769" height="336" alt="ImagegoV" src="https://github.com/user-attachments/assets/3690aff2-68c7-4f9e-90eb-c73389809ac1" />
 
-The **v0.5.0** "Federated Judiciary" update introduces M-of-N Multi-Signature Approval and Vector-Based Semantic Guardrails, allowing for the deployment of ultra-high-risk agent swarms with absolute institutional consensus and self-healing forensic audit trails.
+The **v0.5.1** "Federated Judiciary" update introduces M-of-N Multi-Signature Approval and Vector-Based Semantic Guardrails, allowing for the deployment of ultra-high-risk agent swarms with absolute institutional consensus and self-healing forensic audit trails.
 
 ---
 
@@ -32,29 +32,29 @@ docker-compose exec govagent-demo python examples/demo.py
 ```
 ---
 
-## 🏗️ Core Pillars: The Chain of Accountability
-GovAgent replaces "Black Box" reasoning with a transparent, governed loop:
+## 🏗️ Core Pillars: The v0.5.1 Sovereign Architecture
+GovAgent utilizes a modular package structure to ensure a clean "Separation of Duties":
 
-1.  **Policy (The Law):** Declarative boundaries and "Rules of Engagement" defined by stakeholders in `policy.yaml`.
-2.  **Guards (The Enforcement):** Real-time circuit breakers that intercept agent intent *before* API execution to prevent budget or security breaches.
-3.  **HITL (The Judiciary):** **Synchronous** Human-in-the-Loop escalation. High-risk actions are physically blocked until an explicit "Approve" or "Reject" signal is received via Slack or CLI.
-4.  **Telemetry (The Evidence):** Forensic-grade audit trails providing an immutable ledger of compliance and real-world ROI.
+1.  **`govagent.context` (The State):** Manages thread-safe session isolation and Recursive TCO tracking across swarms.
+2.  **`govagent.registry` (The Law):** A centralized ledger where all tools must be legislated before execution.
+3.  **`govagent.telemetry` (The Evidence):** Forensic-grade audit trails dispatched to multi-cloud SOC sinks (AWS/Azure).
+4.  **`govagent.guards` (The Enforcement):** Real-time Stage 0 (Privacy) and Stage 1 (Fiscal) circuit breakers.
 
 ---
 
 ## ⚖️ Comparative Analysis: Governance Superiority
 
-In an institutional setting, "State Management" is insufficient—you need **Sovereignty**. GovAgent is engineered to meet the specific requirements of Big 4 audit and compliance, transforming "Black Box" reasoning into a transparent, governed lifecycle.
+In an institutional setting, "State Management" is insufficient; you need Sovereignty. GovAgent v0.5.1 is engineered to meet the strict requirements for audit and compliance, transforming "Black Box" reasoning into a transparent, governed lifecycle.
 
 | Feature | **GovAgent** | LangGraph | CrewAI |
 | :--- | :--- | :--- | :--- |
-| **Policy Enforcement** | ✅ **Deterministic & Semantic** | ⚠️ Partial / Manual | ❌ None |
-| **Federated Judiciary** | ✅ **M-of-N Consesus** | ⚠️ Local / LangSmith | ❌ Console Logs |
-| **Human Approval Gates** | ✅ **Synchronous & Blocking** | ⚠️ Manual Interrupts | ❌ Optional |
-| **Forensic Resilience** | ✅ **Self Healing Local DLQ** | ❌ Per-run only | ❌ None |
+| **Architectural Scope** | ✅ **Modular Control Pane** | ⚠️ Local State Graph | ❌ Role Play Swarm |
+| **State Management** | ✅ **Isolated Fiscal Ledger** | ⚠️ Shared Thread State | ❌ Global context |
+| **Tool Legislation** | ✅ **Global Registry Singleton** | ⚠️ Function Decorators | ❌ String-based Tools |
+| **Forensic Audit** | ✅ **Inherited Trace IDs** | ❌ Per-run only | ❌ Console Prints |
 | **Regulatory Status** | ✅ **EU AI Act Article 9,12,14 Ready** | ❌ Experimental | ❌ Experimental |
 
-> **Strategic Directive:** While LangGraph and CrewAI focus on agent capability and roleplay, GovAgent operates as the **Institutional Control Plane** that ensures every action is legislated, evaluated, and forensically recorded.
+> **Strategic Directive:** While LangGraph and CrewAI focus on graph-based execution and task delegation, GovAgent v0.5.1 operates as the Sovereign Infrastructure that ensures every action across a multi-agent swarm is legislated by a central registry, evaluated by isolated fiscal guards, and forensically recorded for institutional audit.
 
 ---
 
@@ -69,7 +69,7 @@ GovAgent satisfies key mandates for **High-Risk AI Systems**:
     
 ---
 
-## 🛠️ Key Capabilities (v0.5.0)
+## 🛠️ Key Capabilities (v0.5.1)
 * **⚖️Federated M-of-N Quorum:** Require $M$ approvals from a board of $N$ reviewers before high-risk execution.
 * **🧠 Semantic Alignment Judge:** Vector-based Similarity Checks to ensure agent reasoning adheres to qualitative "Mission Statements".
 * **💸 Recursive Fiscal Ceilings:** Aggregate TCO tracking across parent and sub-agents to prevent budget fragmentation.
@@ -91,13 +91,13 @@ async def process_payment(amount: float, reference_id: str):
     """
     return f"SUCCESS: Paid ${amount} for Ref: {reference_id}"
 ```
-### 2. The Institutional session (v0.5.0 standard)
+### 2. The Institutional session (v0.5.1 standard)
 
 ```python
 import asyncio
 from govagent import ExecutiveAgent
 
-async def run_governed_session():
+async def run_governed_swarm():
     # 1. Bootstrap: Loads Policy & Federated Judiciary Adapters
     agent = ExecutiveAgent.bootstrap(
         policy_path="policies/finance_policy.yaml",
@@ -110,7 +110,7 @@ async def run_governed_session():
     report = await agent.execute(task)
     
     # 3. Institutional Audit Report (Article 12)
-    print(f"🏁 Session Status: {report.status.upper()}")
+    print(f"🏁 Swarm Status: {report.status.upper()}")
     print(f"💰 Recursive Swarm TCO: ${report.recursive_tco_usd:.4f}")
 ```
 ---
@@ -194,6 +194,6 @@ OPENAI_API_KEY=sk-your-key
 **"Governance is not a constraint; it is the catalyst for enterprise AI adoption."**
 ---
 ### Author Stamp
-*   **Framework: GovAgent v0.5.0 (Federated)
+*   **Framework: GovAgent v0.5.1 (Federated)
 *   **Compliance: Designed for Article 9, 12, and 14 Accountability
 *   **Status:** Active / Open-Source Standard
