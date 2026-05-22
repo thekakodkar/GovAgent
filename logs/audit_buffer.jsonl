@@ -1,0 +1,3 @@
+{"status": "BLOCKED: RECURSIVE_TCO_REJECT", "policy_id": "finance_policy.yaml", "metrics": {"recursive_tco_usd": 100.0, "requested_amount": 150.0}}
+{"status": "BLOCKED: RECURSIVE_TCO_REJECT", "policy_id": "finance_policy.yaml", "metrics": {"recursive_tco_usd": 100.0, "requested_amount": 150.0}}
+{"status": "BLOCKED: RECURSIVE_TCO_REJECT", "policy_id": "finance_policy.yaml", "metrics": {"recursive_tco_usd": 100.0, "requested_amount": 150.0}}
