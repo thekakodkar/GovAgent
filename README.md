@@ -3,7 +3,8 @@
 **The Governance-First Framework for Production-Grade Autonomous Systems.**
 
 GovAgent provides a high-abstraction **Control Plane** for agentic AI. With a clear chain of accountability, this lightweight framework helps move autonomous systems from experimental sandboxes into governed, production environments.
-<img width="1476" height="866" alt="govAgent drawio" src="https://github.com/user-attachments/assets/e8088984-b2e6-48c3-a7ad-02b99a1dd241" />
+<img width="769" height="336" alt="govAgent drawio" src="https://github.com/user-attachments/assets/e8088984-b2e6-48c3-a7ad-02b99a1dd241" />
+
 The **v0.6.0** "Self-Healing Swarm" release introduces automated, data-driven policy calibration and federated cross-organization audit trails, enabling multi-agent swarms to run safely across diverse enterprise infrastructures with rigorous institutional oversight.
 
 ---
