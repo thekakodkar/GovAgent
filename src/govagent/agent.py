@@ -7,6 +7,7 @@ from govagent.telemetry import TelemetryManager
 from govagent.hitl import HITLManager, SlackJudiciaryAdapter
 from govagent.context import set_current_agent, reset_current_agent
 from govagent.registry import registry, ExecutionSnapshot  # Legislated Imports
+from govagent.governance.meta import MetaGovernor
 
 class ExecutiveAgent:
     def __init__(
@@ -196,3 +197,29 @@ class ExecutiveAgent:
     async def perform_action(self, action: str, params: dict) -> str:
         if not action or action == "complete": return "Task complete."
         return f"Action {action} executed with params {params}"
+    
+    async def post_session_cleanup(self):
+        """
+        Executes institutional governance verification post-transaction lifecycle.
+        """
+        # Initialize the governor pointing to your certified audit destination
+        governor = MetaGovernor(log_path="logs/audit_trail.jsonl", friction_threshold=3)
+        analysis_result = governor.analyze_friction()
+        
+        # If systemic issues are uncovered, immediately escalate to human authorities
+        if analysis_result.get("type") == "POLICY_AMENDMENT_PROPOSAL":
+            logger.info("ExecutiveAgent: Escalating policy amendment proposal to Federated Slack Courtroom.")
+            
+            # Construct corporate payload text block for Slack
+            slack_payload = (
+                f"🚨 *GovAgent Governance Alert: Automated Policy Amendment Proposed*\n"
+                f"• *Reason:* {analysis_result['reason']}\n"
+                f"• *Target File:* `{analysis_result['target_policy']}`\n"
+                f"• *Current Limit:* ${analysis_result['current_limit']:.4f}\n"
+                f"• *Proposed Ceiling:* *${analysis_result['proposed_limit']:.4f}*\n"
+                f"• *Impact:* {analysis_result['impact_assessment']}\n"
+                f"👉 _Reply with 'APPROVE AMENDMENT' to apply this change to the root policy layer._"
+            )
+            
+            # Dispatched via your existing Article 14 Slack communications channel
+            await self.slack_judiciary.send_message(text=slack_payload)

@@ -32,3 +32,10 @@ def v6_policy_config():
 @pytest.fixture
 def sovereign_policy(v6_policy_config):
     return Policy(v6_policy_config)
+
+def mock_audit_ledger(tmp_path):
+    """
+    v0.6.0 Engineering Fixture.
+    Generates a thread-safe path to test MetaGovernor log-scraping capabilities.
+    """
+    return tmp_path / "audit_buffer.jsonl"

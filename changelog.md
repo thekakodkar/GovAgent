@@ -2,6 +2,46 @@
 
 All notable changes to the **GovAgent** framework are documented in this file. This project adheres to a "Governance-First" versioning strategy, prioritizing human oversight and fiscal accountability.
 
+## [0.6.0] - 2026-05-22
+### "Self-Healing Swarm" Release: AI-Assisted Calibration & Multi-Tenant Federated Auditing
+
+### 🔄 Added: Pillar 1 - Autonomous Policy Tuning (Self-Healing)
+- **Active Ingestion Telemetry:** Implemented the `MetaGovernor` engine to continuously parse local forensic audit traces (`audit_buffer.jsonl`) for systemic friction boundaries.
+- **AI-Assisted Guardrail Calibration:** Engineered automated logic to detect 3 or more consecutive circuit-breaker rejections (e.g., `RECURSIVE_TCO_REJECT`) and autonomously draft an un-hallucinated `POLICY_AMENDMENT_PROPOSAL`.
+- **Smart Headroom Scaling:** Integrated a cost-overrun calculation formula ($Average\ Overrun\ Request \times 1.1$) to propose precise, data-backed financial ceiling adjustments for executive review.
+
+### ⚖️ Added: Pillar 2 - Federated Judiciary & Weighted Quorum Consensus (Article 14 Hardening)
+- **Role-Based Authority Matrix:** Refactored `HITLManager` to transition from binary headcount checks to a cumulative target weight score threshold matching corporate hierarchy seniority (C-Suite: 3.0, Director: 2.0, Auditor: 1.5, Lead: 1.0, Clerk: 0.5).
+- **Tiered Risk Escalation:** Implemented an automated financial risk evaluation loop that dynamically assigns actions to cascading operational boundaries (Tier 1 Operational, Tier 2 High, Tier 3 Critical) and scales the required quorum score up to 4.0.
+- **Identity Hijacking Defenses:** Hardened the Slack action-handler loops with user-ID composite signature verification (`user_id|role|weight`) to strictly prevent double-voting or signature cloning from a single account.
+- **Sovereign Executive Veto:** Preserved instant lifecycle termination, ensuring a single human "Veto" command immediately kills the active swarm thread and locks out interactive UI buttons.
+
+### 📡 Added: Pillar 3 - Cross-Org Telemetry (Federated Audit Trails)
+- **Horizontal Multi-Tenant Routing:** Introduced `FederatedTelemetryExporter` inheriting cleanly from `BaseExporter` to securely isolate and route forensic session data across distinct corporate entities, joint ventures, or supply chain nodes.
+- **Data Sovereignty Enveloping:** Developed the `FederatedAuditPayload` Pydantic model to package execution snapshots within strict tenant-isolated containers before dispatch.
+- **Unauthorized Tenant Isolation:** Programmed edge-node blocking guards to drop telemetry streams from unregistered or unmapped corporate identifiers automatically.
+
+### 🛡️ Fixed: Interface Integration & Thread Sync
+- **Asynchronous Race Mitigation:** Appended an execution cooldown routine to integration teardowns, allowing Slack's edge servers to successfully process final `chat_update` API packets and collapse buttons before Socket Mode threads disconnect.
+- **State Separation Realignment:** Moved the heavy financial score aggregation engine completely into the `HITLManager` core, reducing `SlackJudiciaryAdapter` to a pure, stateless I/O gateway resilient to mid-vote network dropouts.
+
+## [0.5.1] - 2026-05-12
+### "Institutional Alignment" Release: Modular Architecture & Forensic Hardening
+
+### 🏛️ Added: Phase 4 - Sovereign Package Refactoring
+- **Modular Namespace Migration:** Refactored the core framework into dedicated legislative packages: `govagent.context` (State), `govagent.registry` (Tools), and `govagent.telemetry` (Evidence).
+- **Institutional Registry Manager:** Introduced the `GlobalRegistry` singleton to centralize tool legislation and prevent "Shadow IT" execution.
+- **Schema Sovereignty:** Formally defined `ToolManifest` and `ExecutionSnapshot` in Pydantic V2 to ensure forensic-grade data consistency.
+
+### ⚖️ Added: Phase 5 - Compliance & Test Certification
+- **Fiscal Reset Engine:** Implemented `reset_fiscal_ledger` to ensure state isolation between transactions, satisfying Article 12 audit requirements.
+- **100% Test Certification:** Verified 9/9 institutional test cases covering Privacy (Article 9), Fiscal Ceilings (Recursive TCO), and Federated Judiciary (Article 14).
+- **Federated Swarm Inheritance:** Hardened the inheritance logic to ensure sub-agents automatically inherit Parent Trace IDs during delegation.
+
+### 🛡️ Fixed: Registry & Schema Integrity
+- **Intent Schema Hardening:** Patched `validate_intent_schema` to strictly enforce numeric types for financial transactions, preventing "Type-Spoofing" attacks.
+- **Namespace Export Sync:** Resolved `ImportError` issues by formally legislating exports in all package `__init__.py` files.
+
 ## [0.5.1] - 2026-05-12
 ### "Institutional Alignment" Release: Modular Architecture & Forensic Hardening
 

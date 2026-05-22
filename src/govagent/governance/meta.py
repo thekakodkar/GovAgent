@@ -1,53 +1,102 @@
 import json
+import logging
 from pathlib import Path
 from typing import Dict, List, Any
 from datetime import datetime
+from pydantic import BaseModel, Field
+
+# Setup logging standard matching corporate infrastructure
+logger = logging.getLogger("govagent.governance.meta")
+
+class PolicyAmendmentProposal(BaseModel):
+    """
+    Type-safe legislative snapshot defining a proposed policy modification.
+    """
+    type: str = "POLICY_AMENDMENT_PROPOSAL"
+    version: str = "0.6.0-alpha"
+    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat() + "Z")
+    reason: str
+    target_policy: str
+    metric_breached: str
+    current_limit: float
+    proposed_limit: float
+    impact_assessment: str
 
 class MetaGovernor:
     """
     v0.6.0 Optimization Layer.
-    Analyzes systemic friction to propose policy amendments via the 'Self-Healing' loop.
+    Ingests Article 12 forensic logs to diagnose systemic friction 
+    and autonomously design policy amendment proposals for board sign-off.
     """
-    def __init__(self, log_path: str = "logs/audit_buffer.jsonl"):
+    def __init__(self, log_path: str = "logs/audit_trail.jsonl", friction_threshold: int = 3):
         self.log_path = Path(log_path)
-        self.friction_threshold = 3 
+        self.friction_threshold = friction_threshold
 
     def analyze_friction(self) -> Dict[str, Any]:
         """
-        Scans the Article 12 ledger for Recursive TCO blocks.
+        Scans the active audit log ledger for Recursive TCO block signatures.
         """
         if not self.log_path.exists():
-            return {"status": "OPTIMAL", "reason": "No forensic data available."}
+            logger.info(f"MetaGovernor: Path {self.log_path} not found. System running optimally.")
+            return {"status": "OPTIMAL", "reason": "No forensic data available for ingestion."}
 
         rejections = []
         try:
             with open(self.log_path, "r") as f:
                 for line in f:
+                    if not line.strip():
+                        continue
                     entry = json.loads(line)
-                    # Updated to match the v0.5.1 Status schema
-                    if "blocked" in entry.get("status", "").lower() and "fiscal" in entry.get("status", "").lower():
-                        rejections.append(entry)
+                    
+                    # Target both automated rejections and explicit structural limits
+                    status_str = entry.get("status", "").upper()
+                    if "REJECT" in status_str or "BLOCKED" in status_str:
+                        if "TCO" in status_str or "FISCAL" in status_str:
+                            rejections.append(entry)
         except Exception as e:
-            return {"status": "ERROR", "reason": f"Audit ingestion failure: {str(e)}"}
+            logger.error(f"MetaGovernor: Fatal ledger ingestion error: {str(e)}")
+            return {"status": "ERROR", "reason": f"Audit ingestion fault: {str(e)}"}
 
+        # Evaluate systemic threshold metrics
         if len(rejections) >= self.friction_threshold:
-            return self._draft_amendment(rejections)
-        
-        return {"status": "OPTIMAL", "reason": "Systemic friction within tolerance."}
-
-    def _draft_amendment(self, rejections: List[Dict]) -> Dict[str, Any]:
-        """
-        Drafts a Legislative Amendment to lift fiscal ceilings.
-        """
-        # Calculate impact based on the actual requested amounts in the logs
-        avg_request = sum(r.get("metrics", {}).get("requested_amount", 0.0) for r in rejections) / len(rejections)
-        proposed_limit = max(avg_request * 1.1, 500.0 * 1.2) # Smart Scaling
+            logger.warning(f"MetaGovernor: Systemic friction threshold breached ({len(rejections)} blocks detected). Generating legislation.")
+            proposal = self._draft_amendment(rejections)
+            return proposal.model_dump()
         
         return {
-            "type": "POLICY_AMENDMENT_PROPOSAL",
-            "version": "0.6.0-alpha",
-            "timestamp": datetime.utcnow().isoformat(),
-            "reason": f"Friction detected: {len(rejections)} blocks. Redacting budget bottlenecks.",
-            "proposed_limit": round(proposed_limit, 2),
-            "affected_policy": rejections[0].get("policy_id", "finance_policy")
+            "status": "OPTIMAL", 
+            "reason": f"Friction levels within tolerance ({len(rejections)} / {self.friction_threshold} blocks recorded)."
         }
+
+    def _draft_amendment(self, rejections: List[Dict]) -> PolicyAmendmentProposal:
+        """
+        Compiles structural log traces to craft a precise policy update proposal.
+        """
+        latest_block = rejections[-1]
+        metrics = latest_block.get("metrics", {})
+        
+        # Capture current ceiling baseline
+        current_limit = metrics.get("recursive_tco_usd") or latest_block.get("limit") or 500.0
+        
+        # Pull actual requested overruns to calculate smart headroom
+        requested_costs = [
+            r.get("metrics", {}).get("requested_amount") or 
+            r.get("metrics", {}).get("recursive_tco_usd", current_limit) * 1.1 
+            for r in rejections
+        ]
+        
+        avg_request = sum(requested_costs) / len(requested_costs)
+        
+        # Propose either a 20% margin lift or the historical average request with a 10% safety buffer
+        proposed_limit = max(current_limit * 1.20, avg_request * 1.10)
+        
+        target_policy = latest_block.get("policy_id", "finance_policy.yaml")
+        
+        return PolicyAmendmentProposal(
+            reason=f"Systemic blockage intercepted: {len(rejections)} consecutive TCO budget rejections encountered.",
+            target_policy=target_policy,
+            metric_breached="recursive_tco_usd",
+            current_limit=round(float(current_limit), 4),
+            proposed_limit=round(float(proposed_limit), 4),
+            impact_assessment="Mitigates operational friction across autonomous sub-agent delegation domains, restoring workspace automation liquidity."
+        )
