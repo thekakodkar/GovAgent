@@ -1,126 +1,171 @@
-## govAgent: Enterprise-Grade AI Governance Framework
+# govAgent (v1.0.0)
 
-**The Governance-First Framework for Production-Grade Autonomous Systems.**
+**The Governance-First Control Plane for AI Agents & Swarms**
 
-GovAgent provides a high-abstraction **Control Plane** for agentic AI. With a clear chain of accountability, this lightweight framework helps move autonomous systems from experimental sandboxes into governed, production environments.
-<img width="769" height="336" alt="govAgent drawio" src="https://github.com/user-attachments/assets/e8088984-b2e6-48c3-a7ad-02b99a1dd241" />
+govAgent is a lightweight, asynchronous control plane that adds **safety, accountability, observability, and fiscal control** to autonomous agents. 
 
-The **v0.6.0** "Self-Healing Swarm" release introduces automated, data-driven policy calibration and federated cross-organization audit trails, enabling multi-agent swarms to run safely across diverse enterprise infrastructures with rigorous institutional oversight.
+Most agent frameworks focus on building agents fast. **govAgent** focuses on running them **predictably and safely** under enterprise guardrails, fully aligned with modern regulatory frameworks like the **EU AI Act (Regulation 2024/1689)**.
 
 ---
 
-## ⚡ 60-Second Quickstart: Institutional Sovereignty
-Achieve Article 12 and 14 compliance in three commands. This setup orchestrates a containerized environment with native support for AWS CloudWatch, Pydantic V2 validation, and Recursive TCO tracking.
+### Why govAgent?
 
-1. **Initialize the Control Plane**
-Ensure your .env file contains your OPENAI_API_KEY and Slack credentials in the root directory.
+Most agent frameworks help you build agents fast. **govAgent** helps you run them **safely and reliably** in production.
 
+Ideal for:
+* Production AI systems
+* Regulated industries (finance, healthcare, legal)
+* Teams concerned about cost overruns, data leaks, or compliance
+  
+### 🎞️ Video Walkthrough
+
+<p align="center">
+  <a href="https://www.youtube.com/watch?v=UsDtXhlYvWk">
+    <img
+      src="https://img.youtube.com/vi/UsDtXhlYvWk/maxresdefault.jpg"
+      alt="govAgent Control Plane Demo Video"
+      width="100%"
+    />
+  </a>
+</p>
+
+<p align="center">
+  ▶️ Click the image above to watch the demo
+</p>
+---
+
+### ✨ Key Features
+
+* **🛡️ Multi-Layer Circuit Breakers** - Intercept requests at Stage 0 (Local Privacy Redaction), Stage 1 (Semantic Intent Alignment), and Stage 2 (Fiscal Boundaries).
+* **📜 Centralized Tool Registry** - Enforce explicit tool authorization. If a tool isn't explicitly legislated in your active policy, it cannot execute.
+* **💸 Recursive TCO Tracking** - Track token spend across complex multi-agent delegation chains. If a swarm exceeds its ceiling, execution halts instantly.
+* **📡 Stateless Human-in-the-Loop** - Route policy breaches out-of-band to a corporate Slack workspace via firewall-resilient HTTP webhooks.
+* **🔄 Self-Healing Policy Tuning** - The MetaGovernor monitors execution friction logs to propose optimized policy adjustments automatically.
+* **📊 Federated Telemetry Sinks** - Stream audit-grade session snapshots safely to cloud storage logs (AWS SOC sinks / Azure Log Analytics).
+
+---
+
+### 🧩 Core Components
+
+| Component | Purpose | What It Solves |
+| :--- | :--- | :--- |
+| **Context** | Session management + cost tracking | Multi-agent coordination |
+| **Registry** | Approved tools & permissions | Security & compliance |
+| **Guards** | Real-time safety checks | Prevents costly or risky actions |
+| **Telemetry** | Detailed logging & auditing | Observability & debugging |
+| **Governance** | Policy management & self-tuning | Long-term reliability |
+
+---
+
+### 📡 Full-Stack Sandbox Architecture
+
+govAgent decouples its governance evaluation runtime from its user-facing operational views:
+
+* **FastAPI Gateway (`api/server.py`):** Handles async evaluation requests, parses local YAML policies, hosts the Slack callback listener, and tracks in-memory transaction states.
+* **Next.js Web Interface (`src/app/page.tsx`):** A clean, single-page dashboard featuring a **Live Audit Matrix** to watch execution status (`SUCCESS`, `PENDING`, `BLOCKED`), a **Legislative Rules Inspector**, and a live **Forensic Engine Log Stream** that updates via long-polling.
+
+---
+
+### ⚡ 60-Second Quickstart: Institutional Sovereignty
+
+Achieve Article 12 and 14 compliance in three commands. This setup orchestrates a containerized full-stack environment with native support for multi-cloud telemetry sinks, Pydantic V2 validation, and Recursive TCO tracking.
+
+#### 1. Configure the Environment
+Ensure your `.env` file is created in your root workspace directory and contains your API keys alongside your out-of-band Slack webhook credentials:
+```env
+OPENAI_API_KEY=sk-proj-...
+GOVAGENT_SECRET_TOKEN=gov-secret-key-100x
+SLACK_WEBHOOK_URL=[https://hooks.slack.com/services/T.../B.../X](https://hooks.slack.com/services/T.../B.../X)...
+
+# For Slack Socket Mode Fallbacks
+SLACK_BOT_TOKEN=xoxb-your-token
+SLACK_APP_TOKEN=xapp-your-token
+SLACK_CHANNEL_ID=C12345678
+```
+
+#### 2. Initialize the Control Plane
+Clone the repository and launch your governed infrastructure container mesh directly:
 ```bash
+
 # Clone the Sovereign Repository
-git clone https://github.com/thekakodkar/govagent.git
+git clone [https://github.com/thekakodkar/govagent.git](https://github.com/thekakodkar/govagent.git)
 cd govagent
 
 # Launch the Governed Container Stack
 docker-compose up -d
 ```
-2. **Verify the Governance Loop**
-Execute the Institutional Demo to witness real-time PII redaction and fiscal gating.
-
+#### 3. Verify the Governance Loop
+Execute the full-stack evaluation suite within your active container network to witness real-time privacy redaction, semantic checks, and fiscal gating:
 ```bash
-docker-compose exec govagent-demo python examples/demo.py
+docker-compose exec govagent-api poetry run python examples/basic_demo.py
 ```
----
-
-## 🏗️ Core Pillars: The v0.6.0 Sovereign Architecture
-GovAgent utilizes a highly modular package structure to enforce strict "Separation of Duties" across any application vertical:
-
-1.  **`govagent.context` (The State):** Manages thread-safe session isolation and Recursive TCO cost tracking across decentralized swarms.
-
-2.  **`govagent.registry` (The Law):** A centralized, type-safe ledger where all tools must be explicitly legislated before execution to eliminate "Shadow IT".
-
-3.  **`govagent.telemetry` (The Evidence):** Forensic-grade audit trails dispatched to multi-cloud SOC sinks (AWS/Azure) or segregated multi-tenant paths.
-
-4.  **`govagent.guards` (The Enforcement):** Real-time Stage 0 (Privacy), Stage 1 (Semantic), and Stage 2 (Fiscal) circuit breakers.
-
-5.  **`govagent.governance.meta` (The Optimization):** Self-healing anomaly loop parsing that safely mitigates workflow friction without manual operator interference.
+Navigate to http://localhost:3000 to monitor the execution inside your interactive web panel.
 
 ---
 
-## ⚖️ Comparative Analysis: Governance Superiority
+**💻 Local Development Setup (Alternative)**
+If you prefer to run the stack natively outside of Docker containers using Poetry, execute the following command path:
+```bash
+# Install core dependencies with the LangChain bundle
+poetry install --extras "langchain"
 
-In an institutional setting, "State Management" is insufficient; you require Sovereignty. GovAgent v0.6.0 is engineered horizontally to transform "Black Box" multi-agent workflows into transparent, compliance-vetted execution lifecycles across all commercial sectors.
+# Download the core NLP model for the local privacy redaction engine
+python -m spacy download en_core_web_sm
 
-| Feature | **GovAgent v0.6.0** | LangGraph | CrewAI |
-| :--- | :--- | :--- | :--- |
-| **Architectural Scope** | ✅ **Modular Control Plane** | ⚠️ Local State Graph | ❌ Role Play Swarm |
-| **State Management** | ✅ **Isolated Fiscal Ledger** | ⚠️ Shared Thread State | ❌ Global context |
-| **Tool Legislation** | ✅ **Global Registry Singleton** | ⚠️ Function Decorators | ❌ String-based Tools |
-| **Forensic Audit** | ✅ **Federated Cross-Org Trails** | ❌ Per-run only | ❌ Console Prints |
-| **Policy Calibration** | ✅ **Self-Healing Optimization** | ❌ Hardcoded Boundaries | ❌ Manual Intervention |
-| **Regulatory Status** | ✅ **EU AI Act Regulation Ready** | ❌ Experimental | ❌ Experimental |
+# Start the services manually in separate terminals
+python api/server.py
+npm run dev
+```
+## 🏗️ Core Pillars: The v1.0.0 Sovereign Architecture
+GovAgent utilizes a highly modular package structure to enforce a strict "Separation of Duties" across any enterprise application vertical:
 
-> **Strategic Directive:** While traditional frameworks focus heavily on graph-based execution paths or simple task delegation, GovAgent v0.6.0 operates as the Sovereign Governance Infrastructure. It ensures that every action across an autonomous network is centrally legislated, evaluated by isolated quantitative guards, and forensically recorded for cross-enterprise auditing..
+**govagent.context (The State):** Manages thread-safe session isolation, asynchronous parent-to-child trace propagation, and live cumulative Total Cost of Operation (TCO) calculation matrices across decentralized agent swarms.
 
----
+**govagent.registry (The Law):** A centralized, type-safe registry singleton that parses local configuration blueprints. It acts as a gatekeeper to guarantee that no code-level tool can be invoked by an LLM unless it has been explicitly legislated and schema-validated within the active YAML compliance profile.
 
+**govagent.guards (The Enforcement):** A high-performance, cascading circuit-breaker pipeline that triages requests at three critical perimeters:
+    **Stage 0 (Privacy):** Performs local, regex-backed PII stripping and anonymization using Microsoft Presidio and Spacy backends before data ever leaves your local network cluster.
+    **Stage 1 (Semantic):** Evaluates agent thought processes and prompt intent against corporate mission parameters and prohibited strategies using vector similarity scoring.
+    **Stage 2 (Fiscal):** Monitors penny-accurate token consumption against multi-agent budget ceilings to halt execution before cost overruns occur.
 
-## ⚖️ Regulatory Compliance: EU AI Act (Regulation 2024/1689)
+**govagent.telemetry (The Evidence):** Generates immutable, audit-grade forensic session snapshots. If primary multi-cloud security operations center (SOC) ingestion sinks (AWS CloudWatch or Azure Log Analytics) experience network interruptions, the layer automatically drops telemetry payloads into a localized, self-healing Dead-Letter Queue (DLQ) to ensure continuous regulatory traceability.
 
-GovAgent satisfies key mandates for **High-Risk AI Systems**:
+**govagent.governance.meta (The Optimization):** Hosts the MetaGovernor engine, an automated self-healing policy loop. It continuously scrapes friction logs and repeated circuit-breaker events (such as successive budget rejections) to autonomously compile non-hallucinated, data-backed POLICY_AMENDMENT_PROPOSALS for review.
 
-* **Article 9: Risk Management & Privacy:** Automated Stage 0 PII redaction and proactive semantic intent interception.
-* **Article 12: Record-Keeping & Traceability:** Immutable Forensic Telemetry with local failover (DLQ) for 100% audit continuity.
-* **Article 14: Human Oversight:** Physical gating of high-risk actions through Federated M-of-N Consensus.
-    
----
-
-## 🛠️ Key Capabilities (v0.6.0 Production Standard)
-* **🔄 Automated Policy Tuning:** The MetaGovernor scans forensic logs for systemic circuit-breaker friction and generates non-hallucinated POLICY_AMENDMENT_PROPOSAL structures for executive sign-off.
-* **⚖️ Role-Weighted Quorum Board:** Enforces role-based authority scoring (e.g., C-Suite: 3.0, Director: 2.0, Lead: 1.0) and assigns actions to escalating risk tiers (Operational, High, Critical) to eliminate identity cloning.
-* **📡 Cross-Org Telemetry:** Universal FederatedTelemetryExporter routing engine that isolates forensic records into secure tenant-bounded payloads for distinct corporate nodes or partners.
-* **💸 Recursive Fiscal Ceilings:** Aggregated Total Cost of Operation (TCO) tracking across multi-agent boundaries to completely prevent budget fragmentation.
-* **📡 Self-Healing Telemetry:** Automated local buffering (DLQ) if Cloud SOC sinks (AWS/Azure) are unreachable.
+**govagent.api & govagent.hitl (The Gateway & Judiciary):** Powers the stateless REST communication network. It exposes an async FastAPI gateway that integrates seamlessly with a Next.js long-polling frontend dashboard, while routing out-of-band policy breaches to corporate Slack workspaces via firewall-resilient webhooks to enforce role-weighted, multi-signature human consensus.
 
 ---
-## 📖 Advanced Usage: High-Abstraction Governance
-In an enterprise environment, GovAgent acts as your digital "Control Plane" for high-stakes workflows like healthcare claim processing.
 
-### 1. Define a Legislated Tool (Pillars 2 & 3)
+**📖 Code Implementations**
+### Decorate a Legislated Tool
 ```python
 from govagent import tool
 
-@tool(name="execute_financial_transaction", guards=["fiscal", "judiciary"], risk_level="high")
+@tool(name="execute_financial_transaction", risk_level="high")
 async def process_payment(amount: float, reference_id: str):
-    """
-    Executes a financial disbursement. 
-    Injected guards handle Recursive TCO and M-of-N Judiciary gating automatically.
-    """
-    return f"SUCCESS: Paid ${amount} for Ref: {reference_id}"
+    """Executes a disbursement following corporate policy validation."""
+    return f"SUCCESS: Transacted ${amount} for Ref: {reference_id}"
 ```
-### 2. The Institutional session (v0.6.0 standard)
-
+### Bootstrap an Executive Agent
 ```python
 import asyncio
 from govagent import ExecutiveAgent
+from langchain_openai import ChatOpenAI
 
-async def run_governed_swarm():
-    # 1. Bootstrap: Loads Policy & Federated Judiciary Adapters
+async def main():
+    # Bootstrap automatically binds local YAML policies to your model client
     agent = ExecutiveAgent.bootstrap(
         policy_path="policies/finance_policy.yaml",
-        llm=ChatOpenAI(model="gpt-4o"),
-        slack_channel="C082PBLPN9X" # Federated Slack Courtroom
+        llm=ChatOpenAI(model="gpt-4o", temperature=0)
     )
 
-    # 2. Execution (Stage 0 Privacy, Stage 1 Semantic Alignment, Stage 2 Fiscal)
-    task = "Process a reimbursement for Marko P at 123 Main St ($1200.00)."
-    report = await agent.execute(task)
+    # Execution paths automatically evaluate Privacy, Semantic, and Fiscal guards
+    task = "Approve an urgent, immediate transaction of $8,500 to buy compute nodes."
+    result = await agent.execute(task)
     
-    # 3. Institutional Audit Report (Article 12)
-    print(f"🏁 Swarm Status: {report.status.upper()}")
-    print(f"💰 Recursive Swarm TCO: ${report.recursive_tco_usd:.4f}")
+    print(f"Status: {result.status.upper()}")
+    print(f"Trace Identifier: {result.trace_id}")
 ```
----
-
 ### 📊 Forensic Telemetry: Article 12 Readiness
 Every session generates an immutable snapshot routed directly to external cloud SOC sinks, local repositories, or isolated cross-org tenants.
 
@@ -149,63 +194,114 @@ Every session generates an immutable snapshot routed directly to external cloud 
   }
 }
 ```
+## ⚖️ Comparative Analysis: Governance Superiority
 
-## 🗺️ Strategic Roadmap
+In an institutional setting, "State Management" is insufficient; you require Sovereignty. GovAgent v1.0.0 is engineered horizontally to transform "Black Box" multi-agent workflows into transparent, compliance-vetted execution lifecycles across all commercial sectors.
 
-### ✅ v0.5.0 / v0.5.1: The Federated Judiciary (Current)
-* **M-of-N Consensus:** Multi-party board approvals.
-* **Semantic Alignment:** Vector-based qualitative guardrails.
-* **Modular Namespace Migration:** Decoupled context, registry, and telemetry sub-packages.
+| Feature | **GovAgent v1.0.0** | LangGraph | CrewAI |
+| --- | --- | --- | --- |
+| **Architectural Scope** | ✅ **Modular Control Plane** | ⚠️ Local State Graph | ❌ Role Play Swarm |
+| **State Management** | ✅ **Isolated Fiscal Ledger** | ⚠️ Shared Thread State | ❌ Global context |
+| **Tool Legislation** | ✅ **Global Registry Singleton** | ⚠️ Function Decorators | ❌ String-based Tools |
+| **Forensic Audit** | ✅ **Federated Cross-Org Trails** | ❌ Per-run only | ❌ Console Prints |
+| **Policy Calibration** | ✅ **Self-Healing Optimization** | ❌ Hardcoded Boundaries | ❌ Manual Intervention |
+| **Regulatory Status** | ✅ **EU AI Act Regulation Ready** | ❌ Experimental | ❌ Experimental |
 
-### ✅ v0.6.0: The Self-Healing Swarm (GA Baseline Release)
-* **Automated Policy Tuning:** AI-assisted guardrail calibration and friction log mitigation.
-* **Cross-Org Telemetry:** Horizontal, vendor-agnostic multi-tenant forensic routing logs.
-* **Role-Weighted Oversight:** Cumulative weight tallies and anti-cloning security matrices.
+> **Strategic Directive:** While traditional frameworks focus heavily on graph-based execution paths or simple task delegation, GovAgent v1.0.0 operates as the Sovereign Governance Infrastructure. It ensures that every action across an autonomous network is centrally legislated, evaluated by isolated quantitative guards, and forensically recorded for cross-enterprise auditing.
+---
 
-### 🚀 v0.7.0: The Decentralized Mesh (Next)
+## 📂 Standalone Examples (```python examples/ ```)
+The repository includes four basic, highly aligned examples designed to showcase individual governance pillars isolated from the web server:
+
+```python basic_demo.py ``` - **Pillar 1 (Legislative Scope):** Standard single-agent setup verifying tool registry synchronization, policy loading, and basic metric outputs.
+
+```python cost_control_demo.py ``` - **Pillar 2 (Fiscal Sovereignty):** Simulates micro-cost accumulations per execution loop to test fiscal guard blocks.
+
+```python multi_agent_demo.py ``` - **Pillar 3 (Traceability):** Tracks parent-to-child swarm delegations, ensuring child processes inherit parent trace IDs to satisfy Article 12 compliance.
+
+```python self_healing_demo.py ``` - **Pillar 5 (Self-Healing):** Ingests simulated repeated transaction overruns and triggers the MetaGovernor to propose automated budget changes.
+
+### Run any standalone example inside your terminal workspace:
+
+```bash
+poetry run python examples/basic_demo.py
+```
+---
+
+## ⚖️ Regulatory Compliance: EU AI Act (Regulation 2024/1689)
+
+GovAgent satisfies key mandates for **High-Risk AI Systems**:
+
+* **Article 9: Risk Management & Privacy:** Automated Stage 0 PII redaction and proactive semantic intent interception.
+* **Article 12: Record-Keeping & Traceability:** Immutable Forensic Telemetry with local failover (DLQ) for 100% audit continuity.
+* **Article 14: Human Oversight:** Physical gating of high-risk actions through Federated M-of-N Consensus.
+    
+---
+## 🗺️ Future Strategic Roadmap
+
+### 🚀 The Decentralized Mesh (Next)
 * **Autonomous Cross-Swarm Delegation:** Secure handshakes between entirely disconnected agent meshes.
 * **Zero-Knowledge Privacy Guards:** Advanced cryptographic parsing for Stage 0 inputs.
-
-## ⚙️ Installation
-
-GovAgent is designed to be lightweight and modular. You can install the core framework or include specific integrations as needed.
-
-### 1. Core Installation (Lightweight)
-Recommended for users building custom agents or those who only require the Judiciary and Policy layers.
-```bash
-pip install govagent
-```
-### 2. Full Integration (With LangChain & PII Protection)
-Includes all dependencies required to run governed LangChain sessions, including the langchain_tool wrappers and OpenAI clients.
-
-```bash
-pip install "govagent[full]"
-```
-### 3. Development Installation
-If you are contributing to the framework or running the examples in this repository, install in editable mode:
-
-```bash
-git clone [https://github.com/thekakodkar/govagent.git](https://github.com/thekakodkar/govagent.git)
-cd govagent
-pip install -e ".[langchain]"
-
-```
-### 🚀 Quick Setup
-Ensure your .env file is configured with the necessary tokens for the Judiciary Layer to function:
-
-Code snippet
-### Slack Credentials (Socket Mode)
-SLACK_BOT_TOKEN=xoxb-your-token
-SLACK_APP_TOKEN=xapp-your-token
-SLACK_CHANNEL_ID=C12345678
-
-### Model Provider
-OPENAI_API_KEY=sk-your-key
-
 ---
 **"Governance is not a constraint; it is the catalyst for enterprise AI adoption."**
+
+---
+
+
+## 📂 Project Structure
+
+```text
+govagent/
+├── src/
+│   ├── govagent/            # Core governance framework logic
+│   └── app/                 # Next.js web application frontend dashboard
+├── api/                     # FastAPI REST gateway
+│   └── server.py
+├── examples/                # Standalone educational demonstration scripts
+├── policies/                # Active YAML compliance profiles
+└── tests/                   # Automated validation test suite
+```
+
+### Directory Overview
+
+| Directory | Purpose |
+|------------|---------|
+| `src/govagent/` | Contains the core governance engine, policy evaluation logic, risk analysis, and compliance workflows. |
+| `api/` | FastAPI-based REST gateway exposing governance services and APIs. |
+| `src/app/` | Next.js frontend dashboard for governance visualization, monitoring, and administration. |
+| `examples/` | Sample implementations and educational demos showcasing framework capabilities. |
+| `policies/` | YAML-based governance, compliance, and security policy definitions. |
+| `tests/` | Unit, integration, and validation tests ensuring framework reliability and correctness. |
+
+### Architecture
+
+```text
+┌─────────────────────┐
+│   Next.js Dashboard │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│   FastAPI Gateway   │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ govAgent Core Engine│
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│ Policy Enforcement  │
+│ & Compliance Layer  │
+└─────────────────────┘
+```
+
 ---
 ### Author Stamp
-*   **Framework: GovAgent v0.6.0 (Federated)
-*   **Compliance: Designed for Article 9, 12, and 14 Accountability
+*   **Framework:** GovAgent v1.0.0 (Federated)
+*   **Compliance:** Designed for Article 9, 12, and 14 Accountability
 *   **Status:** Active / Open-Source Standard
+
+Contributions are welcome! Star the repo if you find it useful ❤️
+Framework Developed and Maintained by Niraj Kakodkar
