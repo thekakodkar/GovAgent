@@ -42,7 +42,7 @@ app.add_middleware(
 
 API_TOKEN = os.environ.get("GOVAGENT_SECRET_TOKEN", "gov-secret-key-100x")
 AUDIT_LOG_PATH = os.path.join(base_directory, "policies", "audit_buffer.jsonl")
-SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL") or "https://hooks.slack.com/services/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"
+SLACK_WEBHOOK_URL = os.environ.get("SLACK_WEBHOOK_URL") 
 
 # 🧠 VOLATILE RUNTIME STATE REGISTRY
 # Tracks active human-in-the-loop transaction authorizations across threads in-memory
