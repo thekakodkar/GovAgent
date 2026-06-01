@@ -1,0 +1,27 @@
+metadata:
+  agent_name: "SovereignDirector"
+  version: "0.6.0"
+  compliance_standard: "ISO/IEC 42001 Baseline Guardrails"
+  description: "Standard legislative baseline policy controlling operational tool permissions and entry thresholds."
+
+registry_alignment:
+  allowed_tools:
+    - "search_web"
+    - "send_email"
+  high_risk_tools:
+    - "send_email"
+
+fiscal_governance:
+  currency: "USD"
+  global_limits:
+    daily_budget_usd: 100.00
+    transaction_ceiling: 50.00
+    recursive_tco_limit: 150.00
+
+security_guardrails:
+  required_guards:
+    - "pillar_1_integrity"
+    - "privacy_redaction"
+  privacy:
+    compliance_level: "GDPR_ARTICLE_9"
+    enforce_local_masking: true

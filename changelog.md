@@ -2,6 +2,25 @@
 
 All notable changes to the **GovAgent** framework are documented in this file. This project adheres to a "Governance-First" versioning strategy, prioritizing human oversight and fiscal accountability.
 
+## [1.0.0] - 2026-06-01
+### "Sovereign Swarm" General Availability (GA) Stable Release
+
+### 🏛️ Added: Production-Grade Package Standardization
+- **Poetry Workspace Migration:** Completely transitioned the framework configuration from Hatchling metadata to a deterministic Poetry infrastructure (`pyproject.toml` + `poetry.lock`) to eliminate package dependency drift across corporate environments.
+- **Isolated Dependency Groups:** Partitioned the runtime footprint by segregating core application libraries from development-specific server utilities (`fastapi`, `uvicorn`), ensuring a lean production installation.
+- **LangChain Modular Extraction:** Refactored the heavy `langchain-core` and `langchain-openai` adapters into an explicit Poetry extra-dependencies block (`govagent[langchain]`), allowing resource-constrained runtimes to deploy local Small Language Models (SLMs) seamlessly without cloud library bloat.
+
+### 📡 Added: Single-Window Full-Stack Synchronization
+- **Long-Polling Synchronization Interceptor:** Implemented a background polling listener hook into the frontend dashboard (`src/app/page.tsx`) that checks the server's state checkpoint every 2,000 milliseconds when an execution drops into a `PENDING` state.
+- **Asynchronous State Memory Registry:** Embedded an in-memory execution status tracking register (`LIVE_TRANSACTION_STATES`) inside the FastAPI gateway layer to hold multi-agent session contexts across threads out-of-band.
+- **Stateless REST Callback Controller:** Engineered a high-speed web callback endpoint (`/api/v1/slack/interactive`) that processes inbound human verification clicks, updates local telemetry logs, and serves self-closing window scripts to handle Slack actions without requiring stateful local WebSocket tunnels.
+
+### 🛡️ Fixed: Robust Boundary Interception
+- **Frontend Encoding Defenses:** Expanded the string signature matching array to include explicit keywords (`"approve"`, `"nodes"`, `"compute"`), completely preventing financial transaction payload slips caused by frontend HTML character or currency symbol entity encoding variations.
+- **Telemetry Object Flattening:** Patched the native `ExecutionSnapshot` metadata parser to safely wrap telemetry cost calculations via dictionary bracket accessors (`.get("recursive_tco_usd")`), eliminating Pydantic-driven dot-notation `AttributeError` failures.
+
+---
+
 ## [0.6.0] - 2026-05-22
 ### "Self-Healing Swarm" Release: AI-Assisted Calibration & Multi-Tenant Federated Auditing
 
@@ -25,22 +44,7 @@ All notable changes to the **GovAgent** framework are documented in this file. T
 - **Asynchronous Race Mitigation:** Appended an execution cooldown routine to integration teardowns, allowing Slack's edge servers to successfully process final `chat_update` API packets and collapse buttons before Socket Mode threads disconnect.
 - **State Separation Realignment:** Moved the heavy financial score aggregation engine completely into the `HITLManager` core, reducing `SlackJudiciaryAdapter` to a pure, stateless I/O gateway resilient to mid-vote network dropouts.
 
-## [0.5.1] - 2026-05-12
-### "Institutional Alignment" Release: Modular Architecture & Forensic Hardening
-
-### 🏛️ Added: Phase 4 - Sovereign Package Refactoring
-- **Modular Namespace Migration:** Refactored the core framework into dedicated legislative packages: `govagent.context` (State), `govagent.registry` (Tools), and `govagent.telemetry` (Evidence).
-- **Institutional Registry Manager:** Introduced the `GlobalRegistry` singleton to centralize tool legislation and prevent "Shadow IT" execution.
-- **Schema Sovereignty:** Formally defined `ToolManifest` and `ExecutionSnapshot` in Pydantic V2 to ensure forensic-grade data consistency.
-
-### ⚖️ Added: Phase 5 - Compliance & Test Certification
-- **Fiscal Reset Engine:** Implemented `reset_fiscal_ledger` to ensure state isolation between transactions, satisfying Article 12 audit requirements.
-- **100% Test Certification:** Verified 9/9 institutional test cases covering Privacy (Article 9), Fiscal Ceilings (Recursive TCO), and Federated Judiciary (Article 14).
-- **Federated Swarm Inheritance:** Hardened the inheritance logic to ensure sub-agents automatically inherit Parent Trace IDs during delegation.
-
-### 🛡️ Fixed: Registry & Schema Integrity
-- **Intent Schema Hardening:** Patched `validate_intent_schema` to strictly enforce numeric types for financial transactions, preventing "Type-Spoofing" attacks.
-- **Namespace Export Sync:** Resolved `ImportError` issues by formally legislating exports in all package `__init__.py` files.
+---
 
 ## [0.5.1] - 2026-05-12
 ### "Institutional Alignment" Release: Modular Architecture & Forensic Hardening
@@ -59,8 +63,11 @@ All notable changes to the **GovAgent** framework are documented in this file. T
 - **Intent Schema Hardening:** Patched `validate_intent_schema` to strictly enforce numeric types for financial transactions, preventing "Type-Spoofing" attacks.
 - **Namespace Export Sync:** Resolved `ImportError` issues by formally legislating exports in all package `__init__.py` files.
 
-### [0.5.0] - 2026-05-12
+---
+
+## [0.5.0] - 2026-05-12
 ### "Federated Judiciary" Release: Consensus-Driven Governance & Forensic Resilience
+
 ### ⚖️ Added: Phase 1 - Federated M-of-N Consensus
 - **Federated Quorum Logic:** Introduced the ApprovalRequest model with min_approvals support, requiring multiple human stakeholders to reach consensus before high-risk execution.
 - **M-of-N Quorum Extraction:** Enhanced ExecutiveAgent and HITLManager to dynamically extract quorum requirements from the institutional policy manifest.
@@ -78,6 +85,8 @@ All notable changes to the **GovAgent** framework are documented in this file. T
 - **Stage 0 Address Redaction:** Hardened the PrivacyGuard with a custom regex-based Pattern Recognizer to successfully scrub street-level PII (e.g., "123 Main St"), resolving an Article 9 compliance gap.
 - **Safe Policy Accessors:** Refactored CircuitBreaker and ExecutiveAgent to use getattr for policy configuration, preventing AttributeError crashes during partial policy loads.
 - **Indentation & Syntax:** Resolved critical indentation errors in the ExecutiveAgent.evaluate method that previously blocked institutional test suites.
+
+---
 
 ## [0.4.0] - 2026-05-07
 ### "Sovereign Swarm" Release: Cloud-Native Governance & Recursive Fiscal Control
@@ -101,6 +110,8 @@ All notable changes to the **GovAgent** framework are documented in this file. T
 - **Coroutine Resolution**: Patched `ExecutiveAgent.execute` to fully `await` all telemetry paths, resolving a critical `AttributeError` where audit reports were returned as unresolved coroutines.
 - **Address Leakage Patch**: Hardened the `PrivacyGuard` with a regex-based "Safety Net" to ensure physical addresses (e.g., "123 Main St") are successfully captured as `LOCATION` entities.
 
+---
+
 ## [0.3.0] - 2026-05-07
 ### Major Release: Institutional Scaling & Terminal Integrity
 
@@ -122,6 +133,8 @@ All notable changes to the **GovAgent** framework are documented in this file. T
 - **Industry-Agnostic Schema**: Renamed specific tools (e.g., `healthcare_payment_tool`) to generic counterparts like `execute_financial_transaction` to support horizontal scaling across Fintech, Supply Chain, and Audit sectors.
 - **Forensic Telemetry**: Updated `TelemetryManager` to log every stage of the cascading triage (Fiscal -> Policy -> Judiciary).
 
+---
+
 ## [0.2.3] - 2026-05-06
 ### Added
 - **LangChain Integration Adapter**: Automated wrapper in `ExecutiveAgent` to standardize LangChain `ChatOpenAI` clients to the GovAgent contract.
@@ -135,6 +148,8 @@ All notable changes to the **GovAgent** framework are documented in this file. T
 ### Fixed
 - Resolved `NoneType` and `AttributeError` issues during agent initialization.
 - Fixed namespace exports in `govagent.hitl` for `SlackJudiciaryAdapter`.
+
+---
 
 ## [0.2.2] - 2026-05-05
 ### Added
@@ -151,57 +166,57 @@ All notable changes to the **GovAgent** framework are documented in this file. T
 ## [0.2.0] - 2026-05-04 (Stable)
 
 ### 🏛️ Added: The Judiciary Pillar
-*   **Synchronous HITL Manager**: Introduced a core orchestration layer to manage Human-in-the-Loop (HITL) requests across multiple communication adapters.
-*   **Slack Socket Mode Adapter**: Implemented a real-time, mobile-first intervention bridge using secure WebSockets, enabling remote executive oversight without public endpoint exposure.
-*   **Stateful Execution Blocking**: Developed a mechanism using `asyncio.Future` patterns that physically pauses the agent's logic thread until a human "Approve" or "Reject" signal is received.
-*   **Interactive Block Kit UI**: Added rich, structured Slack message templates providing forensic context (Agent ID, Reason, Parameters) for executive decision-making.
+* **Synchronous HITL Manager**: Introduced a core orchestration layer to manage Human-in-the-Loop (HITL) requests across multiple communication adapters.
+* **Slack Socket Mode Adapter**: Implemented a real-time, mobile-first intervention bridge using secure WebSockets, enabling remote executive oversight without public endpoint exposure.
+* **Stateful Execution Blocking**: Developed a mechanism using `asyncio.Future` patterns that physically pauses the agent's logic thread until a human "Approve" or "Reject" signal is received.
+* **Interactive Block Kit UI**: Added rich, structured Slack message templates providing forensic context (Agent ID, Reason, Parameters) for executive decision-making.
 
 ### 🛠️ Improvements & Refactoring
-*   **EU AI Act Compliance**: Mapped code-level functionality to **Article 14 (Human Oversight)** and **Article 12 (Traceability)** requirements.
-*   **Legislative Registry Hardening**: Stabilized the `@tool` decorator to ensure strict type-safety and parity between Python signatures and YAML policy permissions.
-*   **Self-Healing Handshake**: Added intelligent detection for common Slack errors (e.g., `not_in_channel`) with automated join attempts where permitted by scopes.
-*   **Executive Audit Logging**: Interaction handlers now capture and log the specific Slack User ID of the human overseer to maintain the "Chain of Accountability".
+* **EU AI Act Compliance**: Mapped code-level functionality to **Article 14 (Human Oversight)** and **Article 12 (Traceability)** requirements.
+* **Legislative Registry Hardening**: Stabilized the `@tool` decorator to ensure strict type-safety and parity between Python signatures and YAML policy permissions.
+* **Self-Healing Handshake**: Added intelligent detection for common Slack errors (e.g., `not_in_channel`) with automated join attempts where permitted by scopes.
+* **Executive Audit Logging**: Interaction handlers now capture and log the specific Slack User ID of the human overseer to maintain the "Chain of Accountability".
 
 ### 🛡️ Security & Integrity
-*   **Zero-Trust Identity**: Standardized the dual-token system using `SLACK_APP_TOKEN` (`xapp-`) for connection and `SLACK_BOT_TOKEN` (`xoxb-`) for privileged communication.
-*   **Thread-Safe Callbacks**: Integrated `loop.call_soon_threadsafe` to bridge background WebSocket threads with the main asynchronous execution loop.
-*   **Constitutional Startup Check**: Enhanced the boot-up sequence to refuse execution if tool code and policy permissions do not align.
+* **Zero-Trust Identity**: Standardized the dual-token system using `SLACK_APP_TOKEN` (`xapp-`) for connection and `SLACK_BOT_TOKEN` (`xoxb-`) for privileged communication.
+* **Thread-Safe Callbacks**: Integrated `loop.call_soon_threadsafe` to bridge background WebSocket threads with the main asynchronous execution loop.
+* **Constitutional Startup Check**: Enhanced the boot-up sequence to refuse execution if tool code and policy permissions do not align.
 
 ---
 
 ## [0.1.7] - 2026-05-04
 
 ### 📜 Added: Legislative Tool Registry
-*   **Legislative Tool Registry**: Introduced the `@tool` decorator to auto-map Python functions to governance permissions.
-*   **Strict Risk Parity Audit**: Implemented `Policy.validate_registry()` to prevent "Risk Downgrading" between code and YAML.
-*   **Shadow Tool Prevention**: The system now halts at startup if a code-level tool is not explicitly authorized in the Policy YAML.
-*   **Interface Reflection**: Captures function signatures and docstrings for automated prompt engineering.
+* **Legislative Tool Registry**: Introduced the `@tool` decorator to auto-map Python functions to governance permissions.
+* **Strict Risk Parity Audit**: Implemented `Policy.validate_registry()` to prevent "Risk Downgrading" between code and YAML.
+* **Shadow Tool Prevention**: The system now halts at startup if a code-level tool is not explicitly authorized in the Policy YAML.
+* **Interface Reflection**: Captures function signatures and docstrings for automated prompt engineering.
 
 ### 🛠️ Fixed
-*   **Policy Attribute Sync**: Standardized naming for `max_spend_usd` and `require_human_approval` to ensure internal Guard compatibility.
-*   **Cross-Walk Validation**: Resolved the gap where code and policy could drift out of alignment without triggering a failure.
+* **Policy Attribute Sync**: Standardized naming for `max_spend_usd` and `require_human_approval` to ensure internal Guard compatibility.
+* **Cross-Walk Validation**: Resolved the gap where code and policy could drift out of alignment without triggering a failure.
 
 ---
 
 ## [0.1.6] - 2026-05-03
 
 ### ✅ Added
-*   **Hardened Core**: Implemented explicit Intent Validation and a Telemetry Contract.
-*   **Financial Circuit Breaker**: Real-time spend tracking and budget enforcement.
-*   **Path Independence**: Absolute resolution for Policies.
+* **Hardened Core**: Implemented explicit Intent Validation and a Telemetry Contract.
+* **Financial Circuit Breaker**: Real-time spend tracking and budget enforcement.
+* **Path Independence**: Absolute resolution for Policies.
 
 ---
 
 ## [0.1.5] - 2026-05-03
 
 ### 🏛️ Added
-*   **Synchronous HITL Enforcement**: The agent now treats a human 'Reject' signal as a terminal event, physically breaking the execution loop.
-*   **Governance Test Suite**: Added `test_governance.py` to verify policy enforcement and guardrail reliability.
-*   **ExecutionSnapshots**: Enhanced telemetry reporting for forensic-grade audit trails.
+* **Synchronous HITL Enforcement**: The agent now treats a human 'Reject' signal as a terminal event, physically breaking the execution loop.
+* **Governance Test Suite**: Added `test_governance.py` to verify policy enforcement and guardrail reliability.
+* **ExecutionSnapshots**: Enhanced telemetry reporting for forensic-grade audit trails.
 
 ### 🛠️ Changed
-*   **Loop Hardening**: Refactored `ExecutiveAgent` to prioritize governance checks over tool execution.
-*   **Telemetry Mapping**: Standardized attribute names (e.g., `reasoning_steps`) across the framework.
+* **Loop Hardening**: Refactored `ExecutiveAgent` to prioritize governance checks over tool execution.
+* **Telemetry Mapping**: Standardized attribute names (e.g., `reasoning_steps`) across the framework.
 
 ### 🛠️ Fixed
-*   **Bypass Resolution**: Fixed a critical bypass where the agent would continue execution after an intervention request was denied.
+* **Bypass Resolution**: Fixed a critical bypass where the agent would continue execution after an intervention request was denied.

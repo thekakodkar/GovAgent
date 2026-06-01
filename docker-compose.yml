@@ -1,7 +1,36 @@
+version: "3.8"
+
 services:
-  govagent-demo:
-    build: .
+  # 🐍 GOVAGENT RUNTIME CORE & API GATEWAY
+  govagent-api:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: govagent-api-gateway
+    ports:
+      - "8000:8000"
     volumes:
       - .:/app
-    env_file: .env
-    command: python examples/demo.py
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: poetry run uvicorn api.server:app --host 0.0.0.0 --port 8000 --reload
+    restart: unless-stopped
+
+  # 🎨 CONTROL PLANE MANAGEMENT PANEL 
+  govagent-dashboard:
+    image: node:18-alpine
+    container_name: govagent-web-sandbox
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+    working_dir: /app
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+    command: sh -c "npm install && npm run dev"
+    depends_on:
+      - govagent-api
+    restart: unless-stopped

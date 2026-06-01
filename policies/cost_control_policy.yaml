@@ -1,0 +1,26 @@
+metadata:
+  agent_name: "CostAuditor"
+  version: "0.6.0"
+  compliance_standard: "Corporate Spending & Fiscal Sovereignty Mandate"
+  description: "Strict cost-control policy designed to evaluate multi-agent swarm cumulative budget overruns."
+
+registry_alignment:
+  allowed_tools:
+    - "analyze_report"
+  high_risk_tools:
+    - "analyze_report"
+
+fiscal_governance:
+  currency: "USD"
+  global_limits:
+    daily_budget_usd: 50.00
+    transaction_ceiling: 2000.00 # Lower than the $8,500 demo trigger to force a breach condition
+    recursive_tco_limit: 25.00
+
+security_guardrails:
+  required_guards:
+    - "fiscal_gate"
+    - "recursive_tco_check"
+  circuit_breaker:
+    fail_secure: true
+    action_on_breach: "HALT_AND_ESCALATE"

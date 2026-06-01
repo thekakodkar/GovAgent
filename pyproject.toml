@@ -1,43 +1,59 @@
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
-[project]
+[tool.poetry]
 name = "govagent"
-version = "0.6.1"
+version = "1.0.0"  # 
 description = "The Governance-First Framework for Agentic AI"
+authors = ["Niraj Kakodkar <niraj.kakodkar@gmail.com>"]
 readme = "README.md"
-requires-python = ">=3.10"
-license = {text = "MIT"}
-authors = [
-    {name = "Niraj Kakodkar"}, 
-    {email = "niraj.kakodkar@gmail.com"}
-]
+license = "MIT"
+homepage = "https://github.com/thekakodkar/govagent"
+repository = "https://github.com/thekakodkar/govagent"
 keywords = ["ai", "agents", "governance", "roi", "enterprise", "EU-AI-Act"]
-
-# CORE DEPENDENCIES: Kept minimal to reduce the footprint
-dependencies = [
-    "pydantic>=2.0.0",
-    "pyyaml>=6.0.0",
-    "httpx>=0.25.0",
-    "slack-sdk>=3.0.0",
-    "python-dotenv>=1.0.0",
-    "presidio-analyzer>=2.2.0",      # PII Analysis Engine (Pillar 2/Article 9)
-    "presidio-anonymizer>=2.2.0",    # PII Redaction/Anonymization (Pillar 2)
-    "spacy>=3.0.0",                  # Required NLP backend for Presidio
-    "boto3>=1.26.0",                 # AWS Pillar
-    "azure-monitor-ingestion>=1.0.0", # Azure Pillar
-    "azure-identity>=1.12.0",        # Azure Identity Pillar
-    "opentelemetry-api>=1.15.0"      # OTEL Pillar
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence"
 ]
 
-# OPTIONAL DEPENDENCIES: Users install via pip install "govagent[langchain]"
-[project.optional-dependencies]
-langchain = [
-    "langchain-core>=0.1.0",
-    "langchain-openai>=0.1.0",
-    "openai"
+# 📦 TOOL LOGISTICS & PACKAGING SPECIFICATION
+packages = [
+    { include = "govagent", from = "src" }
 ]
 
-[project.urls]
-"Homepage" = "https://github.com/thekakodkar/govagent"
+# 🚀 CORE PRODUCTION DEPENDENCIES (Minimal Footprint)
+[tool.poetry.dependencies]
+python = ">=3.10"
+pydantic = ">=2.0.0"
+pyyaml = ">=6.0.0"
+httpx = ">=0.25.0"
+slack-sdk = ">=3.0.0"
+python-dotenv = ">=1.0.0"
+presidio-analyzer = ">=2.2.0"      # PII Analysis Engine (Pillar 4 / Article 9 Compliance)
+presidio-anonymizer = ">=2.2.0"    # PII Redaction/Anonymization Engine
+spacy = ">=3.0.0"                  # Required NLP Core Backend for Presidio
+boto3 = ">=1.26.0"                 # AWS Cloud SOC Forensic Telemetry Sink
+azure-monitor-ingestion = ">=1.0.0" # Azure Log Analytics Telemetry Ingestion
+azure-identity = ">=1.12.0"        # Azure Active Directory Identity Validation
+opentelemetry-api = ">=1.15.0"      # OpenTelemetry Framework Core API Standard
+
+# 🔌 OPTIONAL DEPENDENCIES (Installs via: pip install "govagent[langchain]" or poetry install --extras "langchain")
+langchain-core = { version = ">=0.1.0", optional = true }
+langchain-openai = { version = ">=0.1.0", optional = true }
+openai = { version = "*", optional = true }
+
+[tool.poetry.extras]
+langchain = ["langchain-core", "langchain-openai", "openai"]
+
+# 🛠️ MODERN DEVELOPMENT GROUPS: Keeps sandbox & server frameworks separated from cloud builds
+[tool.poetry.group.dev.dependencies]
+pytest = ">=7.0.0"
+black = ">=23.0.0"
+uvicorn = ">=0.22.0"
+fastapi = ">=0.100.0"
+
+[tool.poetry.urls]
+"Bug Tracker" = "https://github.com/thekakodkar/govagent/issues"

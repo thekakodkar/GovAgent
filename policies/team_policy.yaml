@@ -1,0 +1,23 @@
+metadata:
+  agent_name: "SwarmOrchestrator"
+  version: "0.6.0"
+  compliance_standard: "EU AI Act Article 12 (Traceability & Delegation)"
+  description: "Multi-agent team framework policy dictating hierarchy scopes, trace logging, and multi-sig triggers."
+
+registry_alignment:
+  allowed_tools:
+    - "get_customer_data"
+  high_risk_tools: []
+
+fiscal_governance:
+  currency: "USD"
+  global_limits:
+    daily_budget_usd: 500.00
+    transaction_ceiling: 1000.00
+    recursive_tco_limit: 1000.00
+
+delegation_governance:
+  allow_sub_agent_creation: true
+  max_swarm_depth: 3
+  enforce_trace_inheritance: true # Triggers Parent Trace ID synchronization loops
+  requires_human_oversight: true
