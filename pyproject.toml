@@ -6,7 +6,10 @@ build-backend = "poetry.core.masonry.api"
 name = "govagent"
 version = "1.0.0"  # 
 description = "The Governance-First Framework for Agentic AI"
-authors = ["Niraj Kakodkar <niraj.kakodkar@gmail.com>"]
+authors = [
+  { name="Niraj Kakodkar" },
+  { email="niraj.kakodkar@gmail.com" },
+]
 readme = "README.md"
 license = "MIT"
 homepage = "https://github.com/thekakodkar/govagent"
