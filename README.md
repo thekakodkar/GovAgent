@@ -298,10 +298,21 @@ govagent/
 ```
 
 ---
+Contributions are welcome! Star the repo if you find it useful ❤️
+Framework Developed and Maintained by Niraj Kakodkar
+
+## Contribution Workflow
+
+We enforce a strict branching strategy to keep `main` stable:
+
+1. **Fork/Branch**: Create a feature branch from latest main (`feature/your-feature-name` or `fix/issue-name`).
+2. **Local Validation**: Ensure all local tests pass and run the linter.
+3. **Open a PR**: Submit a Pull Request against `main`. 
+4. **Automated Check**: GitHub Actions will automatically validate your build.
+5. **Peer Review**: At least one maintainer must review and approve the changes before merge.
+
+---
 ### Author Stamp
 *   **Framework:** GovAgent v1.0.0 (Federated)
 *   **Compliance:** Designed for Article 9, 12, and 14 Accountability
 *   **Status:** Active / Open-Source Standard
-
-Contributions are welcome! Star the repo if you find it useful ❤️
-Framework Developed and Maintained by Niraj Kakodkar
