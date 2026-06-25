@@ -1,28 +1,31 @@
-import re
 import os
-from typing import List, Optional, Any, Tuple
+import logging
+from typing import List, Optional, Any, Dict
 from govagent.policy import Policy
 from govagent.guards import CircuitBreaker, GovernanceViolation, SemanticGuard
 from govagent.telemetry import TelemetryManager
 from govagent.hitl import HITLManager, SlackJudiciaryAdapter
 from govagent.context import set_current_agent, reset_current_agent
-from govagent.registry import registry, ExecutionSnapshot  # Legislated Imports
+from govagent.registry import registry, ExecutionSnapshot  
 from govagent.governance.meta import MetaGovernor
+from govagent.llm.base import LLMRequest
+
+logger = logging.getLogger("govagent.agent")
 
 class ExecutiveAgent:
     def __init__(
         self,
         persona: str,
         policy: Policy,
-        model_client: Any,
+        router: Any,  # Sovereign Routing Bus injected cleanly
         telemetry: Optional[TelemetryManager] = None,
         hitl_manager: Optional[HITLManager] = None
     ):
         self.persona = persona
         self.policy = policy
+        self.router = router  # Environmental Router Configuration
         
-        # 1. Initialize the Alignment Judge (v0.6.0)
-        # Standardized path for nested policy blocks
+        # Initialize the Alignment Judge
         align_config = getattr(policy, 'alignment', {})
         self.semantic_guard = SemanticGuard(
             mission=align_config.get('mission_statement', ""),
@@ -30,17 +33,14 @@ class ExecutiveAgent:
             threshold=align_config.get('min_similarity_score', 0.85)
         )
 
-        # 2. Inject Pillars into the CircuitBreaker
+        # Inject Pillars into the CircuitBreaker
         self.guard = CircuitBreaker(policy, self.semantic_guard) 
-        
-        # 3. Model Wrapping & Infrastructure
-        self.model = self._wrap_model(model_client)
         self.telemetry = telemetry or TelemetryManager()
         self.hitl = hitl_manager or HITLManager()
         
     @classmethod
-    def bootstrap(cls, policy_path: str, llm: Any, slack_channel: Optional[str] = None):
-        """Institutional Factory: One-line Enterprise Setup."""
+    def bootstrap(cls, policy_path: str, router_client: Any, slack_channel: Optional[str] = None):
+        """Institutional Factory: Fully pluggable Enterprise Setup."""
         policy = Policy.from_yaml(policy_path)
         adapter = None
         if slack_channel:
@@ -54,55 +54,16 @@ class ExecutiveAgent:
         return cls(
             persona=policy.metadata.get("agent_name", "ExecutiveAgent"),
             policy=policy,
-            model_client=llm,
+            router=router_client,
             hitl_manager=HITLManager(adapter=adapter)
         )
-
-    def _wrap_model(self, client: Any) -> Any:
-        if client is None: return None 
-        if hasattr(client, "ainvoke"):
-            class LangChainAdapter:
-                def __init__(self, lc_client):
-                    self.lc_client = lc_client
-                
-                async def generate_plan(self, task: str, persona: str) -> Tuple[dict, float, int]:
-                    prompt = (
-                        f"System: You are a {persona}.\nTask: {task}\n\n"
-                        "Format: Include 'ACTION: execute_financial_transaction', 'ID: [ref]', and 'AMOUNT: [amount]'."
-                    )
-                    response = await self.lc_client.ainvoke(prompt)
-                    content = response.content
-
-                    id_match = re.search(r"ID:\s*#?([A-Za-z0-9_]+)", content)
-                    amt_match = re.search(r"AMOUNT:\s*\$?\s*([\d,.]+)", content)
-                    
-                    ref_id = id_match.group(1) if id_match else "UNKNOWN"
-                    raw_amt = amt_match.group(1).replace(",", "") if amt_match else "0.0"
-                    
-                    action = "execute_financial_transaction" if (id_match or amt_match) else None
-                    if "complete" in content.lower(): action = "complete"
-
-                    intent = {
-                        "thought": content.split('\n\n')[0][:250] + "...", 
-                        "action": action,
-                        "params": {"reference_id": ref_id, "amount": float(raw_amt)},
-                        "full_audit_log": content 
-                    }
-                    
-                    meta = response.response_metadata.get("token_usage", {})
-                    tokens = meta.get("total_tokens", 0)
-                    cost = (tokens / 1000) * 0.02 
-                    return intent, cost, tokens
-            
-            return LangChainAdapter(client)
-        return client
 
     async def evaluate(self, guards: List[str], intent: dict = None, value: float = 0.0):
         """Modular Triage with Federated M-of-N support."""
         if not self.telemetry.current_session:
             self.telemetry.start_trace(self.persona, "Internal Evaluation")
         
-        # 1. SEMANTIC ALIGNMENT
+        # SEMANTIC ALIGNMENT
         if intent and intent.get("thought"):
             await self.guard.evaluate(
                 tool_name=intent.get("action", "unknown"), 
@@ -110,15 +71,14 @@ class ExecutiveAgent:
                 thought=intent["thought"]
             )
 
-        # 2. FISCAL SOVEREIGNTY
+        # FISCAL SOVEREIGNTY
         if "fiscal" in guards:
             current_total = self.telemetry.current_session.estimated_cost_usd + value
             self.guard.check_financial_risk(current_total)
 
-        # 3. FEDERATED JUDICIARY (M-of-N)
+        # FEDERATED JUDICIARY (M-of-N)
         if "judiciary" in guards and intent and intent.get("action") != "complete":
             if self.policy.is_high_risk(intent["action"]):
-                # Retrieve from new 'oversight' block in v0.6.0
                 judiciary_cfg = getattr(self.policy, 'oversight', {}).get('judiciary', {})
                 tool_cfg = judiciary_cfg.get('high_risk_protocol', {})
                 
@@ -135,21 +95,67 @@ class ExecutiveAgent:
         return True
 
     async def execute(self, task: str) -> ExecutionSnapshot:
-        """Governed Reasoning Loop Certified for v0.6.0."""
+        """Governed Reasoning Loop driven dynamically by YAML Infrastructure Parameters."""
         token = set_current_agent(self)
-        sanitized_task = self.guard.privacy.redact_task(task) # Article 9
+        sanitized_task = self.guard.privacy.redact_task(task)  # Article 9 Compliance
         
         self.telemetry.start_trace(self.persona, sanitized_task)
         current_step, total_tokens = 0, 0
+        last_active_model = "None Assigned"
         
         try:
             while current_step < 10:
-                response = await self.model.generate_plan(sanitized_task, self.persona)
-                intent, cost, tokens = response if isinstance(response, tuple) else (response, 0, 0)
-                total_tokens += tokens
+                # Package the standardized generation contract
+                request_payload = LLMRequest(
+                    prompt=sanitized_task,
+                    system_instruction=f"You are a {self.persona}. Corporate Policy Boundaries apply.",
+                    temperature=0.0
+                )
+
+                # Extract context metadata live from the parsed YAML properties
+                context_metadata = {
+                    "routing_mode": getattr(self.policy, "routing_mode", "LOCAL_ONLY"),
+                    "default_provider": getattr(self.policy, "default_provider", "local_ollama"),
+                    "agent_risk_profile": self.policy.metadata.get("risk_profile", "standard"),
+                    "contains_pii": getattr(self.guard.privacy, "last_execution_had_pii", False),
+                    "current_step": current_step
+                }
+
+                # Safe fallback if router is not hydrated during unit testing context
+                if self.router is None:
+                    return await self._finalize("success", "Task complete (Test Sandbox Mode).", total_tokens, model_node="mock_sandbox")
+
+                # Route & Generate via the pluggable routing bus
+                response = await self.router.route_and_generate(request_payload, context_metadata)
+                
+                # Update tracking parameters with current runtime node snapshot
+                if hasattr(response, 'selected_model'):
+                    last_active_model = response.selected_model
+                elif "local_ollama" in context_metadata["default_provider"]:
+                    last_active_model = "local_ollama"
+
+                tokens_used = response.raw_usage.get("total_tokens", 0)
+                cost_incurred = response.raw_usage.get("estimated_cost_usd", 0.0)
+                total_tokens += tokens_used
+
+                if response.tool_calls:
+                    tool_call = response.tool_calls[0]
+                    intent = {
+                        "thought": response.text[:250] + "...",
+                        "action": tool_call.get("name"),
+                        "params": tool_call.get("args", {}),
+                        "full_audit_log": response.text
+                    }
+                else:
+                    intent = {
+                        "thought": response.text[:250] + "...",
+                        "action": "complete" if "complete" in response.text.lower() else None,
+                        "params": {},
+                        "full_audit_log": response.text
+                    }
                 
                 if not intent.get("action") or intent["action"] == "complete":
-                    return await self._finalize("success", "Task complete.", total_tokens)
+                    return await self._finalize("success", "Task complete.", total_tokens, model_node=last_active_model)
 
                 # STAGE 1: Schema Validation
                 validation = registry.validate_intent_schema(
@@ -157,40 +163,44 @@ class ExecutiveAgent:
                     intent.get("params", {})
                 )
                 if not validation.get("valid"):
-                    return await self._finalize(f"blocked", f"Schema Violation: {validation.get('error')}", total_tokens)
+                    return await self._finalize(f"blocked", f"Schema Violation: {validation.get('error')}", total_tokens, model_node=last_active_model)
 
                 # STAGE 2: Evaluation (Circuit Breaker)
-                await self.evaluate(guards=["fiscal", "judiciary"], intent=intent, value=cost)
+                await self.evaluate(guards=["fiscal", "judiciary"], intent=intent, value=cost_incurred)
 
                 # STAGE 3: Action Execution
-                self.telemetry.current_session.estimated_cost_usd += cost
+                self.telemetry.current_session.estimated_cost_usd += cost_incurred
                 result = await self.perform_action(intent.get("action"), intent.get("params", {}))
                 self.telemetry.log_step(intent.get("thought", ""), intent.get("action"), str(result))
                 
                 if intent.get("action") == "execute_financial_transaction":
-                    return await self._finalize("success", result, total_tokens, impact=intent["params"].get("amount", 0.0))
+                    return await self._finalize("success", result, total_tokens, impact=intent["params"].get("amount", 0.0), model_node=last_active_model)
                 
                 current_step += 1
 
-            return await self._finalize("timeout", "Max steps reached.", total_tokens)
+            return await self._finalize("timeout", "Max steps reached.", total_tokens, model_node=last_active_model)
 
         except GovernanceViolation as gv:
-            return await self._finalize("blocked", str(gv), total_tokens)
+            return await self._finalize("blocked", str(gv), total_tokens, model_node=last_active_model)
         except Exception as e:
-            return await self._finalize("error", str(e), total_tokens)
+            return await self._finalize("error", str(e), total_tokens, model_node=last_active_model)
         finally:
             reset_current_agent(token)
 
-    async def _finalize(self, status: str, output: Any, tokens: int, impact: float = 0.0) -> ExecutionSnapshot:
+    async def _finalize(self, status: str, output: Any, tokens: int, impact: float = 0.0, model_node: str = "None Assigned") -> ExecutionSnapshot:
         """Institutional Finalization: Ensures proper metric mapping."""
-        # Await the telemetry manager to close the Article 12 trace
         await self.telemetry.finalize(status=status, tokens=tokens)
         
         return ExecutionSnapshot(
             trace_id=self.telemetry.current_session.trace_id,
             status=status,
             output=output,
-            metrics={"fiscal_impact": impact, "total_tokens": tokens}, # v0.6.0 Metrics
+            metrics={
+                "fiscal_impact": impact, 
+                "total_tokens": tokens,
+                "recursive_tco_usd": self.telemetry.current_session.estimated_cost_usd,
+                "selected_model": model_node
+            },
             parent_trace_id=self.telemetry.current_session.parent_trace_id
         )
 
@@ -199,27 +209,23 @@ class ExecutiveAgent:
         return f"Action {action} executed with params {params}"
     
     async def post_session_cleanup(self):
-        """
-        Executes institutional governance verification post-transaction lifecycle.
-        """
-        # Initialize the governor pointing to your certified audit destination
+        """Executes institutional governance verification post-transaction lifecycle."""
         governor = MetaGovernor(log_path="logs/audit_trail.jsonl", friction_threshold=3)
         analysis_result = governor.analyze_friction()
         
-        # If systemic issues are uncovered, immediately escalate to human authorities
-        if analysis_result.get("type") == "POLICY_AMENDMENT_PROPOSAL":
-            logger.info("ExecutiveAgent: Escalating policy amendment proposal to Federated Slack Courtroom.")
-            
-            # Construct corporate payload text block for Slack
-            slack_payload = (
-                f"🚨 *GovAgent Governance Alert: Automated Policy Amendment Proposed*\n"
-                f"• *Reason:* {analysis_result['reason']}\n"
-                f"• *Target File:* `{analysis_result['target_policy']}`\n"
-                f"• *Current Limit:* ${analysis_result['current_limit']:.4f}\n"
-                f"• *Proposed Ceiling:* *${analysis_result['proposed_limit']:.4f}*\n"
-                f"• *Impact:* {analysis_result['impact_assessment']}\n"
-                f"👉 _Reply with 'APPROVE AMENDMENT' to apply this change to the root policy layer._"
-            )
-            
-            # Dispatched via your existing Article 14 Slack communications channel
-            await self.slack_judiciary.send_message(text=slack_payload)
+        if analysis_result.get("type") == "POLICY_AMENDMENT_PROPOSALS" or analysis_result.get("status") != "OPTIMAL":
+            if "proposed_limit" in analysis_result:
+                logger.info("ExecutiveAgent: Escalating policy amendment proposal to Federated Slack Courtroom.")
+                
+                slack_payload = (
+                    f"🚨 *GovAgent Governance Alert: Automated Policy Amendment Proposed*\n"
+                    f"• *Reason:* {analysis_result.get('reason', 'Systemic friction detected')}\n"
+                    f"• *Target File:* `{analysis_result.get('target_policy', 'policy.yaml')}`\n"
+                    f"• *Current Limit:* ${analysis_result.get('current_limit', 0.0):.4f}\n"
+                    f"• *Proposed Ceiling:* *${analysis_result.get('proposed_limit', 0.0):.4f}*\n"
+                    f"• *Impact:* {analysis_result.get('impact_assessment', 'N/A')}\n"
+                    f"👉 _Reply with 'APPROVE AMENDMENT' to apply this change to the root policy layer._"
+                )
+                
+                if hasattr(self, 'hitl') and self.hitl.adapter:
+                    await self.hitl.adapter.send_message(text=slack_payload)

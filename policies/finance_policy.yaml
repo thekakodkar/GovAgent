@@ -3,6 +3,18 @@ metadata:
   version: "0.6.0" # Upgraded for Self-Healing Swarm compatibility
   compliance_standard: "EU AI Act - Article 9, 12 & 14"
 
+  # ⚙️ INFRASTRUCTURE & ROUTING POSTURE
+infrastructure:
+  routing_mode: "HYBRID"              # Options: LOCAL_ONLY, CLOUD_ONLY, HYBRID
+  default_provider: "local_ollama"
+  rules:
+    - condition_key: "contains_pii"
+      expected_value: true
+      target_provider: "local_ollama"
+    - condition_key: "tool_complexity"
+      expected_value: "high"
+      target_provider: "cloud_openai"
+
 # --- PILLAR 1: LEGISLATIVE SCOPE ---
 # These must match the @tool decorators in your Python registry
 registry_alignment:

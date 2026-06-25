@@ -2,14 +2,13 @@ import asyncio
 import os
 import json
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
-from govagent import ExecutiveAgent, tool
+from govagent import ExecutiveAgent, tool, Policy, PolicyBasedRouter, RouterConfig
+from govagent.llm.ollama import OllamaClient
 from govagent.telemetry.exporters import MockSOCExporter
 from govagent.governance.meta import MetaGovernor
 
 load_dotenv()
 
-# 1. LEGISLATED GOVERNED TOOLS
 @tool(name="execute_financial_transaction", risk_level="high")
 async def pay(amount: float, reference_id: str):
     """Executes an industry-agnostic payment following Role-Weighted Quorum validation."""
@@ -21,29 +20,33 @@ async def audit():
     return "SUCCESS: Cross-org audit trail verified for multi-tenant isolation."
 
 async def main():
-    print("🏢 GOVAGENT v0.6.0: LOCAL SWARM ORCHESTRATION & OPTIMIZATION\n" + "="*60)
+    print("🏢 GOVAGENT v1.0.0: LOCAL SWARM ORCHESTRATION & OPTIMIZATION\n" + "="*60)
 
-    # 2. INITIALIZE JURISDICTIONS (Natively attaching policy frameworks)
+    clients = {
+        "local_ollama": OllamaClient(config={"base_url": "http://localhost:11434", "model": "llama3"})
+    }
+    
+    router_cfg = RouterConfig(routing_mode="LOCAL_ONLY", default_provider="local_ollama")
+    router = PolicyBasedRouter(clients=clients, config=router_cfg)
+
+    # Natively attach corresponding policy frameworks
     director = ExecutiveAgent.bootstrap(
         policy_path="policies/finance_policy.yaml",
-        llm=ChatOpenAI(model="gpt-4o", temperature=0)
+        router_client=router
     )
 
     auditor = ExecutiveAgent.bootstrap(
         policy_path="policies/audit_policy.yaml",
-        llm=ChatOpenAI(model="gpt-4o", temperature=0)
+        router_client=router
     )
 
-    # 3. ENROLL SYSTEMIC FORENSIC SINKS & TARGET TENANT IDENTITY
     shared_soc = MockSOCExporter()
     director.telemetry.add_exporter(shared_soc)
     auditor.telemetry.add_exporter(shared_soc)
 
-    # 4. EXECUTION: Director processes high-risk task using Role-Weighted Quorum
     print("🤖 [Director] Ingesting instruction and evaluating risk tier...")
     tx_report = await director.execute("Reimburse patient contract for $150.00")
     
-    # 5. SWARM DELEGATION: Trace ID inheritance ensures Article 12 compliance
     print(f"\n🤖 [Director] Delegating forensic verification to Auditor...")
     audit_report = await auditor.execute(f"Verify the logs for Trace ID: {tx_report.trace_id}")
 
@@ -52,12 +55,10 @@ async def main():
     print(f"Auditor Status:  {audit_report.status.upper()}")
     print(f"Traceability:    {'VERIFIED' if tx_report.trace_id else 'FAILED'}")
 
-    # 6. DEMONSTRATE PILLAR 1: Self-Healing Meta-Governor Ingestion Loop
     print("\n🔄 --- PILLAR 1: AUTOMATED POLICY TUNING HANDSHAKE ---")
     mock_log_path = "logs/audit_buffer.jsonl"
     os.makedirs(os.path.dirname(mock_log_path), exist_ok=True)
     
-    # Simulate recurring fiscal friction overruns (3 repetitive blocks) to trigger tuning
     mock_friction_entry = {
         "status": "BLOCKED: RECURSIVE_TCO_REJECT",
         "policy_id": "finance_policy.yaml",

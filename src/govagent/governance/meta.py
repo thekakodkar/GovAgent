@@ -5,7 +5,6 @@ from typing import Dict, List, Any
 from datetime import datetime
 from pydantic import BaseModel, Field
 
-# Setup logging standard matching corporate infrastructure
 logger = logging.getLogger("govagent.governance.meta")
 
 class PolicyAmendmentProposal(BaseModel):
@@ -13,7 +12,7 @@ class PolicyAmendmentProposal(BaseModel):
     Type-safe legislative snapshot defining a proposed policy modification.
     """
     type: str = "POLICY_AMENDMENT_PROPOSAL"
-    version: str = "0.6.0-alpha"
+    version: str = "1.0.0"
     timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat() + "Z")
     reason: str
     target_policy: str
@@ -24,7 +23,7 @@ class PolicyAmendmentProposal(BaseModel):
 
 class MetaGovernor:
     """
-    v0.6.0 Optimization Layer.
+    v1.0.0 Optimization Layer.
     Ingests Article 12 forensic logs to diagnose systemic friction 
     and autonomously design policy amendment proposals for board sign-off.
     """
@@ -42,13 +41,13 @@ class MetaGovernor:
 
         rejections = []
         try:
-            with open(self.log_path, "r") as f:
+            # Enforce strict UTF-8 boundaries during stream reads to ensure Windows environment safety
+            with open(self.log_path, "r", encoding="utf-8") as f:
                 for line in f:
                     if not line.strip():
                         continue
                     entry = json.loads(line)
                     
-                    # Target both automated rejections and explicit structural limits
                     status_str = entry.get("status", "").upper()
                     if "REJECT" in status_str or "BLOCKED" in status_str:
                         if "TCO" in status_str or "FISCAL" in status_str:
@@ -57,7 +56,6 @@ class MetaGovernor:
             logger.error(f"MetaGovernor: Fatal ledger ingestion error: {str(e)}")
             return {"status": "ERROR", "reason": f"Audit ingestion fault: {str(e)}"}
 
-        # Evaluate systemic threshold metrics
         if len(rejections) >= self.friction_threshold:
             logger.warning(f"MetaGovernor: Systemic friction threshold breached ({len(rejections)} blocks detected). Generating legislation.")
             proposal = self._draft_amendment(rejections)
@@ -75,10 +73,8 @@ class MetaGovernor:
         latest_block = rejections[-1]
         metrics = latest_block.get("metrics", {})
         
-        # Capture current ceiling baseline
         current_limit = metrics.get("recursive_tco_usd") or latest_block.get("limit") or 500.0
         
-        # Pull actual requested overruns to calculate smart headroom
         requested_costs = [
             r.get("metrics", {}).get("requested_amount") or 
             r.get("metrics", {}).get("recursive_tco_usd", current_limit) * 1.1 
@@ -86,10 +82,7 @@ class MetaGovernor:
         ]
         
         avg_request = sum(requested_costs) / len(requested_costs)
-        
-        # Propose either a 20% margin lift or the historical average request with a 10% safety buffer
         proposed_limit = max(current_limit * 1.20, avg_request * 1.10)
-        
         target_policy = latest_block.get("policy_id", "finance_policy.yaml")
         
         return PolicyAmendmentProposal(

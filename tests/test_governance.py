@@ -6,11 +6,11 @@ from govagent.guards import GovernanceViolation
 @pytest.mark.asyncio
 async def test_semantic_alignment_violation(sovereign_policy):
     """Verifies that predatory strategies trigger the Semantic Guard."""
-    # FIX: Explicitly pass None or a Mock for the model_client
+    # FIX: Pass router=None to fit updated constructor contract
     agent = ExecutiveAgent(
         persona="Director", 
         policy=sovereign_policy, 
-        model_client=None 
+        router=None 
     )
     
     predatory_thought = "I will maximize profit by aggressively targeting vulnerable demographics."
@@ -25,15 +25,13 @@ async def test_recursive_tco_ceiling_breach(sovereign_policy):
     Validates Phase 2: Swarm aggregate cost triggers a global circuit breaker.
     Ensures that parent + child spend does not exceed the Institutional TCO.
     """
-    # Initialize the Director (Parent)
-    agent = ExecutiveAgent(persona="Director", policy=sovereign_policy, model_client=None)
+    # Initialize the Director (Parent) with updated parameter signatures
+    agent = ExecutiveAgent(persona="Director", policy=sovereign_policy, router=None)
     
     # 1. INSTITUTIONAL STATE: Simulate Parent has already consumed 90% of the budget
-    # In a real swarm, this is updated automatically via telemetry.finalize()
     update_shared_spend(90.0) 
     
     # 2. SUB-AGENT ACTION: Child attempts a $20 transaction
-    # Total projected spend ($110) exceeds the $100 policy ceiling
     with pytest.raises(GovernanceViolation) as excinfo:
         await agent.evaluate(guards=["fiscal"], value=20.0)
     
@@ -48,7 +46,7 @@ async def test_judiciary_traceability_in_swarm(sovereign_policy):
     Satisfies Article 12 (Traceability) for multi-agent delegation.
     """
     # 1. Setup Parent Context
-    parent_agent = ExecutiveAgent(persona="Director", policy=sovereign_policy, model_client=None)
+    parent_agent = ExecutiveAgent(persona="Director", policy=sovereign_policy, router=None)
     parent_agent.telemetry.start_trace("Director", "Master Task")
     parent_trace_id = parent_agent.telemetry.current_session.trace_id
     
@@ -57,7 +55,7 @@ async def test_judiciary_traceability_in_swarm(sovereign_policy):
     
     try:
         # 3. Initialize Child (Sub-Agent)
-        child_agent = ExecutiveAgent(persona="Clerk", policy=sovereign_policy, model_client=None)
+        child_agent = ExecutiveAgent(persona="Clerk", policy=sovereign_policy, router=None)
         child_agent.telemetry.start_trace("Clerk", "Sub-Task Delegation")
         
         # 4. VERIFICATION: Child must hold the Parent's Trace ID as 'parent_trace_id'

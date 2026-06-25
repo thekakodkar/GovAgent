@@ -5,7 +5,8 @@ from govagent.context import get_current_agent
 @pytest.mark.asyncio
 async def test_privacy_redaction_flow(sovereign_policy):
     """Verifies Article 9 compliance: PII is redacted before LLM ingestion."""
-    agent = ExecutiveAgent(persona="Director", policy=sovereign_policy, model_client=None)
+    # Updated: router=None injected instead of legacy model_client
+    agent = ExecutiveAgent(persona="Director", policy=sovereign_policy, router=None)
     
     # Task containing PII
     raw_task = "Pay John Doe at 123 Main St for invoice #99."
@@ -19,7 +20,8 @@ async def test_privacy_redaction_flow(sovereign_policy):
 @pytest.mark.asyncio
 async def test_pydantic_schema_enforcement(sovereign_policy):
     """Verifies Pillar 1 Integrity: Malformed tool calls fail at the schema level."""
-    agent = ExecutiveAgent(persona="Director", policy=sovereign_policy, model_client=None)
+    # Updated: router=None injected instead of legacy model_client
+    agent = ExecutiveAgent(persona="Director", policy=sovereign_policy, router=None)
     
     # Intent with a 'string' where a 'float' is required for amount
     malformed_intent = {"action": "execute_financial_transaction", "params": {"amount": "invalid_amt"}}

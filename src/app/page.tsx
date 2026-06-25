@@ -9,6 +9,7 @@ interface Message {
     status: string;
     trace_id: string;
     recursive_tco_usd: number;
+    selected_model?: string;  // Added for layout engine matching
     block_reason?: string;
     slack_status?: string;
   };
@@ -41,7 +42,7 @@ export default function Home() {
   const [showRawPolicy, setShowRawPolicy] = useState(false);
   
   const consoleEndRef = useRef<HTMLDivElement>(null);
-  const pollingIntervalRef = useRef<any>(null); // Anchor pointer holds interval context safely
+  const pollingIntervalRef = useRef<any>(null); 
 
   const BACKEND_URL = "http://localhost:8000";
   const AUTH_HEADERS = {
@@ -54,7 +55,6 @@ export default function Home() {
     setSystemLogs((prev) => [...prev, `[${timestamp}] ${text}`]);
   };
 
-  // Cleanup active memory leaks on unmount strings
   useEffect(() => {
     return () => { if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current); };
   }, []);
@@ -106,8 +106,19 @@ export default function Home() {
     if (lastAssistantMsg && lastAssistantMsg.metrics) setActiveMetrics(lastAssistantMsg.metrics);
   };
 
-  // --- 📡 ASYNCHRONOUS POLL MECHANISM CONTROLLER ---
-  const startStateSynchronizationPoll = (traceId: string, basePrompt: string) => {
+  const renderModelPill = (modelName?: string) => {
+    if (!modelName) return null;
+    const isLocal = modelName.toLowerCase().includes("local") || modelName.toLowerCase().includes("ollama");
+    return (
+      <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[9px] font-mono font-bold uppercase tracking-wider border ml-2 ${
+        isLocal ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+      }`}>
+        {isLocal ? "💻 LOCAL" : "☁️ CLOUD"} : {modelName}
+      </span>
+    );
+  };
+
+  const startStateSynchronizationPoll = (traceId: string, preservedModel: string) => {
     pushLog(`📡 POLLING INITIALIZED: Listening for out-of-band Slack authorization tokens...`);
     
     if (pollingIntervalRef.current) clearInterval(pollingIntervalRef.current);
@@ -124,11 +135,11 @@ export default function Home() {
           setLoading(false);
           pushLog(`✓ Slack Core Consensus Synchronized: APPROVED ✅ Overriding local policy thresholds.`);
 
-          const updateMetrics = { status: "SUCCESS", trace_id: traceId, recursive_tco_usd: 0.00284 };
+          const updateMetrics = { status: "SUCCESS", trace_id: traceId, recursive_tco_usd: 0.00284, selected_model: preservedModel };
           setActiveMetrics(updateMetrics);
 
           setMessages((prev) => [
-            ...prev.filter(m => m.metrics?.trace_id !== traceId), // Erase the pending card
+            ...prev.filter(m => m.metrics?.trace_id !== traceId), 
             {
               role: "assistant",
               content: "✅ TRANSACTION SANCTIONED: Human-in-the-loop multi-sig bypass verified via Slack Workspace. Proceeding with compute swarm procurement initialization.",
@@ -140,7 +151,7 @@ export default function Home() {
           setLoading(false);
           pushLog(`❌ Slack Core Consensus Synchronized: VETOED 🛑 Execution halted.`);
 
-          const updateMetrics = { status: "BLOCKED", trace_id: traceId, recursive_tco_usd: 0.00 };
+          const updateMetrics = { status: "BLOCKED", trace_id: traceId, recursive_tco_usd: 0.00, selected_model: preservedModel };
           setActiveMetrics(updateMetrics);
 
           setMessages((prev) => [
@@ -155,7 +166,7 @@ export default function Home() {
       } catch (err) {
         console.error("Polling sync anomaly:", err);
       }
-    }, 2000); // Polls memory map registers seamlessly every 2000 milliseconds
+    }, 2000); 
   };
 
   const handlePipelineSubmission = async (e: React.FormEvent) => {
@@ -195,13 +206,13 @@ export default function Home() {
             content: `${data.sanitized_output}\n\n⏳ OUT-OF-BAND DISPATCH REFERENCE:\n${data.block_reason}`,
             metrics: {
               status: "PENDING", trace_id: data.trace_id, recursive_tco_usd: 0.00,
+              selected_model: data.selected_model,
               slack_status: data.slack_escalation_status
             }
           }
         ]);
 
-        // Hand over execution pipeline variables to background polling worker loop
-        startStateSynchronizationPoll(data.trace_id, currentPrompt);
+        startStateSynchronizationPoll(data.trace_id, data.selected_model);
       } else {
         setLoading(false);
         pushLog(`✓ Verification Confirmed: Input payload cleared regulatory constraints.`);
@@ -211,7 +222,7 @@ export default function Home() {
             role: "assistant",
             content: data.sanitized_output,
             metrics: {
-              status: data.status, trace_id: data.trace_id, recursive_tco_usd: data.recursive_tco_usd
+              status: data.status, trace_id: data.trace_id, recursive_tco_usd: data.recursive_tco_usd, selected_model: data.selected_model
             }
           }
         ]);
@@ -259,6 +270,7 @@ export default function Home() {
               {showRawPolicy && (
                 <div className="pt-2 text-[10px] font-mono text-slate-400 space-y-2 max-h-40 overflow-y-auto border-t border-slate-900 mt-2">
                   <div><span className="text-emerald-500">Agent:</span> {selectedPolicy.raw_content?.metadata?.agent_name}</div>
+                  <div><span className="text-emerald-500">Routing Profile:</span> {selectedPolicy.raw_content?.infrastructure?.routing_mode || "LOCAL_ONLY"}</div>
                   <div><span className="text-emerald-500">Ceiling:</span> ${selectedPolicy.max_spend?.toLocaleString()} USD</div>
                   <div><span className="text-emerald-500">Standard:</span> {selectedPolicy.raw_content?.metadata?.compliance_standard}</div>
                 </div>
@@ -300,6 +312,10 @@ export default function Home() {
                 }`}>{activeMetrics.status}</span>
               </div>
               <div className="space-y-1 font-medium text-[11px] text-slate-400">
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Active Node:</span>
+                  <span className="font-mono text-cyan-400">{activeMetrics.selected_model || "None Assigned"}</span>
+                </div>
                 <div className="flex justify-between"><span className="text-slate-500">Recursive Cost:</span><span className="font-mono text-emerald-400">${activeMetrics.recursive_tco_usd?.toFixed(5)}</span></div>
                 <div className="flex flex-col pt-2 border-t border-slate-900"><span className="text-slate-600 text-[10px]">Trace Identifier:</span><span className="font-mono text-[10px] block truncate">{activeMetrics.trace_id}</span></div>
               </div>
@@ -328,6 +344,12 @@ export default function Home() {
                 msg.metrics?.status === "PENDING" ? "bg-amber-950/20 border-amber-500/20 text-amber-200" :
                 msg.metrics?.status === "BLOCKED" ? "bg-rose-950/20 border-rose-500/20 text-rose-200" : "bg-slate-900 border-slate-800/80 text-slate-200"
               }`}>
+                <div className="flex items-center justify-between gap-2 mb-1">
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-slate-500">
+                    {msg.role === "user" ? "Operator Input" : "System Response"}
+                  </span>
+                  {msg.role === "assistant" && renderModelPill(msg.metrics?.selected_model)}
+                </div>
                 <div className="whitespace-pre-wrap font-medium">{msg.content}</div>
                 {msg.metrics?.slack_status && <div className="mt-3 pt-2 border-t border-slate-800/60 text-[10px] text-amber-400 font-mono bg-amber-950/30 p-2 rounded-lg border border-amber-500/10 animate-pulse">{msg.metrics.slack_status}</div>}
               </div>

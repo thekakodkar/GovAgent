@@ -4,7 +4,7 @@ from govagent.registry import registry
 
 class Policy:
     """
-    The Legislative Engine v0.2.3: Translates YAML-based SOPs into 
+    The Legislative Engine v1.0.0: Translates YAML-based SOPs into 
     parameterized governance constraints for cascading guards.
     """
     def __init__(self, config: Dict[str, Any]):
@@ -15,15 +15,20 @@ class Policy:
         # Mapping YAML tools for O(1) lookup
         self.tool_rules = {t["name"]: t for t in config.get("tools", [])}
 
-        # v0.2.3: Global Fiscal & Operational Ceilings
-        # These feed directly into CircuitBreaker stage 1 and 2
+        # Extract Core Infrastructure & Routing Configurations dynamically
+        self.infra_settings = config.get("infrastructure", {})
+        self.routing_mode = self.infra_settings.get("routing_mode", "LOCAL_ONLY")  # Defensively default to secure local
+        self.default_provider = self.infra_settings.get("default_provider", "local_ollama")
+        self.routing_rules = self.infra_settings.get("rules", [])
+
+        # Global Fiscal & Operational Ceilings
         self.global_limits = config.get("global_limits", {
             "daily_budget_usd": 10.0,
             "max_per_transaction": 2000.0,
             "max_tokens_per_run": 4000
         })
         
-        # v0.2.3: Judiciary Handshake Settings
+        # Judiciary Handshake Settings
         self.judiciary_settings = config.get("judiciary", {
             "channel": "slack",
             "confidence_threshold": 0.9,
@@ -47,7 +52,8 @@ class Policy:
 
     @classmethod
     def from_yaml(cls, path: str):
-        with open(path, 'r') as f:
+        # Enforce explicit UTF-8 decoding boundaries to secure Windows cross-compatibility
+        with open(path, 'r', encoding='utf-8') as f:
             config = yaml.safe_load(f)
         return cls(config)
 
@@ -72,7 +78,6 @@ class Policy:
     def is_high_risk(self, tool_name: str) -> bool:
         """Determines if an action requires Judiciary (Human) intervention."""
         rule = self.get_tool_config(tool_name)
-        # Check for explicit HITL requirement or 'high' risk level
         if rule.get("require_human_approval") or rule.get("risk_level") == "high":
             return True
         return False

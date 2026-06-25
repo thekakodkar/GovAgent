@@ -1,11 +1,11 @@
 import asyncio
 from dotenv import load_dotenv
-from langchain_openai import ChatOpenAI
-from govagent import ExecutiveAgent, tool
+from govagent import ExecutiveAgent, tool, Policy, PolicyBasedRouter, RouterConfig
+from govagent.llm.ollama import OllamaClient
+# from govagent.llm.openai import OpenAIClient  # Un-comment as client wrappers stabilize
 
 load_dotenv()
 
-# 1. LEGISLATED GOVERNED TOOLS
 @tool(name="search_web", risk_level="low")
 async def search_web(query: str):
     """Search the internet for data points safely."""
@@ -19,31 +19,43 @@ async def send_email(to: str, subject: str):
 async def main():
     print("🚀 RUNNING ALIGNED REFACTORED BASIC GOVERNED AGENT DEMO\n" + "="*60)
     
-    # 2. INITIALIZE JURISDICTION (Directly matching the demo.py bootstrap model)
-    agent = ExecutiveAgent.bootstrap(
-        policy_path="policies/default_policy.yaml",
-        llm=ChatOpenAI(model="gpt-4o", temperature=0)
+    # 1. Parse policy first to extract infrastructure rules dynamically
+    policy = Policy.from_yaml("policies/default_policy.yaml")
+    
+    # 2. Build the client registry mapping
+    clients = {
+        "local_ollama": OllamaClient(config={"base_url": "http://localhost:11434", "model": "llama3.2"})
+    }
+    
+    # 3. Construct the router matching the active policy profile settings
+    router_cfg = RouterConfig(
+        routing_mode=getattr(policy, "routing_mode", "LOCAL_ONLY"),
+        default_provider=getattr(policy, "default_provider", "local_ollama"),
+        rules=getattr(policy, "routing_rules", [])
+    )
+    router = PolicyBasedRouter(clients=clients, config=router_cfg)
+    
+    # 4. Inject the Sovereign Router cleanly into the Agent instance
+    agent = ExecutiveAgent(
+        persona=policy.metadata.get("agent_name", "Basic-Sovereign-Governor"),
+        policy=policy,
+        router=router
     )
     
-    # Register tools directly to the operational runtime environment
     agent.telemetry.start_trace(agent_id="Basic-Sovereign-Governor", task="Information synthesis task execution")
     
     task = "Search for latest AI governance news and summarize."
     print(f"🤖 [Agent] Processing task request: \"{task}\"")
     
-# Execute through the validated core contract path
     result = await agent.execute(task)
     
     print(f"\n📊 --- EXECUTION TRACE SUMMARY ---")
     print(f"Task Status:   {result.status.upper()}")
     print(f"Trace Identifier: {result.trace_id}")
     
-    # 🌟 FIXED: Accessing the native metrics dictionary using robust bracket lookups
-    # Falls back safely to 0.00 if the metric key is unhydrated during a nominal text run
     estimated_cost = result.metrics.get("recursive_tco_usd", 0.00) if isinstance(result.metrics, dict) else 0.00
     print(f"Estimated Cost:   ${estimated_cost:.4f} USD")
-    
-    print(f"📋 Output Snapshot: {result.output[:150]}...")
+    print(f"📋 Output Snapshot: {str(result.output)[:150]}...")
 
 if __name__ == "__main__":
     asyncio.run(main())
