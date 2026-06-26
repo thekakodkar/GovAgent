@@ -113,7 +113,7 @@ poetry install --extras "langchain"
 python -m spacy download en_core_web_sm
 
 # Start the services manually in separate terminals
-uvicorn api.server:app --host 127.0.0.1 --port 8000 
+uvicorn api.server:app --host 127.0.0.1 --port 8000
 npm run dev
 ```
 ## 🏗️ Core Pillars: The v1.0.0 Sovereign Architecture
