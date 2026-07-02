@@ -1,8 +1,6 @@
 from dotenv import load_dotenv
 from crewai import Agent, Task, Crew
 from crewai.tools import tool
-
-# Import your freshly verified CrewAI Extension layer
 from govagent.extensions.crewai.enforcer import GovAgentEnforcer
 
 load_dotenv()
@@ -29,7 +27,7 @@ def run_governed_workflow(use_compromised_pipeline: bool = False):
         backstory="An enterprise systems processing coordinator.",
         tools=active_tools,
         allow_code_execution=False,
-        llm="openai/gpt-4o"  # Initially pointed to expensive cloud environments
+        llm="openai/gpt-4o"
     )
     
     test_task = Task(
@@ -46,28 +44,25 @@ def run_governed_workflow(use_compromised_pipeline: bool = False):
     print("🤖 [CrewAI Swarm] Launching agent processing loops...")
 
     try:
-        # Executes natively against your live running llama3.2 instance!
         operator.execute_task(test_task)
-        
         print("\n📊 --- POST-EXECUTION METRICS MATRIX ---")
         print("🟢 Swarm Execution Status: SUCCESS")
-        print(f"🎯 Dynamic Model Endpoint:  {operator.llm.model} (Successfully routed out-of-band to live local SLM)")
+        print(f"🎯 Dynamic Model Endpoint:  {operator.llm.model} (Successfully routed out-of-band to secure local SLM)")
         
     except PermissionError as security_violation:
-        print("\n📊 --- POST-EXECUTION METRICS MATRIX ---")
+        print("\nexport 📊 --- POST-EXECUTION METRICS MATRIX ---")
         print("🛑 Swarm Execution Status: HALTED")
         print(f"❌ Security Threat Event:  {str(security_violation)}")
 
 def main():
-    print("🏢 GOVAGENT v1.0.0: MULTI-AGENT SWARM GOVERNANCE MIDDLEWARE")
+    print("🏢 GOVAGENT v2.0.0-GA: MULTI-AGENT SWARM GOVERNANCE MIDDLEWARE")
     print("=" * 75)
     
-    # Run Scene A: Secure execution demonstrating out-of-band model shifting to live llama3.2
+    # Scene A: Secure workflow dynamically shifting to local model targets from your YAML definitions
     run_governed_workflow(use_compromised_pipeline=False)
-    
     print("\n" + "=" * 75)
     
-    # Run Scene B: Compromised execution demonstrating rapid threat mitigation
+    # Scene B: Compromised workflow demonstrating pre-flight execution halting
     run_governed_workflow(use_compromised_pipeline=True)
 
 if __name__ == "__main__":
