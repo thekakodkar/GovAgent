@@ -245,7 +245,7 @@ In an institutional setting, "State Management" is insufficient; you require Sov
 | **Forensic Audit** | ✅ **Federated Cross-Org Trails** | ❌ Per-run only | ❌ Console Prints |
 | **Policy Calibration** | ✅ **Self-Healing Optimization** | ❌ Hardcoded Boundaries | ❌ Manual Intervention |
 | **Regulatory Status** | ✅ **EU AI Act Regulation Ready** | ❌ Experimental | ❌ Experimental |
-| **Orchestration Wrapper ** | ✅ **Native CrewAI extension** | ❌ Experimental | ❌ Experimental |
+| **Orchestration Wrapper** | ✅ **Native CrewAI extension** | ❌ Experimental | ❌ Experimental |
 
 > **Strategic Directive:** While traditional frameworks focus heavily on graph-based execution paths or simple task delegation, GovAgent v1.0.0 operates as the Sovereign Governance Infrastructure. It ensures that every action across an autonomous network is centrally legislated, evaluated by isolated quantitative guards, and forensically recorded for cross-enterprise auditing.
 ---
@@ -261,7 +261,7 @@ The repository includes four basic, highly aligned examples designed to showcase
 
 ```python self_healing_demo.py ``` - **Pillar 5 (Self-Healing):** Ingests simulated repeated transaction overruns and triggers the MetaGovernor to propose automated budget changes.
 
-```python crewai_governed_swarm.py ``` - Pillar 6 (Ecosystem Integration): Live multi-agent verification script showcasing CrewAI extension plane running out-of-band model shifting to local llama3.2 and intercepting rogue execution lines.
+```python crewai_governed_swarm.py ``` - **Pillar 6 (Ecosystem Integration):** Live multi-agent verification script showcasing CrewAI extension plane running out-of-band model shifting to local llama3.2 and intercepting rogue execution lines.
 
 ### Run any standalone example inside your terminal workspace:
 
