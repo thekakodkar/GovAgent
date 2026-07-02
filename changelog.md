@@ -2,6 +2,22 @@
 
 All notable changes to the **GovAgent** framework are documented in this file. This project adheres to a "Governance-First" versioning strategy, prioritizing human oversight and fiscal accountability.
 
+## [1.5.0] - 2026-07-02
+### "Federated Routing & Traceability Swarm" Release
+
+### 🧠 Added: Pluggable Environmental Routing (`PolicyBasedRouter`)
+- **Decoupled LLM Construction:** Completely removed legacy model client bindings from the core constructor[cite: 5]. The system now shifts execution entirely to an environment-agnostic routing fabric driven by `RouterConfig`.
+- **Dynamic Optimization Profiling:** Implemented policy metadata parameter scanning (`routing_mode`, `default_provider`) to allow real-time selection between local SLMs or cloud services depending on data risk profiles.
+
+### 📡 Added: Cross-Swarm Context Trace Inheritance
+- **Async Thread Propagation:** Refactored execution isolation to leverage thread-safe tokens via `set_current_agent` and `reset_current_agent` hooks.
+- **Continuous Lineage Auditing:** Configured automated trace propagation so child sub-agents implicitly inherit and validate master anchor trace identifiers (`parent_trace_id`), providing a bulletproof audit trail for Article 12 compliance.
+
+### 🛡️ Fixed: Windows Character Mapping & Payload Parsing
+- **UTF-8 I/O Boundary Safety Net:** Patched file opening streams across `Policy.from_yaml` and `MetaGovernor.analyze_friction` to explicitly use `encoding="utf-8"`, permanently solving `UnicodeDecodeError` failures caused by legacy Windows system decoder defaults (`cp1252`).
+- **Telemetry Parameter Flattening:** Refactored model tracking fields inside `ExecutionSnapshot` to resolve metrics using safe dictionary bracket indexing (`.get("recursive_tco_usd")`), eliminating unhandled dot-notation `AttributeError` crashes[cite: 5].
+- **Multi-Tenant Segmentation Security:** Stabilized horizontal isolation parameters within `FederatedTelemetryExporter` to segmentation-wrap telemetry packets securely before broadcasting to decoupled organizational sinks.
+
 ## [1.0.0] - 2026-06-01
 ### "Sovereign Swarm" General Availability (GA) Stable Release
 

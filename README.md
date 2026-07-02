@@ -1,4 +1,4 @@
-# govAgent (v1.0.0)
+# govAgent (v1.5.0)
 
 **The Governance-First Control Plane for AI Agents & Swarms**
 
@@ -6,16 +6,22 @@ govAgent is a lightweight, asynchronous control plane that adds **safety, accoun
 
 Most agent frameworks focus on building agents fast. **govAgent** focuses on running them **predictably and safely** under enterprise guardrails, fully aligned with modern regulatory frameworks like the **EU AI Act (Regulation 2024/1689)**.
 
+### 🚀 New in v1.5.0: Pluggable Routing Bus & Swarm Traceability
+
+* **Sovereign Routing Fabric (`PolicyBasedRouter`):** Fully decoupled from hardcoded LLM clients[cite: 5]. The engine now routes requests dynamically to local or cloud models based on configuration criteria and real-time context metadata specified in your YAML policies[cite: 1, 5].
+* **Swarm Trace Inheritance (Article 12 Tracing):** Sub-agents automatically inherit and validate parent session tracking parameters (`parent_trace_id`) across complex async delegation domains, ensuring complete accountability lineages[cite: 2, 5].
+* **Cross-Platform Windows Core:** Integrated strict UTF-8 I/O boundaries across all policy parser streams and log scrapers to guarantee 100% cross-platform parity out of the box.
+
 ---
 
 ### Why govAgent?
 
-Most agent frameworks help you build agents fast. **govAgent** helps you run them **safely and reliably** in production.
+In an enterprise environment, raw agentic execution paths introduce severe operational risks: unmonitored API cost escalation, accidental PII exposure, and un-auditable "black box" decisions. govAgent acts as an inline governance proxy layer to mitigate these friction vectors seamlessly.
 
 Ideal for:
-* Production AI systems
-* Regulated industries (finance, healthcare, legal)
-* Teams concerned about cost overruns, data leaks, or compliance
+* **Production AI Systems:** Moving from experimental playground scripthooks to resilient IT execution models.
+* **Regulated Verticals:** Providing verifiable compliance out-of-the-box for Fintech, Supply Chain, Healthcare, and Legal infrastructure.
+* **Sovereign Cloud Operations:** Teams looking to deploy local Small Language Models (SLMs) safely alongside or entirely independent of cloud providers.
   
 ### 🎞️ Video Walkthrough
 
@@ -116,7 +122,7 @@ python -m spacy download en_core_web_sm
 uvicorn api.server:app --host 127.0.0.1 --port 8000
 npm run dev
 ```
-## 🏗️ Core Pillars: The v1.0.0 Sovereign Architecture
+## 🏗️ Core Pillars: The v1.5.0 Sovereign Architecture
 GovAgent utilizes a highly modular package structure to enforce a strict "Separation of Duties" across any enterprise application vertical:
 
 **govagent.context (The State):** Manages thread-safe session isolation, asynchronous parent-to-child trace propagation, and live cumulative Total Cost of Operation (TCO) calculation matrices across decentralized agent swarms.
@@ -146,17 +152,27 @@ async def process_payment(amount: float, reference_id: str):
     """Executes a disbursement following corporate policy validation."""
     return f"SUCCESS: Transacted ${amount} for Ref: {reference_id}"
 ```
-### Bootstrap an Executive Agent
+### Bootstrap an Executive Agent (v1.5.0 Pluggable Router Pattern)
+
 ```python
 import asyncio
-from govagent import ExecutiveAgent
+from govagent import ExecutiveAgent, PolicyBasedRouter, RouterConfig
 from langchain_openai import ChatOpenAI
+from langchain_community.llms import Ollama
 
 async def main():
-    # Bootstrap automatically binds local YAML policies to your model client
+    # v1.5.0 Routing Setup: Configure the dynamic path fabric
+    router_cfg = RouterConfig(routing_mode="LOCAL_PREFERRED")
+    clients = {
+        "local_ollama": Ollama(model="llama3"),
+        "cloud_openai": ChatOpenAI(model="gpt-4o", temperature=0)
+    }
+    router = PolicyBasedRouter(clients=clients, config=router_cfg)
+
+    # Bootstrap automatically binds local YAML policies to your router client
     agent = ExecutiveAgent.bootstrap(
         policy_path="policies/finance_policy.yaml",
-        llm=ChatOpenAI(model="gpt-4o", temperature=0)
+        router_client=router  # Injected routing fabric replacing legacy 'llm' parameter
     )
 
     # Execution paths automatically evaluate Privacy, Semantic, and Fiscal guards
@@ -166,6 +182,7 @@ async def main():
     print(f"Status: {result.status.upper()}")
     print(f"Trace Identifier: {result.trace_id}")
 ```
+
 ### 📊 Forensic Telemetry: Article 12 Readiness
 Every session generates an immutable snapshot routed directly to external cloud SOC sinks, local repositories, or isolated cross-org tenants.
 
@@ -249,17 +266,21 @@ GovAgent satisfies key mandates for **High-Risk AI Systems**:
 
 
 ## 📂 Project Structure
-
 ```text
-govagent/
-├── src/
-│   ├── govagent/            # Core governance framework logic
-│   └── app/                 # Next.js web application frontend dashboard
-├── api/                     # FastAPI REST gateway
+GovAgent/
+├── api/                     # FastAPI REST Gateway Layer
 │   └── server.py
-├── examples/                # Standalone educational demonstration scripts
-├── policies/                # Active YAML compliance profiles
-└── tests/                   # Automated validation test suite
+├── src/
+│   ├── govagent/            # Core Python Governance Framework Packages
+│   │   ├── context.py       # Thread-safe trace inheritance and ledger state
+│   │   ├── registry.py      # Global tool legislation singleton
+│   │   ├── guards.py        # Presidio Privacy, Semantic Vector, and Fiscal filters
+│   │   ├── telemetry.py     # Multi-cloud SOC emitters with DLQ serialization
+│   │   └── llm/             # Environment-agnostic PolicyBasedRouter bus
+│   └── app/                 # Next.js Presentation Panel Dashboard Frontend
+├── examples/                # Standalone Educational Demonstration Scripts
+├── policies/                # Declarative YAML Operational Manifests
+└── tests/                   # Automated Pytest Validation Matrix Suite
 ```
 
 ### Directory Overview
