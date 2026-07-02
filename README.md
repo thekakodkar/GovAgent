@@ -1,4 +1,4 @@
-# govAgent (v2.0.0 beta)
+# govAgent (v2.0.0)
 
 **The Governance-First Control Plane for AI Agents & Swarms**
 
@@ -144,7 +144,7 @@ python -m spacy download en_core_web_sm
 uvicorn api.server:app --host 127.0.0.1 --port 8000
 npm run dev
 ```
-## 🏗️ Core Pillars: The v1.5.0 Sovereign Architecture
+## 🏗️ Core Pillars: The v2.0.0 Sovereign Architecture
 GovAgent utilizes a highly modular package structure to enforce a strict "Separation of Duties" across any enterprise application vertical:
 
 **govagent.context (The State):** Manages thread-safe session isolation, asynchronous parent-to-child trace propagation, and live cumulative Total Cost of Operation (TCO) calculation matrices across decentralized agent swarms.
@@ -174,7 +174,7 @@ async def process_payment(amount: float, reference_id: str):
     """Executes a disbursement following corporate policy validation."""
     return f"SUCCESS: Transacted ${amount} for Ref: {reference_id}"
 ```
-### Bootstrap an Executive Agent (v1.5.0 Pluggable Router Pattern)
+### Bootstrap an Executive Agent (v2.0.0 Pluggable Router Pattern)
 
 ```python
 import asyncio
@@ -237,7 +237,7 @@ Every session generates an immutable snapshot routed directly to external cloud 
 
 In an institutional setting, "State Management" is insufficient; you require Sovereignty. GovAgent v1.0.0 is engineered horizontally to transform "Black Box" multi-agent workflows into transparent, compliance-vetted execution lifecycles across all commercial sectors.
 
-| Feature | **GovAgent v1.0.0** | LangGraph | CrewAI |
+| Feature | **GovAgent v2.0.0** | LangGraph | CrewAI |
 | --- | --- | --- | --- |
 | **Architectural Scope** | ✅ **Modular Control Plane** | ⚠️ Local State Graph | ❌ Role Play Swarm |
 | **State Management** | ✅ **Isolated Fiscal Ledger** | ⚠️ Shared Thread State | ❌ Global context |
@@ -320,14 +320,19 @@ GovAgent/
 
 ### Directory Overview
 
-| Directory | Purpose |
-|------------|---------|
-| `src/govagent/` | Contains the core governance engine, policy evaluation logic, risk analysis, and compliance workflows. |
-| `api/` | FastAPI-based REST gateway exposing governance services and APIs. |
-| `src/app/` | Next.js frontend dashboard for governance visualization, monitoring, and administration. |
-| `examples/` | Sample implementations and educational demos showcasing framework capabilities. |
-| `policies/` | YAML-based governance, compliance, and security policy definitions. |
-| `tests/` | Unit, integration, and validation tests ensuring framework reliability and correctness. |
+| Directory                         | Purpose                                                                                                                                                  |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/govagent/`                   | Contains the core governance engine, policy evaluation logic, risk analysis, and compliance workflows.                                                   |
+| `src/govagent/llm/`               | Contains the environment-agnostic LLM routing layer (`router.py`), local SLM connectors (`ollama.py`), and foundational abstractions (`base.py`).        |
+| `src/govagent/telemetry/`         | Houses the centralized `TelemetryManager` responsible for audit event collection, telemetry routing, and hydration pipelines.                            |
+| `src/govagent/extensions/`        | Hosts pluggable middleware packages that integrate third-party AI frameworks and enterprise platforms into the governance engine.                        |
+| `src/govagent/extensions/crewai/` | Contains the `GovAgentEnforcer` integration layer for wrapping CrewAI swarms with governance, policy enforcement, auditing, and compliance capabilities. |
+| `api/`                            | FastAPI-based REST gateway exposing governance services, policy evaluation APIs, telemetry endpoints, and administrative operations.                     |
+| `src/app/`                        | Next.js frontend dashboard for governance visualization, policy management, monitoring, audit review, and system administration.                         |
+| `examples/`                       | Sample applications, reference implementations, and educational demos illustrating framework features and best practices.                                |
+| `policies/`                       | YAML-based governance, compliance, security, and organizational policy definitions used by the governance engine.                                        |
+| `tests/`                          | Unit, integration, end-to-end, and validation tests that ensure framework reliability, correctness, and policy compliance.                               |
+
 
 ### Architecture
 
