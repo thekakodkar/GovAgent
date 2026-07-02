@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "govagent"
-version = "1.5.0"
+version = "2.0.0"
 description = "The Governance-First Framework for Agentic AI"
 authors = ["Niraj Kakodkar <niraj.kakodkar@gmail.com>"]
 readme = "README.md"
@@ -26,7 +26,7 @@ packages = [
 
 # 🚀 CORE PRODUCTION DEPENDENCIES (Minimal Footprint)
 [tool.poetry.dependencies]
-python = ">=3.10"
+python = ">=3.10,<3.14"
 pydantic = ">=2.0.0"
 pyyaml = ">=6.0.0"
 httpx = ">=0.25.0"
@@ -41,11 +41,13 @@ azure-identity = ">=1.12.0"        # Azure Active Directory Identity Validation
 opentelemetry-api = ">=1.15.0"      # OpenTelemetry Framework Core API Standard
 
 # 🔌 OPTIONAL DEPENDENCIES (Installs via: pip install "govagent[langchain]" or poetry install --extras "langchain")
+crewai = { version = "^1.15.0", optional = true }
 langchain-core = { version = ">=0.1.0", optional = true }
 langchain-openai = { version = ">=0.1.0", optional = true }
 openai = { version = "*", optional = true }
 
 [tool.poetry.extras]
+crewai = ["crewai"]
 langchain = ["langchain-core", "langchain-openai", "openai"]
 
 # 🛠️ MODERN DEVELOPMENT GROUPS: Keeps sandbox & server frameworks separated from cloud builds

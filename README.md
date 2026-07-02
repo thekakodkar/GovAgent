@@ -1,16 +1,10 @@
-# govAgent (v1.5.0)
+# govAgent (v2.0.0)
 
 **The Governance-First Control Plane for AI Agents & Swarms**
 
 govAgent is a lightweight, asynchronous control plane that adds **safety, accountability, observability, and fiscal control** to autonomous agents. 
 
 Most agent frameworks focus on building agents fast. **govAgent** focuses on running them **predictably and safely** under enterprise guardrails, fully aligned with modern regulatory frameworks like the **EU AI Act (Regulation 2024/1689)**.
-
-### 🚀 New in v1.5.0: Pluggable Routing Bus & Swarm Traceability
-
-* **Sovereign Routing Fabric (`PolicyBasedRouter`):** Fully decoupled from hardcoded LLM clients[cite: 5]. The engine now routes requests dynamically to local or cloud models based on configuration criteria and real-time context metadata specified in your YAML policies[cite: 1, 5].
-* **Swarm Trace Inheritance (Article 12 Tracing):** Sub-agents automatically inherit and validate parent session tracking parameters (`parent_trace_id`) across complex async delegation domains, ensuring complete accountability lineages[cite: 2, 5].
-* **Cross-Platform Windows Core:** Integrated strict UTF-8 I/O boundaries across all policy parser streams and log scrapers to guarantee 100% cross-platform parity out of the box.
 
 ---
 
@@ -71,6 +65,29 @@ govAgent decouples its governance evaluation runtime from its user-facing operat
 * **Next.js Web Interface (`src/app/page.tsx`):** A clean, single-page dashboard featuring a **Live Audit Matrix** to watch execution status (`SUCCESS`, `PENDING`, `BLOCKED`), a **Legislative Rules Inspector**, and a live **Forensic Engine Log Stream** that updates via long-polling.
 
 ---
+
+### 🚀 New in v2.0.0: Pluggable Routing Bus & Swarm Traceability
+
+* **Sovereign Routing Fabric (`PolicyBasedRouter`):** Fully decoupled from hardcoded LLM clients[cite: 5]. The engine now routes requests dynamically to local or cloud models based on configuration criteria and real-time context metadata specified in your YAML policies[cite: 1, 5].
+* **Swarm Trace Inheritance (Article 12 Tracing):** Sub-agents automatically inherit and validate parent session tracking parameters (`parent_trace_id`) across complex async delegation domains, ensuring complete accountability lineages[cite: 2, 5].
+* **Cross-Platform Windows Core:** Integrated strict UTF-8 I/O boundaries across all policy parser streams and log scrapers to guarantee 100% cross-platform parity out of the box.
+
+## 🔌 Ecosystem Extensions
+
+### CrewAI Middleware Adapter
+Instantly elevate experimental CrewAI swarms into enterprise-grade production runtimes using our single-line wrapper:
+
+```python
+from crewai import Crew
+from govagent.extensions.crewai import GovAgentEnforcer
+
+crew = Crew(agents=[analyst_agent], tasks=[financial_task])
+
+# Inject out-of-band routing, PII triage filters, and absolute tool gating
+enforced_crew = GovAgentEnforcer(crew, policy_path="policies/enterprise_default.yaml")
+enforced_crew.crew.kickoff()
+
+```
 
 ### ⚡ 60-Second Quickstart: Institutional Sovereignty
 

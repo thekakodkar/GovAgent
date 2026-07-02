@@ -1,6 +1,12 @@
 ## CHANGELOG.md
 
 All notable changes to the **GovAgent** framework are documented in this file. This project adheres to a "Governance-First" versioning strategy, prioritizing human oversight and fiscal accountability.
+## [2.0.0-alpha.1] - 2026-07-02
+### Added
+- Created the non-invasive extensions package boundary layer: `src/govagent/extensions/crewai/`.
+- Developed `GovAgentEnforcer` capitalizing on native CrewAI v1.15+ execution hooks.
+- Implemented out-of-band automated validation checks blocking unregistered tools at execution.
+- Added pyproject.toml extra dependencies for modular installation sizing.
 
 ## [1.5.0] - 2026-07-02
 ### "Federated Routing & Traceability Swarm" Release

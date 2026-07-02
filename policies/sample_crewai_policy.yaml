@@ -1,0 +1,24 @@
+version: "2.0.0"
+metadata:
+  policy_name: "crewai_enterprise_sandbox"
+  organization_id: "org_bizzteq_dev"
+
+governance_rules:
+  # Strict Tool Access Controls
+  authorized_tools:
+    - "approved_market_fetcher"
+    - "search_tool"
+    - "read_local_file"
+
+routing_profiles:
+  # The router evaluates incoming payloads and maps them to these targets
+  default_cloud_runtime: "openai/gpt-4o"
+  default_local_slm: "ollama/llama3.2"
+
+  routing_conditions:
+    - condition_id: "high_risk_data_isolation"
+      trigger_keywords:
+        - "financial_ledger"
+        - "confidential_payroll"
+        - "raw_pii"
+      target_action: "USE_LOCAL_SLM"
