@@ -78,14 +78,19 @@ govAgent decouples its governance evaluation runtime from its user-facing operat
 Instantly elevate experimental CrewAI swarms into enterprise-grade production runtimes using our single-line wrapper:
 
 ```python
-from crewai import Crew
-from govagent.extensions.crewai import GovAgentEnforcer
+from crewai import Crew, Agent, Task
+from govagent.extensions.crewai.enforcer import GovAgentEnforcer
 
+# Setup your native orchestration layer
+analyst_agent = Agent(role="Auditor", goal="Review logs", backstory="Enterprise auditor.", llm="openai/gpt-4o")
+financial_task = Task(description="Analyze confidential_payroll tables.", expected_output="Report", agent=analyst_agent)
 crew = Crew(agents=[analyst_agent], tasks=[financial_task])
 
-# Inject out-of-band routing, PII triage filters, and absolute tool gating
-enforced_crew = GovAgentEnforcer(crew, policy_path="policies/enterprise_default.yaml")
-enforced_crew.crew.kickoff()
+# Inject out-of-band routing, Stage 0-2 filters, and absolute tool gating out-of-band
+enforced_crew = GovAgentEnforcer(crew, policy_path="policies/sample_crewai_policy.yaml")
+
+# Run via standard CrewAI entry points - execution is parsed completely under governance
+analyst_agent.execute_task(financial_task)
 
 ```
 
@@ -240,6 +245,7 @@ In an institutional setting, "State Management" is insufficient; you require Sov
 | **Forensic Audit** | ✅ **Federated Cross-Org Trails** | ❌ Per-run only | ❌ Console Prints |
 | **Policy Calibration** | ✅ **Self-Healing Optimization** | ❌ Hardcoded Boundaries | ❌ Manual Intervention |
 | **Regulatory Status** | ✅ **EU AI Act Regulation Ready** | ❌ Experimental | ❌ Experimental |
+| **Orchestration Wrapper ** | ✅ **Native CrewAI extension** | ❌ Experimental | ❌ Experimental |
 
 > **Strategic Directive:** While traditional frameworks focus heavily on graph-based execution paths or simple task delegation, GovAgent v1.0.0 operates as the Sovereign Governance Infrastructure. It ensures that every action across an autonomous network is centrally legislated, evaluated by isolated quantitative guards, and forensically recorded for cross-enterprise auditing.
 ---
@@ -255,10 +261,12 @@ The repository includes four basic, highly aligned examples designed to showcase
 
 ```python self_healing_demo.py ``` - **Pillar 5 (Self-Healing):** Ingests simulated repeated transaction overruns and triggers the MetaGovernor to propose automated budget changes.
 
+```python crewai_governed_swarm.py ``` - Pillar 6 (Ecosystem Integration): Live multi-agent verification script showcasing CrewAI extension plane running out-of-band model shifting to local llama3.2 and intercepting rogue execution lines.
+
 ### Run any standalone example inside your terminal workspace:
 
 ```bash
-poetry run python examples/basic_demo.py
+poetry run python examples/crewai_governed_swarm.py
 ```
 ---
 
@@ -292,12 +300,22 @@ GovAgent/
 │   │   ├── context.py       # Thread-safe trace inheritance and ledger state
 │   │   ├── registry.py      # Global tool legislation singleton
 │   │   ├── guards.py        # Presidio Privacy, Semantic Vector, and Fiscal filters
-│   │   ├── telemetry.py     # Multi-cloud SOC emitters with DLQ serialization
-│   │   └── llm/             # Environment-agnostic PolicyBasedRouter bus
+│   │   ├── telemetry/       # Centralized Telemetry Management Packages
+│   │   │   └── manager.py   # Core Telemetry & Next.js Hydration Manager
+│   │   ├── llm/             # Environment-agnostic PolicyBasedRouter bus
+│   │   │   ├── base.py      # Abstract LLM Interface Base Definitions
+│   │   │   ├── ollama.py    # Native Ollama / Local SLM Integration Client
+│   │   │   └── router.py    # Declarative YAML Policy-Based Router Matrix
+│   │   └── extensions/      # Ecosystem Adapters & Middleware Plugins
+│   │       └── crewai/      # CrewAI Governance Extension Plane
+│   │           ├── __init__.py
+│   │           ├── enforcer.py   # Production Interceptor Control Engine (Sync/Async)
+│   │           └── compliance.py # Dedicated Stage 0-2 CrewAI Compliance Core
 │   └── app/                 # Next.js Presentation Panel Dashboard Frontend
 ├── examples/                # Standalone Educational Demonstration Scripts
 ├── policies/                # Declarative YAML Operational Manifests
 └── tests/                   # Automated Pytest Validation Matrix Suite
+    └── test_crewai_adapter.py # Extension Verification Unit Tests
 ```
 
 ### Directory Overview
@@ -314,25 +332,27 @@ GovAgent/
 ### Architecture
 
 ```text
-┌─────────────────────┐
-│   Next.js Dashboard │
-└──────────┬──────────┘
-           │
-           ▼
-┌─────────────────────┐
-│   FastAPI Gateway   │
-└──────────┬──────────┘
-           │
-           ▼
-┌─────────────────────┐
-│ govAgent Core Engine│
-└──────────┬──────────┘
-           │
-           ▼
-┌─────────────────────┐
-│ Policy Enforcement  │
-│ & Compliance Layer  │
-└─────────────────────┘
+┌──────────────────────────────────────┐
+│          Next.js Dashboard           │
+└──────────────────┬───────────────────┘
+                   │
+                   ▼
+┌──────────────────────────────────────┐
+│           FastAPI Gateway            │
+└──────────────────┬───────────────────┘
+                   │
+                   ▼
+┌──────────────────────────────────────┐
+│         govAgent Core Engine         │
+│  (Context, Registry, Guards, Shared) │
+└──────────────────┬───────────────────┘
+                   │
+         ┌─────────┴─────────┐
+         ▼                   ▼
+┌─────────────────┐ ┌──────────────────┐
+│ Native Execution│ │Ecosystem Adapters│
+│ & Policy Layers │ │(CrewAI Extension)│
+└─────────────────┘ └──────────────────┘
 ```
 
 ---
@@ -351,6 +371,6 @@ We enforce a strict branching strategy to keep `main` stable:
 
 ---
 ### Author Stamp
-*   **Framework:** GovAgent v1.0.0 (Federated)
+*   **Framework:** GovAgent v2.0.0 
 *   **Compliance:** Designed for Article 9, 12, and 14 Accountability
 *   **Status:** Active / Open-Source Standard
