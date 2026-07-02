@@ -1,4 +1,4 @@
-# govAgent (v2.0.0)
+# govAgent (v2.0.0 beta)
 
 **The Governance-First Control Plane for AI Agents & Swarms**
 
