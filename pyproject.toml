@@ -4,19 +4,20 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "govagent"
-version = "2.0.0"
-description = "The Governance-First Framework for Agentic AI"
+version = "3.0.0"
+description = "The Governance-First Framework for Agentic AI, Enterprise Middleware & OCI Supply Chain Gating"
 authors = ["Niraj Kakodkar <niraj.kakodkar@gmail.com>"]
 readme = "README.md"
 license = "MIT"
 homepage = "https://github.com/thekakodkar/govagent"
 repository = "https://github.com/thekakodkar/govagent"
-keywords = ["ai", "agents", "governance", "roi", "enterprise", "EU-AI-Act"]
+keywords = ["ai", "agents", "governance", "roi", "enterprise", "EU-AI-Act", "IBM-Bob", "watsonx", "Harbor-Registry", "MCP"]
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
-    "Topic :: Scientific/Engineering :: Artificial Intelligence"
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Development Status :: 5 :: Production/Stable"
 ]
 
 # 📦 TOOL LOGISTICS & PACKAGING SPECIFICATION
@@ -24,7 +25,7 @@ packages = [
     { include = "govagent", from = "src" }
 ]
 
-# 🚀 CORE PRODUCTION DEPENDENCIES (Minimal Footprint)
+# 🚀 CORE PRODUCTION DEPENDENCIES (Minimal Sovereign Footprint)
 [tool.poetry.dependencies]
 python = ">=3.10,<3.14"
 pydantic = ">=2.0.0"
@@ -32,28 +33,30 @@ pyyaml = ">=6.0.0"
 httpx = ">=0.25.0"
 slack-sdk = ">=3.0.0"
 python-dotenv = ">=1.0.0"
-presidio-analyzer = ">=2.2.0"      # PII Analysis Engine (Pillar 4 / Article 9 Compliance)
-presidio-anonymizer = ">=2.2.0"    # PII Redaction/Anonymization Engine
-spacy = ">=3.0.0"                  # Required NLP Core Backend for Presidio
-boto3 = ">=1.26.0"                 # AWS Cloud SOC Forensic Telemetry Sink
-azure-monitor-ingestion = ">=1.0.0" # Azure Log Analytics Telemetry Ingestion
-azure-identity = ">=1.12.0"        # Azure Active Directory Identity Validation
-opentelemetry-api = ">=1.15.0"      # OpenTelemetry Framework Core API Standard
+presidio-analyzer = ">=2.2.0"       # PII Analysis Engine (Pillar 4 / Article 9 Compliance)
+presidio-anonymizer = ">=2.2.0"     # PII Redaction/Anonymization Engine
+spacy = ">=3.0.0"                   # Required NLP Core Backend for Presidio
+boto3 = ">=1.26.0"                  # AWS Cloud SOC Forensic Telemetry Sink
+azure-monitor-ingestion = ">=1.0.0"  # Azure Log Analytics Telemetry Ingestion
+azure-identity = ">=1.12.0"         # Azure Active Directory Identity Validation
+opentelemetry-api = ">=1.15.0"       # OpenTelemetry Framework Core API Standard
 
-# 🔌 OPTIONAL DEPENDENCIES (Installs via: pip install "govagent[langchain]" or poetry install --extras "langchain")
+# 🔌 OPTIONAL ENTERPRISE EXTENSIONS (Installs dynamically via poetry extras bundle groups)
 crewai = { version = "^1.15.0", optional = true }
 langchain-core = { version = ">=0.1.0", optional = true }
 langchain-openai = { version = ">=0.1.0", optional = true }
 openai = { version = "*", optional = true }
-sentence-transformers = "^5.6.0"
+sentence-transformers = { version = "^5.6.0", optional = true } # Optional to ensure token-free local embedding modularity
 
 [tool.poetry.extras]
 crewai = ["crewai"]
 langchain = ["langchain-core", "langchain-openai", "openai"]
+enterprise = ["sentence-transformers"] # Bundles local out-of-band vector evaluations for IBM Bob MCP
 
 # 🛠️ MODERN DEVELOPMENT GROUPS: Keeps sandbox & server frameworks separated from cloud builds
 [tool.poetry.group.dev.dependencies]
 pytest = ">=7.0.0"
+pytest-asyncio = ">=0.21.0"          # Required for asynchronous middleware proxy test isolation
 black = ">=23.0.0"
 uvicorn = ">=0.22.0"
 fastapi = ">=0.100.0"
