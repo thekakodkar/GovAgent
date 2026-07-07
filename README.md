@@ -82,6 +82,7 @@ Ideal for:
        │     Stateful Slack Socket Mode Quorum Judiciary        │
        │           (M-of-N Role-Weighted Consensus)             │
        └────────────────────────────────────────────────────────┘
+```       
 ---
 
 ### 📡 Full-Stack Sandbox Architecture
