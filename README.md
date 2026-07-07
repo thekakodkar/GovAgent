@@ -1,3 +1,5 @@
+<img width="2071" height="795" alt="logo" src="https://github.com/user-attachments/assets/7aed634c-34e0-450c-9a7e-ee03ecd26ea5" />
+
 # govAgent (v3.0.2)
 
 **The Governance-First Control Plane for AI Agents & Swarms**
