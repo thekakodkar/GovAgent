@@ -17,7 +17,7 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
-    "Development Status :: 5 :: Production/Stable"
+    "Development Status :: 5 - Production/Stable"  
 ]
 
 # 📦 TOOL LOGISTICS & PACKAGING SPECIFICATION
