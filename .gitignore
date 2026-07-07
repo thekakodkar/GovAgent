@@ -117,4 +117,18 @@ venv.bak/
 
 # 🧠 Cursor AI Feature Boundaries
 .cursorignore
-.cursorindexingignore
+.cursorindexingignorenext-env.d.ts
+.next/
+node_modules/
+*.egg-info/
+dist/
+build/
+__pycache__/
+
+next-env.d.ts
+.next/
+node_modules/
+*.egg-info/
+dist/
+build/
+__pycache__/
