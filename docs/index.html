@@ -11,11 +11,9 @@
 </head>
 <body class="bg-[#000000] text-[#FFFFFF] antialiased selection:bg-[#FFFFFF] selection:text-[#000000]">
 
-    <!-- Navigation -->
     <nav class="sticky top-0 z-50 backdrop-blur-md bg-black/70 border-b border-neutral-900 px-6 py-5">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
             <div class="flex items-center space-x-4">
-                <!-- AMPLIFIED LOGO SIZE: Height boosted from h-8 to h-11 for prominent visual branding -->
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 150" class="h-11 w-auto">
                     <path d="M 10,10 L 130,10 L 130,80 C 130,115 70,140 70,140 C 70,140 10,115 10,80 Z" fill="#FFFFFF" />
                     <line x1="5" y1="85" x2="135" y2="85" stroke="#000000" stroke-width="4" />
@@ -26,6 +24,7 @@
             </div>
             <div class="flex items-center space-x-6 text-sm font-medium tracking-tight">
                 <a href="#features" class="text-neutral-400 hover:text-white transition-colors hidden sm:inline-block">Architecture</a>
+                <a href="#installation" class="text-neutral-400 hover:text-white transition-colors hidden sm:inline-block">Get Started</a>
                 <a href="#distribution" class="text-neutral-400 hover:text-white transition-colors hidden sm:inline-block">Registry</a>
                 <a href="#author" class="text-neutral-400 hover:text-white transition-colors">Provenance</a>
                 <a href="https://github.com/thekakodkar/GovAgent" target="_blank" class="bg-white text-black px-4 py-1.5 rounded-full hover:bg-neutral-200 transition-all font-semibold">GitHub</a>
@@ -33,7 +32,6 @@
         </div>
     </nav>
 
-    <!-- Hero Section -->
     <header class="relative overflow-hidden pt-32 pb-24 border-b border-neutral-900">
         <div class="max-w-5xl mx-auto px-6 text-center">
             <p class="text-sm font-semibold uppercase tracking-[0.4em] text-neutral-500 mb-4">Enterprise-Grade Orchestration</p>
@@ -54,7 +52,6 @@
         </div>
     </header>
 
-    <!-- Core Architecture Section -->
     <section id="features" class="py-24 max-w-7xl mx-auto px-6">
         <div class="text-center mb-20">
             <h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-4">The Governance Pillars</h2>
@@ -76,8 +73,38 @@
         </div>
     </section>
 
-    <!-- Distribution & Package Registry Section -->
-    <section id="distribution" class="py-20 bg-[#050607] border-t border-neutral-900">
+    <section id="installation" class="py-24 bg-[#050607] border-t border-b border-neutral-900">
+        <div class="max-w-5xl mx-auto px-6">
+            <h2 class="text-3xl md:text-4xl font-bold tracking-tight text-center mb-16">Implementation Matrix</h2>
+            
+            <div class="bg-black border border-neutral-800 rounded-2xl overflow-hidden shadow-2xl">
+                <div class="flex items-center space-x-2 px-4 py-3 border-b border-neutral-900 bg-neutral-950/50">
+                    <div class="w-3 h-3 rounded-full bg-neutral-800"></div>
+                    <div class="w-3 h-3 rounded-full bg-neutral-800"></div>
+                    <div class="w-3 h-3 rounded-full bg-neutral-800"></div>
+                    <span class="text-xs text-neutral-500 font-mono pl-4">pip install govagent</span>
+                </div>
+                <div class="p-6 font-mono text-sm leading-relaxed overflow-x-auto text-neutral-300">
+                    <p class="text-neutral-500"># Install the stable core governance framework</p>
+                    <p class="mb-4"><span class="text-neutral-400">$</span> pip install govagent</p>
+                    
+                    <p class="text-neutral-500"># Implement deterministic policy evaluation</p>
+                    <p><span class="text-purple-400">from</span> govagent <span class="text-purple-400">import</span> Governor, AgentWorkflow</p>
+                    <p><span class="text-purple-400">from</span> govagent.policies <span class="text-purple-400">import</span> GuardrailBoundary</p>
+                    <br>
+                    <p><span class="text-neutral-500"># Define enterprise risk control parameters</span></p>
+                    <p>policy = GuardrailBoundary(strict_mode=<span class="text-amber-400">True</span>, data_leak_boundary=<span class="text-amber-400">True</span>)</p>
+                    <p>gov = Governor(policy=policy)</p>
+                    <br>
+                    <p><span class="text-neutral-500"># Secure execution loop</span></p>
+                    <p>workflow = AgentWorkflow().register_governor(gov)</p>
+                    <p>result = workflow.execute(prompt=<span class="text-green-400">"Execute autonomous supply chain matrix update"</span>)</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="distribution" class="py-20 bg-[#000000] border-b border-neutral-900">
         <div class="max-w-5xl mx-auto px-6">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                 <div>
@@ -118,15 +145,12 @@
         </div>
     </section>
 
-    <!-- ENHANCED: Author / Strategic Provenance Section with Global Social Matrix -->
-    <section id="author" class="py-24 border-t border-neutral-900 bg-[#020203]">
+    <section id="author" class="py-24 bg-[#020203]">
         <div class="max-w-4xl mx-auto px-6 text-center">
             
-            <!-- Architect Avatar Box -->
             <div class="mb-8 flex justify-center">
                 <div class="relative group">
                     <div class="absolute -inset-0.5 bg-gradient-to-r from-neutral-800 to-white rounded-full opacity-30 blur group-hover:opacity-50 transition duration-300"></div>
-                    <!-- Linked Avatar with GitHub Fallback profile image resolution -->
                     <img class="relative w-24 h-24 rounded-full object-cover border-2 border-neutral-800" 
                          src="https://github.com/thekakodkar.png" 
                          alt="Niraj Kakodkar"
@@ -143,7 +167,6 @@
                 Designed explicitly to bridge the gap between autonomous technical execution and corporate risk management, the framework applies architectural rigor to the world of open-source Small Language Models (SLMs) and agent orchestration.
             </p>
             
-            <!-- Strategic Platform Footprint Matrix -->
             <div class="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 max-w-xl mx-auto">
                 <a href="https://www.linkedin.com/in/thekakodkar" target="_blank" class="w-full sm:w-auto text-xs font-semibold uppercase tracking-wider bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 text-white px-6 py-3 rounded-full transition-all">
                     Connect on LinkedIn
@@ -158,7 +181,6 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="py-16 max-w-7xl mx-auto px-6 text-center text-neutral-500 text-sm border-t border-neutral-950">
         <p class="mb-2 font-medium tracking-wide">&copy; 2026 govagent architecture. All rights reserved.</p>
         <p class="font-light text-neutral-600">Engineered for deterministic execution boundaries and high-status compliance ecosystems.</p>
