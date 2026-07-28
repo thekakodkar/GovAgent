@@ -85,6 +85,7 @@
                     <span class="text-xs text-neutral-500 font-mono pl-4">pip install govagent</span>
                 </div>
                 <div class="p-6 font-mono text-sm leading-relaxed overflow-x-auto text-neutral-300">
+<<<<<<< HEAD
                     <p class="text-neutral-500"># Install the core governance control plane</p>
                     <p class="mb-4"><span class="text-neutral-400">$</span> pip install govagent</p>
                     
@@ -112,6 +113,22 @@
                     <br>
                     <p><span class="text-purple-400">if</span> __name__ == <span class="text-green-400">"__main__"</span>:</p>
                     <p class="pl-4">asyncio.run(main())</p>
+=======
+                    <p class="text-neutral-500"># Install the stable core governance framework</p>
+                    <p class="mb-4"><span class="text-neutral-400">$</span> pip install govagent</p>
+                    
+                    <p class="text-neutral-500"># Implement deterministic policy evaluation</p>
+                    <p><span class="text-purple-400">from</span> govagent <span class="text-purple-400">import</span> Governor, AgentWorkflow</p>
+                    <p><span class="text-purple-400">from</span> govagent.policies <span class="text-purple-400">import</span> GuardrailBoundary</p>
+                    <br>
+                    <p><span class="text-neutral-500"># Define enterprise risk control parameters</span></p>
+                    <p>policy = GuardrailBoundary(strict_mode=<span class="text-amber-400">True</span>, data_leak_boundary=<span class="text-amber-400">True</span>)</p>
+                    <p>gov = Governor(policy=policy)</p>
+                    <br>
+                    <p><span class="text-neutral-500"># Secure execution loop</span></p>
+                    <p>workflow = AgentWorkflow().register_governor(gov)</p>
+                    <p>result = workflow.execute(prompt=<span class="text-green-400">"Execute autonomous supply chain matrix update"</span>)</p>
+>>>>>>> 9665645f40ecff87139e32a86cbd45997fbddaa9
                 </div>
             </div>
         </div>
@@ -127,7 +144,11 @@
                     </p>
                     <div class="flex space-x-8 border-t border-neutral-900 pt-6">
                         <div>
+<<<<<<< HEAD
                             <div class="text-2xl font-bold tracking-tight text-white">v3.0.2</div>
+=======
+                            <div class="text-2xl font-bold tracking-tight text-white">v3.0.0</div>
+>>>>>>> 9665645f40ecff87139e32a86cbd45997fbddaa9
                             <div class="text-xs uppercase tracking-widest text-neutral-500 mt-1">Stable Release</div>
                         </div>
                         <div>
@@ -151,7 +172,11 @@
                         <span class="text-neutral-200">Local SLMs / Enterprise Clusters</span>
                     </div>
                     <div class="bg-neutral-950 p-4 rounded-xl border border-neutral-900 text-neutral-300 text-sm">
+<<<<<<< HEAD
                         <span class="text-neutral-600">$</span> pip install govagent==1.0.0
+=======
+                        <span class="text-neutral-600">$</span> pip install govagent==3.0.0
+>>>>>>> 9665645f40ecff87139e32a86cbd45997fbddaa9
                     </div>
                 </div>
             </div>
@@ -200,4 +225,8 @@
     </footer>
 
 </body>
+<<<<<<< HEAD
 </html>
+=======
+</html>
+>>>>>>> 9665645f40ecff87139e32a86cbd45997fbddaa9
