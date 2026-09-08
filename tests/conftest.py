@@ -2,6 +2,15 @@ import pytest
 from govagent.policy import Policy
 from govagent.context import reset_fiscal_ledger
 
+import os
+
+# Disable CrewAI telemetry to prevent network hang and timeouts
+os.environ["CREWAI_TELEMETRY_OPT_OUT"] = "true"
+os.environ["OTEL_SDK_DISABLED"] = "true"
+
+from govagent.policy import Policy
+# ... keep the rest of your conftest fixtures
+
 @pytest.fixture(autouse=True)
 def clean_institutional_state():
     """Automatically resets the ledger before every test to prevent spend leakage."""
