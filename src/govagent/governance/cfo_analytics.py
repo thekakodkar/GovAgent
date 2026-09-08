@@ -1,9 +1,7 @@
 # src/govagent/governance/cfo_analytics.py
-
-import json
-from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any
 from pydantic import BaseModel, Field
+import datetime
 
 
 class CostCenterAllocation(BaseModel):
@@ -20,68 +18,72 @@ class CFORiskReport(BaseModel):
     burn_rate_anomaly_detected: bool = False
     average_cost_per_work_unit: float = 0.0
     allocations_by_center: Dict[str, CostCenterAllocation] = Field(default_factory=dict)
+    generated_at: str = Field(default_factory=lambda: datetime.datetime.now(datetime.timezone.utc).isoformat())
 
 
 class CFOAnalyticsEngine:
-    """Calculates ROI metrics, capital risk exposure, and ledger allocations."""
+    def __init__(self):
+        self.snapshots: List[Any] = []
+        self.allocations: Dict[str, CostCenterAllocation] = {}
 
-    def __init__(
-        self,
-        high_burn_threshold_per_run: float = 0.50,
-        buffer_path: Optional[str] = None,
-    ):
-        self.burn_threshold = high_burn_threshold_per_run
-        if buffer_path:
-            self.buffer_path = Path(buffer_path)
-        else:
-            project_root = Path(__file__).resolve().parent.parent.parent.parent
-            self.buffer_path = project_root / "logs" / "audit_buffer.jsonl"
+    def record_execution(self, snapshot: Any) -> None:
+        """Primary ingestion entrypoint for execution snapshots."""
+        self.snapshots.append(snapshot)
+        self._aggregate_snapshot(snapshot)
 
-    def load_buffer_records(self) -> List[Dict[str, Any]]:
-        records = []
-        if self.buffer_path.exists():
-            with open(self.buffer_path, "r", encoding="utf-8") as f:
-                for line in f:
-                    line_str = line.strip()
-                    if line_str:
-                        records.append(json.loads(line_str))
-        return records
+    def record_snapshot(self, snapshot: Any) -> None:
+        """Alias for backward compatibility."""
+        self.record_execution(snapshot)
 
-    def analyze(self, ledger_records: Optional[List[Dict[str, Any]]] = None) -> CFORiskReport:
-        if ledger_records is None:
-            ledger_records = self.load_buffer_records()
+    def record_transaction(self, snapshot: Any) -> None:
+        """Alias for backward compatibility."""
+        self.record_execution(snapshot)
 
-        report = CFORiskReport()
-        total_units = len(ledger_records)
+    def _aggregate_snapshot(self, snapshot: Any) -> None:
+        cost_center = getattr(snapshot, "cost_center", "CC-GENAI-DEFAULT")
+        gl_account = getattr(snapshot, "gl_account", "GL-640100-SOFTWARE")
+        spend = float(getattr(snapshot, "recursive_tco_usd", 0.0) or 0.0)
+        tokens = int(getattr(snapshot, "total_tokens", 0) or 0)
 
-        for tx in ledger_records:
-            spend = float(tx.get("recursive_tco_usd", 0.0))
-            report.total_realized_spend_usd += spend
+        # Dynamically register Cost Centers derived from policy YAMLs
+        if cost_center not in self.allocations:
+            self.allocations[cost_center] = CostCenterAllocation(
+                cost_center_id=cost_center,
+                gl_account=gl_account,
+                allocated_spend_usd=0.0,
+                transaction_count=0,
+                token_usage_total=0
+            )
 
-            if spend > self.burn_threshold:
-                report.burn_rate_anomaly_detected = True
+        alloc = self.allocations[cost_center]
+        alloc.allocated_spend_usd += spend
+        alloc.transaction_count += 1
+        alloc.token_usage_total += tokens
 
-            # Track financial exposure prevented by Stage 2 or human judiciary
-            if tx.get("status") in ["BLOCKED", "VETOED"]:
-                potential_exposure = float(tx.get("requested_exposure_usd", 0.0))
-                report.value_at_risk_prevented_usd += potential_exposure
+    def analyze(self) -> CFORiskReport:
+        """Aggregates Value-at-Risk, total spend, and P&L allocations across dynamic centers."""
+        total_realized_spend = sum(a.allocated_spend_usd for a in self.allocations.values())
+        total_tx = sum(a.transaction_count for a in self.allocations.values())
+        avg_unit_cost = (total_realized_spend / total_tx) if total_tx > 0 else 0.00000
 
-            # Financial Allocation to Enterprise Cost Centers
-            cc_id = tx.get("cost_center") or "CC-GENAI-DEFAULT"
-            gl = tx.get("gl_account") or "GL-640100-SOFTWARE"
+        prevented_risk = 0.0
+        burn_anomaly = False
 
-            if cc_id not in report.allocations_by_center:
-                report.allocations_by_center[cc_id] = CostCenterAllocation(
-                    cost_center_id=cc_id,
-                    gl_account=gl,
-                )
+        for snap in self.snapshots:
+            status = getattr(snap, "status", "")
+            exposure = float(getattr(snap, "requested_exposure_usd", 0.0) or 0.0)
+            spend = float(getattr(snap, "recursive_tco_usd", 0.0) or 0.0)
 
-            alloc = report.allocations_by_center[cc_id]
-            alloc.allocated_spend_usd += spend
-            alloc.transaction_count += 1
-            alloc.token_usage_total += int(tx.get("total_tokens", 0))
+            if status in ["BLOCKED", "PENDING"]:
+                prevented_risk += exposure
 
-        if total_units > 0:
-            report.average_cost_per_work_unit = report.total_realized_spend_usd / total_units
+            if spend > 0.50:
+                burn_anomaly = True
 
-        return report
+        return CFORiskReport(
+            total_realized_spend_usd=total_realized_spend,
+            value_at_risk_prevented_usd=prevented_risk,
+            burn_rate_anomaly_detected=burn_anomaly,
+            average_cost_per_work_unit=avg_unit_cost,
+            allocations_by_center=self.allocations
+        )

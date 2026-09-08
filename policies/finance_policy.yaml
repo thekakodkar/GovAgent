@@ -15,6 +15,12 @@ infrastructure:
       expected_value: "high"
       target_provider: "cloud_openai"
 
+financial_accounting:
+  cost_center_id: "CC-FINANCE-CORP"
+  gl_account_nominal: "GL-640200-FINOPS"
+  gl_account_capex: "GL-640100-CAPEX"
+  gl_account_security: "GL-640100-OPS"
+
 # --- PILLAR 1: LEGISLATIVE SCOPE ---
 # These must match the @tool decorators in your Python registry
 registry_alignment:
