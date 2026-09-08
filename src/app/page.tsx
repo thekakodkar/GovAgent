@@ -1,4 +1,20 @@
 // src/app/page.tsx (Update the interface definition and Live Audit Matrix rendering section)
+import CFOExecutivePanel from "./components/CFOExecutivePanel";
+
+export default function Home() {
+  return (
+    <main className="min-h-screen bg-slate-950 text-slate-100 p-6 space-y-8">
+      {/* Existing Header & Live Audit Matrix */}
+      
+      {/* Phase 1 Commercial Core CFO Panel */}
+      <section className="bg-slate-950/40 border border-slate-800/80 rounded-2xl p-6 shadow-2xl">
+        <CFOExecutivePanel />
+      </section>
+
+      {/* Existing Legislative Rules Inspector & Forensic Engine Stream */}
+    </main>
+  );
+}
 
 interface Message {
   role: "user" | "assistant";
